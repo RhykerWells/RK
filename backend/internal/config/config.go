@@ -14,6 +14,7 @@ type ServerConfig struct {
 type DatabaseConfig struct {
 	Host     string `env:"RK_DB_HOST" default:"localhost"`
 	Port     int 	`env:"RK_DB_PORT" default:"5432"`
+	Name	 string `env:"RK_DB_NAME" default:"postgres"`
 	User     string `env:"RK_DB_USER" default:"postgres"`
 	Password string `env:"RK_DB_PASSWORD" default:"postgres"`
 }
