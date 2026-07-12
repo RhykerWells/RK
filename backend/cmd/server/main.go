@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/RhykerWells/RK/backend/internal/config"
+	"github.com/RhykerWells/RK/backend/internal/database"
 	"github.com/RhykerWells/RK/backend/internal/log"
 )
 
@@ -14,5 +15,6 @@ func main() {
 		"Starting Records Keeper",
 	)
 
-	config.Load()
+	cfg := config.Load()
+	database.Connect(cfg)
 }
