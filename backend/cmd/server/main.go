@@ -2,15 +2,14 @@ package main
 
 import (
 	"log/slog"
-	"os"
 
 	"github.com/RhykerWells/RK/backend/internal/logger"
 )
 
 func main() {
-	log := logger.New(os.Stdout, slog.LevelInfo)
+	logger.Init(slog.LevelInfo)
 
-	log.Info(
+	logger.Info(
 		"Starting Records Keeper",
 	)
 }

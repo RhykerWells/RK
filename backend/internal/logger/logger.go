@@ -5,22 +5,67 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 )
 
 type Handler struct {
 	slog.Handler
 }
 
+var (
+	log  *slog.Logger
+	once sync.Once
+)
+
+// Init initializes the global logger.
+// It should only be called once, typically from main().
+func Init(level slog.Leveler) {
+	once.Do(func() {
+		log = New(os.Stdout, level)
+	})
+}
+
+// Logger returns the global logger.
+func Logger() *slog.Logger {
+	if log == nil {
+		panic("logger.Init() has not been called")
+	}
+
+	return log
+}
+
+// Convenience wrappers.
+
+func Debug(msg string, args ...any) {
+	Logger().Debug(msg, args...)
+}
+
+func Info(msg string, args ...any) {
+	Logger().Info(msg, args...)
+}
+
+func Warn(msg string, args ...any) {
+	Logger().Warn(msg, args...)
+}
+
+func Error(msg string, args ...any) {
+	Logger().Error(msg, args...)
+}
+
+// With returns a child logger with additional attributes.
+func With(args ...any) *slog.Logger {
+	return Logger().With(args...)
+}
+
 func New(w io.Writer, level slog.Leveler) *slog.Logger {
 	base := slog.NewTextHandler(w, &slog.HandlerOptions{
 		Level: level,
-
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-			switch a.Key {
-			case slog.TimeKey:
+			if a.Key == slog.TimeKey {
 				return slog.String(
 					"time",
 					a.Value.Time().Format("02/01/2006 @ 15:04"),
@@ -68,24 +113,20 @@ func getCaller() string {
 		}
 
 		fn := runtime.FuncForPC(pc)
-
 		if fn == nil {
 			continue
 		}
 
 		name := fn.Name()
 
-		// Ignore logger internals
 		if strings.Contains(name, "/internal/logger") ||
 			strings.Contains(name, "log/slog") {
 			continue
 		}
 
-		name = shortenFunction(name)
-
 		return fmt.Sprintf(
 			"%s:%s:%d",
-			name,
+			shortenFunction(name),
 			filepath.Base(file),
 			line,
 		)
@@ -97,7 +138,5 @@ func getCaller() string {
 func shortenFunction(name string) string {
 	const prefix = "github.com/RhykerWells/RK/backend/internal/"
 
-	name = strings.TrimPrefix(name, prefix)
-
-	return name
+	return strings.TrimPrefix(name, prefix)
 }
