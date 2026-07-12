@@ -4,13 +4,13 @@ import (
 	"log/slog"
 
 	"github.com/RhykerWells/RK/backend/internal/config"
-	"github.com/RhykerWells/RK/backend/internal/logger"
+	"github.com/RhykerWells/RK/backend/internal/log"
 )
 
 func main() {
-	logger.Init(slog.LevelInfo)
+	log.Init(slog.LevelInfo)
 
-	logger.Info(
+	log.Logger().Info(
 		"Starting Records Keeper",
 	)
 
