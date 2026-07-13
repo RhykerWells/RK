@@ -23,7 +23,7 @@ func Connect() error {
 	)
 
 	var err error
-	DB, err = sql.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Database.Host, config.Database.Port, config.Database.User, config.Database.Password, config.Database.Name))
+	DB, err = sql.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.AppConfig.Database.Host, config.AppConfig.Database.Port, config.AppConfig.Database.User, config.AppConfig.Database.Password, config.AppConfig.Database.Name))
 	if err != nil {
 		log.Error(
 			"Failed to create database handle",
@@ -39,10 +39,10 @@ func Connect() error {
 				"database",
 				fmt.Sprintf(
 					"%s@%s:%d/%s",
-					config.Database.User,
-					config.Database.Host,
-					config.Database.Port,
-					config.Database.Name,
+					config.AppConfig.Database.User,
+					config.AppConfig.Database.Host,
+					config.AppConfig.Database.Port,
+					config.AppConfig.Database.Name,
 				),
 			),
 			slog.Any("error", err),
@@ -56,7 +56,7 @@ func Connect() error {
 		"Database connected successfully",
 	)
 
-	initSchemas(log)
+	initSchemas()
 
 	return nil
 }

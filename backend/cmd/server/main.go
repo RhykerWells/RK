@@ -18,6 +18,6 @@ func main() {
 		fmt.Sprintf("Starting Records Keeper V%s", Version),
 	)
 
-	cfg := config.Load()
-	database.Connect(cfg)
+	config.Load()
+	database.Connect()
 }

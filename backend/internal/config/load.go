@@ -9,6 +9,7 @@ import (
 	"github.com/sethvargo/go-envconfig"
 )
 
+var AppConfig *Config
 var log *slog.Logger
 
 func Load() *Config {
@@ -28,6 +29,8 @@ func Load() *Config {
 		)
 		os.Exit(1)
 	}
+
+	AppConfig = &cfg
 
 	log.Info(
 		"Configuration loaded successfully",
