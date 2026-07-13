@@ -6,15 +6,15 @@ import (
 
 	"github.com/RhykerWells/RK/backend/internal/config"
 	"github.com/RhykerWells/RK/backend/internal/database"
-	"github.com/RhykerWells/RK/backend/internal/log"
+	"github.com/RhykerWells/RK/backend/internal/logger"
 )
 
 var Version = "0.0.0"
 
 func main() {
-	log.Init(slog.LevelInfo)
+	logger.Init(slog.LevelInfo)
 
-	log.Logger().Info(
+	logger.Logger().Info(
 		fmt.Sprintf("Starting Records Keeper V%s", Version),
 	)
 
