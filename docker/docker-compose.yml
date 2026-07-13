@@ -1,0 +1,24 @@
+name: rk-production
+
+volumes:
+  db:
+
+networks:
+  default:
+
+services:
+  rk-postgres-db:
+    container_name: rk-postgres-db
+    image: postgres:16
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - default
+    env_file:
+      - db.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
