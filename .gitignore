@@ -5,3 +5,5 @@ docs/
 !example.*.env
 
 *.sh
+
+backend/cmd/server/server
