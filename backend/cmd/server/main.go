@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 
 	"github.com/RhykerWells/RK/backend/internal/config"
@@ -8,11 +9,13 @@ import (
 	"github.com/RhykerWells/RK/backend/internal/log"
 )
 
+var Version = "0.0.0"
+
 func main() {
 	log.Init(slog.LevelInfo)
 
 	log.Logger().Info(
-		"Starting Records Keeper",
+		fmt.Sprintf("Starting Records Keeper V%s", Version),
 	)
 
 	cfg := config.Load()
