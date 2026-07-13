@@ -9,7 +9,6 @@ import (
 	"github.com/sethvargo/go-envconfig"
 )
 
-
 func Load() *Config {
 	var log = log.With("m", "config")
 

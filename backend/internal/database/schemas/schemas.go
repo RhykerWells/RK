@@ -6,11 +6,11 @@ type Schema struct {
 }
 
 func AllSchemas() [][]Schema {
-    return [][]Schema{
-        AuthSchemas(),
-        PortalSchemas(),
-        DocumentSchemas(),
-        FileSchemas(),
-        PermissionSchemas(),
-    }
+	return [][]Schema{
+		AuthSchemas(),
+		PortalSchemas(),
+		DocumentSchemas(),
+		FileSchemas(),
+		PermissionSchemas(),
+	}
 }
