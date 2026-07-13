@@ -21,4 +21,5 @@ require (
 	github.com/aarondl/inflect v0.0.2 // indirect
 	github.com/aarondl/strmangle v0.0.9
 	github.com/lib/pq v1.12.3
+	goji.io/v3 v3.0.0
 )

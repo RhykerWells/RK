@@ -7,6 +7,7 @@ import (
 	"github.com/RhykerWells/RK/backend/internal/config"
 	"github.com/RhykerWells/RK/backend/internal/database"
 	"github.com/RhykerWells/RK/backend/internal/logger"
+	"github.com/RhykerWells/RK/backend/internal/server"
 )
 
 var Version = "0.0.0"
@@ -20,4 +21,5 @@ func main() {
 
 	config.Load()
 	database.Connect()
+	server.Start()
 }
