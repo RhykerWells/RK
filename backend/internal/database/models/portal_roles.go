@@ -101,26 +101,32 @@ var PortalRoleWhere = struct {
 
 // PortalRoleRels is where relationship names are stored.
 var PortalRoleRels = struct {
-	CreatedByUser     string
-	Portal            string
-	UpdatedByUser     string
-	FolderPermissions string
-	PortalMemberships string
+	CreatedByUser               string
+	Portal                      string
+	UpdatedByUser               string
+	DocumentPermissionOverrides string
+	FolderPermissionOverrides   string
+	PortalMemberships           string
+	PortalRolePermissions       string
 }{
-	CreatedByUser:     "CreatedByUser",
-	Portal:            "Portal",
-	UpdatedByUser:     "UpdatedByUser",
-	FolderPermissions: "FolderPermissions",
-	PortalMemberships: "PortalMemberships",
+	CreatedByUser:               "CreatedByUser",
+	Portal:                      "Portal",
+	UpdatedByUser:               "UpdatedByUser",
+	DocumentPermissionOverrides: "DocumentPermissionOverrides",
+	FolderPermissionOverrides:   "FolderPermissionOverrides",
+	PortalMemberships:           "PortalMemberships",
+	PortalRolePermissions:       "PortalRolePermissions",
 }
 
 // portalRoleR is where relationships are stored.
 type portalRoleR struct {
-	CreatedByUser     *User                 `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
-	Portal            *Portal               `boil:"Portal" json:"Portal" toml:"Portal" yaml:"Portal"`
-	UpdatedByUser     *User                 `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
-	FolderPermissions FolderPermissionSlice `boil:"FolderPermissions" json:"FolderPermissions" toml:"FolderPermissions" yaml:"FolderPermissions"`
-	PortalMemberships PortalMembershipSlice `boil:"PortalMemberships" json:"PortalMemberships" toml:"PortalMemberships" yaml:"PortalMemberships"`
+	CreatedByUser               *User                           `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
+	Portal                      *Portal                         `boil:"Portal" json:"Portal" toml:"Portal" yaml:"Portal"`
+	UpdatedByUser               *User                           `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
+	DocumentPermissionOverrides DocumentPermissionOverrideSlice `boil:"DocumentPermissionOverrides" json:"DocumentPermissionOverrides" toml:"DocumentPermissionOverrides" yaml:"DocumentPermissionOverrides"`
+	FolderPermissionOverrides   FolderPermissionOverrideSlice   `boil:"FolderPermissionOverrides" json:"FolderPermissionOverrides" toml:"FolderPermissionOverrides" yaml:"FolderPermissionOverrides"`
+	PortalMemberships           PortalMembershipSlice           `boil:"PortalMemberships" json:"PortalMemberships" toml:"PortalMemberships" yaml:"PortalMemberships"`
+	PortalRolePermissions       PortalRolePermissionSlice       `boil:"PortalRolePermissions" json:"PortalRolePermissions" toml:"PortalRolePermissions" yaml:"PortalRolePermissions"`
 }
 
 // NewStruct creates a new relationship struct
@@ -176,20 +182,36 @@ func (r *portalRoleR) GetUpdatedByUser() *User {
 	return r.UpdatedByUser
 }
 
-func (o *PortalRole) GetFolderPermissions() FolderPermissionSlice {
+func (o *PortalRole) GetDocumentPermissionOverrides() DocumentPermissionOverrideSlice {
 	if o == nil {
 		return nil
 	}
 
-	return o.R.GetFolderPermissions()
+	return o.R.GetDocumentPermissionOverrides()
 }
 
-func (r *portalRoleR) GetFolderPermissions() FolderPermissionSlice {
+func (r *portalRoleR) GetDocumentPermissionOverrides() DocumentPermissionOverrideSlice {
 	if r == nil {
 		return nil
 	}
 
-	return r.FolderPermissions
+	return r.DocumentPermissionOverrides
+}
+
+func (o *PortalRole) GetFolderPermissionOverrides() FolderPermissionOverrideSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetFolderPermissionOverrides()
+}
+
+func (r *portalRoleR) GetFolderPermissionOverrides() FolderPermissionOverrideSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.FolderPermissionOverrides
 }
 
 func (o *PortalRole) GetPortalMemberships() PortalMembershipSlice {
@@ -206,6 +228,22 @@ func (r *portalRoleR) GetPortalMemberships() PortalMembershipSlice {
 	}
 
 	return r.PortalMemberships
+}
+
+func (o *PortalRole) GetPortalRolePermissions() PortalRolePermissionSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetPortalRolePermissions()
+}
+
+func (r *portalRoleR) GetPortalRolePermissions() PortalRolePermissionSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.PortalRolePermissions
 }
 
 // portalRoleL is where Load methods for each relationship are stored.
@@ -343,18 +381,32 @@ func (o *PortalRole) UpdatedByUser(mods ...qm.QueryMod) userQuery {
 	return Users(queryMods...)
 }
 
-// FolderPermissions retrieves all the folder_permission's FolderPermissions with an executor.
-func (o *PortalRole) FolderPermissions(mods ...qm.QueryMod) folderPermissionQuery {
+// DocumentPermissionOverrides retrieves all the document_permission_override's DocumentPermissionOverrides with an executor.
+func (o *PortalRole) DocumentPermissionOverrides(mods ...qm.QueryMod) documentPermissionOverrideQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"folder_permissions\".\"portal_role_id\"=?", o.ID),
+		qm.Where("\"document_permission_overrides\".\"portal_role_id\"=?", o.ID),
 	)
 
-	return FolderPermissions(queryMods...)
+	return DocumentPermissionOverrides(queryMods...)
+}
+
+// FolderPermissionOverrides retrieves all the folder_permission_override's FolderPermissionOverrides with an executor.
+func (o *PortalRole) FolderPermissionOverrides(mods ...qm.QueryMod) folderPermissionOverrideQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"folder_permission_overrides\".\"portal_role_id\"=?", o.ID),
+	)
+
+	return FolderPermissionOverrides(queryMods...)
 }
 
 // PortalMemberships retrieves all the portal_membership's PortalMemberships with an executor.
@@ -369,6 +421,20 @@ func (o *PortalRole) PortalMemberships(mods ...qm.QueryMod) portalMembershipQuer
 	)
 
 	return PortalMemberships(queryMods...)
+}
+
+// PortalRolePermissions retrieves all the portal_role_permission's PortalRolePermissions with an executor.
+func (o *PortalRole) PortalRolePermissions(mods ...qm.QueryMod) portalRolePermissionQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"portal_role_permissions\".\"portal_role_id\"=?", o.ID),
+	)
+
+	return PortalRolePermissions(queryMods...)
 }
 
 // LoadCreatedByUser allows an eager lookup of values, cached into the
@@ -711,9 +777,9 @@ func (portalRoleL) LoadUpdatedByUser(ctx context.Context, e boil.ContextExecutor
 	return nil
 }
 
-// LoadFolderPermissions allows an eager lookup of values, cached into the
+// LoadDocumentPermissionOverrides allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (portalRoleL) LoadFolderPermissions(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortalRole any, mods queries.Applicator) error {
+func (portalRoleL) LoadDocumentPermissionOverrides(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortalRole any, mods queries.Applicator) error {
 	var slice []*PortalRole
 	var object *PortalRole
 
@@ -766,8 +832,8 @@ func (portalRoleL) LoadFolderPermissions(ctx context.Context, e boil.ContextExec
 	}
 
 	query := NewQuery(
-		qm.From(`folder_permissions`),
-		qm.WhereIn(`folder_permissions.portal_role_id in ?`, argsSlice...),
+		qm.From(`document_permission_overrides`),
+		qm.WhereIn(`document_permission_overrides.portal_role_id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -775,26 +841,26 @@ func (portalRoleL) LoadFolderPermissions(ctx context.Context, e boil.ContextExec
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load folder_permissions")
+		return errors.Wrap(err, "failed to eager load document_permission_overrides")
 	}
 
-	var resultSlice []*FolderPermission
+	var resultSlice []*DocumentPermissionOverride
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice folder_permissions")
+		return errors.Wrap(err, "failed to bind eager loaded slice document_permission_overrides")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on folder_permissions")
+		return errors.Wrap(err, "failed to close results in eager load on document_permission_overrides")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for folder_permissions")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for document_permission_overrides")
 	}
 
 	if singular {
-		object.R.FolderPermissions = resultSlice
+		object.R.DocumentPermissionOverrides = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &folderPermissionR{}
+				foreign.R = &documentPermissionOverrideR{}
 			}
 			foreign.R.PortalRole = object
 		}
@@ -804,9 +870,115 @@ func (portalRoleL) LoadFolderPermissions(ctx context.Context, e boil.ContextExec
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
 			if queries.Equal(local.ID, foreign.PortalRoleID) {
-				local.R.FolderPermissions = append(local.R.FolderPermissions, foreign)
+				local.R.DocumentPermissionOverrides = append(local.R.DocumentPermissionOverrides, foreign)
 				if foreign.R == nil {
-					foreign.R = &folderPermissionR{}
+					foreign.R = &documentPermissionOverrideR{}
+				}
+				foreign.R.PortalRole = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadFolderPermissionOverrides allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (portalRoleL) LoadFolderPermissionOverrides(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortalRole any, mods queries.Applicator) error {
+	var slice []*PortalRole
+	var object *PortalRole
+
+	if singular {
+		var ok bool
+		object, ok = maybePortalRole.(*PortalRole)
+		if !ok {
+			object = new(PortalRole)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybePortalRole)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybePortalRole))
+			}
+		}
+	} else {
+		s, ok := maybePortalRole.(*[]*PortalRole)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybePortalRole)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybePortalRole))
+			}
+		}
+	}
+
+	args := make(map[any]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &portalRoleR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &portalRoleR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]any, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`folder_permission_overrides`),
+		qm.WhereIn(`folder_permission_overrides.portal_role_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load folder_permission_overrides")
+	}
+
+	var resultSlice []*FolderPermissionOverride
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice folder_permission_overrides")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on folder_permission_overrides")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for folder_permission_overrides")
+	}
+
+	if singular {
+		object.R.FolderPermissionOverrides = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &folderPermissionOverrideR{}
+			}
+			foreign.R.PortalRole = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.PortalRoleID) {
+				local.R.FolderPermissionOverrides = append(local.R.FolderPermissionOverrides, foreign)
+				if foreign.R == nil {
+					foreign.R = &folderPermissionOverrideR{}
 				}
 				foreign.R.PortalRole = local
 				break
@@ -913,6 +1085,112 @@ func (portalRoleL) LoadPortalMemberships(ctx context.Context, e boil.ContextExec
 				local.R.PortalMemberships = append(local.R.PortalMemberships, foreign)
 				if foreign.R == nil {
 					foreign.R = &portalMembershipR{}
+				}
+				foreign.R.PortalRole = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadPortalRolePermissions allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (portalRoleL) LoadPortalRolePermissions(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortalRole any, mods queries.Applicator) error {
+	var slice []*PortalRole
+	var object *PortalRole
+
+	if singular {
+		var ok bool
+		object, ok = maybePortalRole.(*PortalRole)
+		if !ok {
+			object = new(PortalRole)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybePortalRole)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybePortalRole))
+			}
+		}
+	} else {
+		s, ok := maybePortalRole.(*[]*PortalRole)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybePortalRole)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybePortalRole))
+			}
+		}
+	}
+
+	args := make(map[any]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &portalRoleR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &portalRoleR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]any, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`portal_role_permissions`),
+		qm.WhereIn(`portal_role_permissions.portal_role_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load portal_role_permissions")
+	}
+
+	var resultSlice []*PortalRolePermission
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice portal_role_permissions")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on portal_role_permissions")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for portal_role_permissions")
+	}
+
+	if singular {
+		object.R.PortalRolePermissions = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &portalRolePermissionR{}
+			}
+			foreign.R.PortalRole = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.PortalRoleID {
+				local.R.PortalRolePermissions = append(local.R.PortalRolePermissions, foreign)
+				if foreign.R == nil {
+					foreign.R = &portalRolePermissionR{}
 				}
 				foreign.R.PortalRole = local
 				break
@@ -1097,11 +1375,11 @@ func (o *PortalRole) RemoveUpdatedByUser(ctx context.Context, exec boil.ContextE
 	return nil
 }
 
-// AddFolderPermissions adds the given related objects to the existing relationships
+// AddDocumentPermissionOverrides adds the given related objects to the existing relationships
 // of the portal_role, optionally inserting them as new records.
-// Appends related to o.R.FolderPermissions.
+// Appends related to o.R.DocumentPermissionOverrides.
 // Sets related.R.PortalRole appropriately.
-func (o *PortalRole) AddFolderPermissions(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*FolderPermission) error {
+func (o *PortalRole) AddDocumentPermissionOverrides(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*DocumentPermissionOverride) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -1111,9 +1389,9 @@ func (o *PortalRole) AddFolderPermissions(ctx context.Context, exec boil.Context
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"folder_permissions\" SET %s WHERE %s",
+				"UPDATE \"document_permission_overrides\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"portal_role_id"}),
-				strmangle.WhereClause("\"", "\"", 2, folderPermissionPrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, documentPermissionOverridePrimaryKeyColumns),
 			)
 			values := []any{o.ID, rel.ID}
 
@@ -1132,15 +1410,15 @@ func (o *PortalRole) AddFolderPermissions(ctx context.Context, exec boil.Context
 
 	if o.R == nil {
 		o.R = &portalRoleR{
-			FolderPermissions: related,
+			DocumentPermissionOverrides: related,
 		}
 	} else {
-		o.R.FolderPermissions = append(o.R.FolderPermissions, related...)
+		o.R.DocumentPermissionOverrides = append(o.R.DocumentPermissionOverrides, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &folderPermissionR{
+			rel.R = &documentPermissionOverrideR{
 				PortalRole: o,
 			}
 		} else {
@@ -1150,14 +1428,14 @@ func (o *PortalRole) AddFolderPermissions(ctx context.Context, exec boil.Context
 	return nil
 }
 
-// SetFolderPermissions removes all previously related items of the
+// SetDocumentPermissionOverrides removes all previously related items of the
 // portal_role replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.PortalRole's FolderPermissions accordingly.
-// Replaces o.R.FolderPermissions with related.
-// Sets related.R.PortalRole's FolderPermissions accordingly.
-func (o *PortalRole) SetFolderPermissions(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*FolderPermission) error {
-	query := "update \"folder_permissions\" set \"portal_role_id\" = null where \"portal_role_id\" = $1"
+// Sets o.R.PortalRole's DocumentPermissionOverrides accordingly.
+// Replaces o.R.DocumentPermissionOverrides with related.
+// Sets related.R.PortalRole's DocumentPermissionOverrides accordingly.
+func (o *PortalRole) SetDocumentPermissionOverrides(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*DocumentPermissionOverride) error {
+	query := "update \"document_permission_overrides\" set \"portal_role_id\" = null where \"portal_role_id\" = $1"
 	values := []any{o.ID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1170,7 +1448,7 @@ func (o *PortalRole) SetFolderPermissions(ctx context.Context, exec boil.Context
 	}
 
 	if o.R != nil {
-		for _, rel := range o.R.FolderPermissions {
+		for _, rel := range o.R.DocumentPermissionOverrides {
 			queries.SetScanner(&rel.PortalRoleID, nil)
 			if rel.R == nil {
 				continue
@@ -1178,16 +1456,16 @@ func (o *PortalRole) SetFolderPermissions(ctx context.Context, exec boil.Context
 
 			rel.R.PortalRole = nil
 		}
-		o.R.FolderPermissions = nil
+		o.R.DocumentPermissionOverrides = nil
 	}
 
-	return o.AddFolderPermissions(ctx, exec, insert, related...)
+	return o.AddDocumentPermissionOverrides(ctx, exec, insert, related...)
 }
 
-// RemoveFolderPermissions relationships from objects passed in.
-// Removes related items from R.FolderPermissions (uses pointer comparison, removal does not keep order)
+// RemoveDocumentPermissionOverrides relationships from objects passed in.
+// Removes related items from R.DocumentPermissionOverrides (uses pointer comparison, removal does not keep order)
 // Sets related.R.PortalRole.
-func (o *PortalRole) RemoveFolderPermissions(ctx context.Context, exec boil.ContextExecutor, related ...*FolderPermission) error {
+func (o *PortalRole) RemoveDocumentPermissionOverrides(ctx context.Context, exec boil.ContextExecutor, related ...*DocumentPermissionOverride) error {
 	if len(related) == 0 {
 		return nil
 	}
@@ -1207,16 +1485,143 @@ func (o *PortalRole) RemoveFolderPermissions(ctx context.Context, exec boil.Cont
 	}
 
 	for _, rel := range related {
-		for i, ri := range o.R.FolderPermissions {
+		for i, ri := range o.R.DocumentPermissionOverrides {
 			if rel != ri {
 				continue
 			}
 
-			ln := len(o.R.FolderPermissions)
+			ln := len(o.R.DocumentPermissionOverrides)
 			if ln > 1 && i < ln-1 {
-				o.R.FolderPermissions[i] = o.R.FolderPermissions[ln-1]
+				o.R.DocumentPermissionOverrides[i] = o.R.DocumentPermissionOverrides[ln-1]
 			}
-			o.R.FolderPermissions = o.R.FolderPermissions[:ln-1]
+			o.R.DocumentPermissionOverrides = o.R.DocumentPermissionOverrides[:ln-1]
+			break
+		}
+	}
+
+	return nil
+}
+
+// AddFolderPermissionOverrides adds the given related objects to the existing relationships
+// of the portal_role, optionally inserting them as new records.
+// Appends related to o.R.FolderPermissionOverrides.
+// Sets related.R.PortalRole appropriately.
+func (o *PortalRole) AddFolderPermissionOverrides(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*FolderPermissionOverride) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.PortalRoleID, o.ID)
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"portal_role_id"}),
+				strmangle.WhereClause("\"", "\"", 2, folderPermissionOverridePrimaryKeyColumns),
+			)
+			values := []any{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.PortalRoleID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &portalRoleR{
+			FolderPermissionOverrides: related,
+		}
+	} else {
+		o.R.FolderPermissionOverrides = append(o.R.FolderPermissionOverrides, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &folderPermissionOverrideR{
+				PortalRole: o,
+			}
+		} else {
+			rel.R.PortalRole = o
+		}
+	}
+	return nil
+}
+
+// SetFolderPermissionOverrides removes all previously related items of the
+// portal_role replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.PortalRole's FolderPermissionOverrides accordingly.
+// Replaces o.R.FolderPermissionOverrides with related.
+// Sets related.R.PortalRole's FolderPermissionOverrides accordingly.
+func (o *PortalRole) SetFolderPermissionOverrides(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*FolderPermissionOverride) error {
+	query := "update \"folder_permission_overrides\" set \"portal_role_id\" = null where \"portal_role_id\" = $1"
+	values := []any{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.FolderPermissionOverrides {
+			queries.SetScanner(&rel.PortalRoleID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.PortalRole = nil
+		}
+		o.R.FolderPermissionOverrides = nil
+	}
+
+	return o.AddFolderPermissionOverrides(ctx, exec, insert, related...)
+}
+
+// RemoveFolderPermissionOverrides relationships from objects passed in.
+// Removes related items from R.FolderPermissionOverrides (uses pointer comparison, removal does not keep order)
+// Sets related.R.PortalRole.
+func (o *PortalRole) RemoveFolderPermissionOverrides(ctx context.Context, exec boil.ContextExecutor, related ...*FolderPermissionOverride) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.PortalRoleID, nil)
+		if rel.R != nil {
+			rel.R.PortalRole = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("portal_role_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.FolderPermissionOverrides {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.FolderPermissionOverrides)
+			if ln > 1 && i < ln-1 {
+				o.R.FolderPermissionOverrides[i] = o.R.FolderPermissionOverrides[ln-1]
+			}
+			o.R.FolderPermissionOverrides = o.R.FolderPermissionOverrides[:ln-1]
 			break
 		}
 	}
@@ -1268,6 +1673,59 @@ func (o *PortalRole) AddPortalMemberships(ctx context.Context, exec boil.Context
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &portalMembershipR{
+				PortalRole: o,
+			}
+		} else {
+			rel.R.PortalRole = o
+		}
+	}
+	return nil
+}
+
+// AddPortalRolePermissions adds the given related objects to the existing relationships
+// of the portal_role, optionally inserting them as new records.
+// Appends related to o.R.PortalRolePermissions.
+// Sets related.R.PortalRole appropriately.
+func (o *PortalRole) AddPortalRolePermissions(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*PortalRolePermission) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.PortalRoleID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"portal_role_permissions\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"portal_role_id"}),
+				strmangle.WhereClause("\"", "\"", 2, portalRolePermissionPrimaryKeyColumns),
+			)
+			values := []any{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.PortalRoleID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &portalRoleR{
+			PortalRolePermissions: related,
+		}
+	} else {
+		o.R.PortalRolePermissions = append(o.R.PortalRolePermissions, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &portalRolePermissionR{
 				PortalRole: o,
 			}
 		} else {

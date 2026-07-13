@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/RhykerWells/RK/backend/internal/config"
+	"github.com/RhykerWells/RK/backend/internal/database/schemas"
 	"github.com/RhykerWells/RK/backend/internal/log"
 	"github.com/aarondl/sqlboiler/v4/boil"
 	_ "github.com/lib/pq"
@@ -63,21 +64,23 @@ func initSchemas(log *slog.Logger) {
 		"Initialising database schemas",
 	)
 
-	for i, schema := range Schemas {
-		_, err := DB.Exec(schema.SQL)
-		if err != nil {
-			log.Error(
-				"Failed initialising postgres db schema",
-				slog.String("schema", schema.Name),
-				slog.Any("error", err),
-			)
-			os.Exit(1)
+	for _, schemaGroup := range schemas.AllSchemas() {
+		for _, schema := range schemaGroup {
+			_, err := DB.Exec(schema.SQL)
+			if err != nil {
+				log.Error(
+					"Failed initialising postgres db schema",
+					slog.String("schema", schema.Name),
+					slog.Any("error", err),
+				)
+				os.Exit(1)
+				return
+			}
+
+			log.Info("Successfully initialised postgres db schema", slog.String("schema", schema.Name))
 		}
 
-		log.Info("Successfully initialised postgres db schema", slog.String("schema", schema.Name))
-
-		if i == len(Schemas)-1 {
-			log.Info("All database schemas initialised successfully")
-		}
 	}
+
+	log.Info("All database schemas initialised successfully")
 }

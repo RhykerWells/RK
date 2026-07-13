@@ -101,32 +101,32 @@ var FolderWhere = struct {
 
 // FolderRels is where relationship names are stored.
 var FolderRels = struct {
-	CreatedByUser       string
-	ParentFolder        string
-	Portal              string
-	UpdatedByUser       string
-	Documents           string
-	FolderPermissions   string
-	ParentFolderFolders string
+	CreatedByUser             string
+	ParentFolder              string
+	Portal                    string
+	UpdatedByUser             string
+	Documents                 string
+	FolderPermissionOverrides string
+	ParentFolderFolders       string
 }{
-	CreatedByUser:       "CreatedByUser",
-	ParentFolder:        "ParentFolder",
-	Portal:              "Portal",
-	UpdatedByUser:       "UpdatedByUser",
-	Documents:           "Documents",
-	FolderPermissions:   "FolderPermissions",
-	ParentFolderFolders: "ParentFolderFolders",
+	CreatedByUser:             "CreatedByUser",
+	ParentFolder:              "ParentFolder",
+	Portal:                    "Portal",
+	UpdatedByUser:             "UpdatedByUser",
+	Documents:                 "Documents",
+	FolderPermissionOverrides: "FolderPermissionOverrides",
+	ParentFolderFolders:       "ParentFolderFolders",
 }
 
 // folderR is where relationships are stored.
 type folderR struct {
-	CreatedByUser       *User                 `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
-	ParentFolder        *Folder               `boil:"ParentFolder" json:"ParentFolder" toml:"ParentFolder" yaml:"ParentFolder"`
-	Portal              *Portal               `boil:"Portal" json:"Portal" toml:"Portal" yaml:"Portal"`
-	UpdatedByUser       *User                 `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
-	Documents           DocumentSlice         `boil:"Documents" json:"Documents" toml:"Documents" yaml:"Documents"`
-	FolderPermissions   FolderPermissionSlice `boil:"FolderPermissions" json:"FolderPermissions" toml:"FolderPermissions" yaml:"FolderPermissions"`
-	ParentFolderFolders FolderSlice           `boil:"ParentFolderFolders" json:"ParentFolderFolders" toml:"ParentFolderFolders" yaml:"ParentFolderFolders"`
+	CreatedByUser             *User                         `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
+	ParentFolder              *Folder                       `boil:"ParentFolder" json:"ParentFolder" toml:"ParentFolder" yaml:"ParentFolder"`
+	Portal                    *Portal                       `boil:"Portal" json:"Portal" toml:"Portal" yaml:"Portal"`
+	UpdatedByUser             *User                         `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
+	Documents                 DocumentSlice                 `boil:"Documents" json:"Documents" toml:"Documents" yaml:"Documents"`
+	FolderPermissionOverrides FolderPermissionOverrideSlice `boil:"FolderPermissionOverrides" json:"FolderPermissionOverrides" toml:"FolderPermissionOverrides" yaml:"FolderPermissionOverrides"`
+	ParentFolderFolders       FolderSlice                   `boil:"ParentFolderFolders" json:"ParentFolderFolders" toml:"ParentFolderFolders" yaml:"ParentFolderFolders"`
 }
 
 // NewStruct creates a new relationship struct
@@ -214,20 +214,20 @@ func (r *folderR) GetDocuments() DocumentSlice {
 	return r.Documents
 }
 
-func (o *Folder) GetFolderPermissions() FolderPermissionSlice {
+func (o *Folder) GetFolderPermissionOverrides() FolderPermissionOverrideSlice {
 	if o == nil {
 		return nil
 	}
 
-	return o.R.GetFolderPermissions()
+	return o.R.GetFolderPermissionOverrides()
 }
 
-func (r *folderR) GetFolderPermissions() FolderPermissionSlice {
+func (r *folderR) GetFolderPermissionOverrides() FolderPermissionOverrideSlice {
 	if r == nil {
 		return nil
 	}
 
-	return r.FolderPermissions
+	return r.FolderPermissionOverrides
 }
 
 func (o *Folder) GetParentFolderFolders() FolderSlice {
@@ -406,18 +406,18 @@ func (o *Folder) Documents(mods ...qm.QueryMod) documentQuery {
 	return Documents(queryMods...)
 }
 
-// FolderPermissions retrieves all the folder_permission's FolderPermissions with an executor.
-func (o *Folder) FolderPermissions(mods ...qm.QueryMod) folderPermissionQuery {
+// FolderPermissionOverrides retrieves all the folder_permission_override's FolderPermissionOverrides with an executor.
+func (o *Folder) FolderPermissionOverrides(mods ...qm.QueryMod) folderPermissionOverrideQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"folder_permissions\".\"folder_id\"=?", o.ID),
+		qm.Where("\"folder_permission_overrides\".\"folder_id\"=?", o.ID),
 	)
 
-	return FolderPermissions(queryMods...)
+	return FolderPermissionOverrides(queryMods...)
 }
 
 // ParentFolderFolders retrieves all the folder's Folders with an executor via parent_folder_id column.
@@ -996,9 +996,9 @@ func (folderL) LoadDocuments(ctx context.Context, e boil.ContextExecutor, singul
 	return nil
 }
 
-// LoadFolderPermissions allows an eager lookup of values, cached into the
+// LoadFolderPermissionOverrides allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (folderL) LoadFolderPermissions(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolder any, mods queries.Applicator) error {
+func (folderL) LoadFolderPermissionOverrides(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolder any, mods queries.Applicator) error {
 	var slice []*Folder
 	var object *Folder
 
@@ -1051,8 +1051,8 @@ func (folderL) LoadFolderPermissions(ctx context.Context, e boil.ContextExecutor
 	}
 
 	query := NewQuery(
-		qm.From(`folder_permissions`),
-		qm.WhereIn(`folder_permissions.folder_id in ?`, argsSlice...),
+		qm.From(`folder_permission_overrides`),
+		qm.WhereIn(`folder_permission_overrides.folder_id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -1060,26 +1060,26 @@ func (folderL) LoadFolderPermissions(ctx context.Context, e boil.ContextExecutor
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load folder_permissions")
+		return errors.Wrap(err, "failed to eager load folder_permission_overrides")
 	}
 
-	var resultSlice []*FolderPermission
+	var resultSlice []*FolderPermissionOverride
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice folder_permissions")
+		return errors.Wrap(err, "failed to bind eager loaded slice folder_permission_overrides")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on folder_permissions")
+		return errors.Wrap(err, "failed to close results in eager load on folder_permission_overrides")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for folder_permissions")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for folder_permission_overrides")
 	}
 
 	if singular {
-		object.R.FolderPermissions = resultSlice
+		object.R.FolderPermissionOverrides = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &folderPermissionR{}
+				foreign.R = &folderPermissionOverrideR{}
 			}
 			foreign.R.Folder = object
 		}
@@ -1089,9 +1089,9 @@ func (folderL) LoadFolderPermissions(ctx context.Context, e boil.ContextExecutor
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
 			if local.ID == foreign.FolderID {
-				local.R.FolderPermissions = append(local.R.FolderPermissions, foreign)
+				local.R.FolderPermissionOverrides = append(local.R.FolderPermissionOverrides, foreign)
 				if foreign.R == nil {
-					foreign.R = &folderPermissionR{}
+					foreign.R = &folderPermissionOverrideR{}
 				}
 				foreign.R.Folder = local
 				break
@@ -1515,11 +1515,11 @@ func (o *Folder) AddDocuments(ctx context.Context, exec boil.ContextExecutor, in
 	return nil
 }
 
-// AddFolderPermissions adds the given related objects to the existing relationships
+// AddFolderPermissionOverrides adds the given related objects to the existing relationships
 // of the folder, optionally inserting them as new records.
-// Appends related to o.R.FolderPermissions.
+// Appends related to o.R.FolderPermissionOverrides.
 // Sets related.R.Folder appropriately.
-func (o *Folder) AddFolderPermissions(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*FolderPermission) error {
+func (o *Folder) AddFolderPermissionOverrides(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*FolderPermissionOverride) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -1529,9 +1529,9 @@ func (o *Folder) AddFolderPermissions(ctx context.Context, exec boil.ContextExec
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"folder_permissions\" SET %s WHERE %s",
+				"UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"folder_id"}),
-				strmangle.WhereClause("\"", "\"", 2, folderPermissionPrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, folderPermissionOverridePrimaryKeyColumns),
 			)
 			values := []any{o.ID, rel.ID}
 
@@ -1550,15 +1550,15 @@ func (o *Folder) AddFolderPermissions(ctx context.Context, exec boil.ContextExec
 
 	if o.R == nil {
 		o.R = &folderR{
-			FolderPermissions: related,
+			FolderPermissionOverrides: related,
 		}
 	} else {
-		o.R.FolderPermissions = append(o.R.FolderPermissions, related...)
+		o.R.FolderPermissionOverrides = append(o.R.FolderPermissionOverrides, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &folderPermissionR{
+			rel.R = &folderPermissionOverrideR{
 				Folder: o,
 			}
 		} else {

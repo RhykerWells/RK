@@ -4,31 +4,35 @@
 package models
 
 var TableNames = struct {
-	DocumentFiles         string
-	DocumentLinks         string
-	DocumentVersions      string
-	Documents             string
-	Files                 string
-	FolderPermissions     string
-	Folders               string
-	GlobalRoles           string
-	PermissionDefinitions string
-	PortalMemberships     string
-	PortalRoles           string
-	Portals               string
-	Users                 string
+	DocumentFiles               string
+	DocumentLinks               string
+	DocumentPermissionOverrides string
+	DocumentVersions            string
+	Documents                   string
+	Files                       string
+	FolderPermissionOverrides   string
+	Folders                     string
+	GlobalRoles                 string
+	Permissions                 string
+	PortalMemberships           string
+	PortalRolePermissions       string
+	PortalRoles                 string
+	Portals                     string
+	Users                       string
 }{
-	DocumentFiles:         "document_files",
-	DocumentLinks:         "document_links",
-	DocumentVersions:      "document_versions",
-	Documents:             "documents",
-	Files:                 "files",
-	FolderPermissions:     "folder_permissions",
-	Folders:               "folders",
-	GlobalRoles:           "global_roles",
-	PermissionDefinitions: "permission_definitions",
-	PortalMemberships:     "portal_memberships",
-	PortalRoles:           "portal_roles",
-	Portals:               "portals",
-	Users:                 "users",
+	DocumentFiles:               "document_files",
+	DocumentLinks:               "document_links",
+	DocumentPermissionOverrides: "document_permission_overrides",
+	DocumentVersions:            "document_versions",
+	Documents:                   "documents",
+	Files:                       "files",
+	FolderPermissionOverrides:   "folder_permission_overrides",
+	Folders:                     "folders",
+	GlobalRoles:                 "global_roles",
+	Permissions:                 "permissions",
+	PortalMemberships:           "portal_memberships",
+	PortalRolePermissions:       "portal_role_permissions",
+	PortalRoles:                 "portal_roles",
+	Portals:                     "portals",
+	Users:                       "users",
 }

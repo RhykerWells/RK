@@ -22,26 +22,28 @@ import (
 	"github.com/friendsofgo/errors"
 )
 
-// FolderPermission is an object representing the database table.
-type FolderPermission struct {
+// FolderPermissionOverride is an object representing the database table.
+type FolderPermissionOverride struct {
 	ID           int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
 	FolderID     int64      `boil:"folder_id" json:"folder_id" toml:"folder_id" yaml:"folder_id"`
 	PortalRoleID null.Int64 `boil:"portal_role_id" json:"portal_role_id,omitempty" toml:"portal_role_id" yaml:"portal_role_id,omitempty"`
 	UserID       null.Int64 `boil:"user_id" json:"user_id,omitempty" toml:"user_id" yaml:"user_id,omitempty"`
 	PermissionID int64      `boil:"permission_id" json:"permission_id" toml:"permission_id" yaml:"permission_id"`
+	Allow        bool       `boil:"allow" json:"allow" toml:"allow" yaml:"allow"`
 	CreatedBy    int64      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
 	CreatedAt    time.Time  `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
-	R *folderPermissionR `boil:"-" json:"-" toml:"-" yaml:"-"`
-	L folderPermissionL  `boil:"-" json:"-" toml:"-" yaml:"-"`
+	R *folderPermissionOverrideR `boil:"-" json:"-" toml:"-" yaml:"-"`
+	L folderPermissionOverrideL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
-var FolderPermissionColumns = struct {
+var FolderPermissionOverrideColumns = struct {
 	ID           string
 	FolderID     string
 	PortalRoleID string
 	UserID       string
 	PermissionID string
+	Allow        string
 	CreatedBy    string
 	CreatedAt    string
 }{
@@ -50,50 +52,55 @@ var FolderPermissionColumns = struct {
 	PortalRoleID: "portal_role_id",
 	UserID:       "user_id",
 	PermissionID: "permission_id",
+	Allow:        "allow",
 	CreatedBy:    "created_by",
 	CreatedAt:    "created_at",
 }
 
-var FolderPermissionTableColumns = struct {
+var FolderPermissionOverrideTableColumns = struct {
 	ID           string
 	FolderID     string
 	PortalRoleID string
 	UserID       string
 	PermissionID string
+	Allow        string
 	CreatedBy    string
 	CreatedAt    string
 }{
-	ID:           "folder_permissions.id",
-	FolderID:     "folder_permissions.folder_id",
-	PortalRoleID: "folder_permissions.portal_role_id",
-	UserID:       "folder_permissions.user_id",
-	PermissionID: "folder_permissions.permission_id",
-	CreatedBy:    "folder_permissions.created_by",
-	CreatedAt:    "folder_permissions.created_at",
+	ID:           "folder_permission_overrides.id",
+	FolderID:     "folder_permission_overrides.folder_id",
+	PortalRoleID: "folder_permission_overrides.portal_role_id",
+	UserID:       "folder_permission_overrides.user_id",
+	PermissionID: "folder_permission_overrides.permission_id",
+	Allow:        "folder_permission_overrides.allow",
+	CreatedBy:    "folder_permission_overrides.created_by",
+	CreatedAt:    "folder_permission_overrides.created_at",
 }
 
 // Generated where
 
-var FolderPermissionWhere = struct {
+var FolderPermissionOverrideWhere = struct {
 	ID           whereHelperint64
 	FolderID     whereHelperint64
 	PortalRoleID whereHelpernull_Int64
 	UserID       whereHelpernull_Int64
 	PermissionID whereHelperint64
+	Allow        whereHelperbool
 	CreatedBy    whereHelperint64
 	CreatedAt    whereHelpertime_Time
 }{
-	ID:           whereHelperint64{field: "\"folder_permissions\".\"id\""},
-	FolderID:     whereHelperint64{field: "\"folder_permissions\".\"folder_id\""},
-	PortalRoleID: whereHelpernull_Int64{field: "\"folder_permissions\".\"portal_role_id\""},
-	UserID:       whereHelpernull_Int64{field: "\"folder_permissions\".\"user_id\""},
-	PermissionID: whereHelperint64{field: "\"folder_permissions\".\"permission_id\""},
-	CreatedBy:    whereHelperint64{field: "\"folder_permissions\".\"created_by\""},
-	CreatedAt:    whereHelpertime_Time{field: "\"folder_permissions\".\"created_at\""},
+	ID:           whereHelperint64{field: "\"folder_permission_overrides\".\"id\""},
+	FolderID:     whereHelperint64{field: "\"folder_permission_overrides\".\"folder_id\""},
+	PortalRoleID: whereHelpernull_Int64{field: "\"folder_permission_overrides\".\"portal_role_id\""},
+	UserID:       whereHelpernull_Int64{field: "\"folder_permission_overrides\".\"user_id\""},
+	PermissionID: whereHelperint64{field: "\"folder_permission_overrides\".\"permission_id\""},
+	Allow:        whereHelperbool{field: "\"folder_permission_overrides\".\"allow\""},
+	CreatedBy:    whereHelperint64{field: "\"folder_permission_overrides\".\"created_by\""},
+	CreatedAt:    whereHelpertime_Time{field: "\"folder_permission_overrides\".\"created_at\""},
 }
 
-// FolderPermissionRels is where relationship names are stored.
-var FolderPermissionRels = struct {
+// FolderPermissionOverrideRels is where relationship names are stored.
+var FolderPermissionOverrideRels = struct {
 	CreatedByUser string
 	Folder        string
 	Permission    string
@@ -107,21 +114,21 @@ var FolderPermissionRels = struct {
 	User:          "User",
 }
 
-// folderPermissionR is where relationships are stored.
-type folderPermissionR struct {
-	CreatedByUser *User                 `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
-	Folder        *Folder               `boil:"Folder" json:"Folder" toml:"Folder" yaml:"Folder"`
-	Permission    *PermissionDefinition `boil:"Permission" json:"Permission" toml:"Permission" yaml:"Permission"`
-	PortalRole    *PortalRole           `boil:"PortalRole" json:"PortalRole" toml:"PortalRole" yaml:"PortalRole"`
-	User          *User                 `boil:"User" json:"User" toml:"User" yaml:"User"`
+// folderPermissionOverrideR is where relationships are stored.
+type folderPermissionOverrideR struct {
+	CreatedByUser *User       `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
+	Folder        *Folder     `boil:"Folder" json:"Folder" toml:"Folder" yaml:"Folder"`
+	Permission    *Permission `boil:"Permission" json:"Permission" toml:"Permission" yaml:"Permission"`
+	PortalRole    *PortalRole `boil:"PortalRole" json:"PortalRole" toml:"PortalRole" yaml:"PortalRole"`
+	User          *User       `boil:"User" json:"User" toml:"User" yaml:"User"`
 }
 
 // NewStruct creates a new relationship struct
-func (*folderPermissionR) NewStruct() *folderPermissionR {
-	return &folderPermissionR{}
+func (*folderPermissionOverrideR) NewStruct() *folderPermissionOverrideR {
+	return &folderPermissionOverrideR{}
 }
 
-func (o *FolderPermission) GetCreatedByUser() *User {
+func (o *FolderPermissionOverride) GetCreatedByUser() *User {
 	if o == nil {
 		return nil
 	}
@@ -129,7 +136,7 @@ func (o *FolderPermission) GetCreatedByUser() *User {
 	return o.R.GetCreatedByUser()
 }
 
-func (r *folderPermissionR) GetCreatedByUser() *User {
+func (r *folderPermissionOverrideR) GetCreatedByUser() *User {
 	if r == nil {
 		return nil
 	}
@@ -137,7 +144,7 @@ func (r *folderPermissionR) GetCreatedByUser() *User {
 	return r.CreatedByUser
 }
 
-func (o *FolderPermission) GetFolder() *Folder {
+func (o *FolderPermissionOverride) GetFolder() *Folder {
 	if o == nil {
 		return nil
 	}
@@ -145,7 +152,7 @@ func (o *FolderPermission) GetFolder() *Folder {
 	return o.R.GetFolder()
 }
 
-func (r *folderPermissionR) GetFolder() *Folder {
+func (r *folderPermissionOverrideR) GetFolder() *Folder {
 	if r == nil {
 		return nil
 	}
@@ -153,7 +160,7 @@ func (r *folderPermissionR) GetFolder() *Folder {
 	return r.Folder
 }
 
-func (o *FolderPermission) GetPermission() *PermissionDefinition {
+func (o *FolderPermissionOverride) GetPermission() *Permission {
 	if o == nil {
 		return nil
 	}
@@ -161,7 +168,7 @@ func (o *FolderPermission) GetPermission() *PermissionDefinition {
 	return o.R.GetPermission()
 }
 
-func (r *folderPermissionR) GetPermission() *PermissionDefinition {
+func (r *folderPermissionOverrideR) GetPermission() *Permission {
 	if r == nil {
 		return nil
 	}
@@ -169,7 +176,7 @@ func (r *folderPermissionR) GetPermission() *PermissionDefinition {
 	return r.Permission
 }
 
-func (o *FolderPermission) GetPortalRole() *PortalRole {
+func (o *FolderPermissionOverride) GetPortalRole() *PortalRole {
 	if o == nil {
 		return nil
 	}
@@ -177,7 +184,7 @@ func (o *FolderPermission) GetPortalRole() *PortalRole {
 	return o.R.GetPortalRole()
 }
 
-func (r *folderPermissionR) GetPortalRole() *PortalRole {
+func (r *folderPermissionOverrideR) GetPortalRole() *PortalRole {
 	if r == nil {
 		return nil
 	}
@@ -185,7 +192,7 @@ func (r *folderPermissionR) GetPortalRole() *PortalRole {
 	return r.PortalRole
 }
 
-func (o *FolderPermission) GetUser() *User {
+func (o *FolderPermissionOverride) GetUser() *User {
 	if o == nil {
 		return nil
 	}
@@ -193,7 +200,7 @@ func (o *FolderPermission) GetUser() *User {
 	return o.R.GetUser()
 }
 
-func (r *folderPermissionR) GetUser() *User {
+func (r *folderPermissionOverrideR) GetUser() *User {
 	if r == nil {
 		return nil
 	}
@@ -201,38 +208,38 @@ func (r *folderPermissionR) GetUser() *User {
 	return r.User
 }
 
-// folderPermissionL is where Load methods for each relationship are stored.
-type folderPermissionL struct{}
+// folderPermissionOverrideL is where Load methods for each relationship are stored.
+type folderPermissionOverrideL struct{}
 
 var (
-	folderPermissionAllColumns            = []string{"id", "folder_id", "portal_role_id", "user_id", "permission_id", "created_by", "created_at"}
-	folderPermissionColumnsWithoutDefault = []string{"folder_id", "permission_id", "created_by"}
-	folderPermissionColumnsWithDefault    = []string{"id", "portal_role_id", "user_id", "created_at"}
-	folderPermissionPrimaryKeyColumns     = []string{"id"}
-	folderPermissionGeneratedColumns      = []string{"id"}
+	folderPermissionOverrideAllColumns            = []string{"id", "folder_id", "portal_role_id", "user_id", "permission_id", "allow", "created_by", "created_at"}
+	folderPermissionOverrideColumnsWithoutDefault = []string{"folder_id", "permission_id", "allow", "created_by"}
+	folderPermissionOverrideColumnsWithDefault    = []string{"id", "portal_role_id", "user_id", "created_at"}
+	folderPermissionOverridePrimaryKeyColumns     = []string{"id"}
+	folderPermissionOverrideGeneratedColumns      = []string{"id"}
 )
 
 type (
-	// FolderPermissionSlice is an alias for a slice of pointers to FolderPermission.
-	// This should almost always be used instead of []FolderPermission.
-	FolderPermissionSlice []*FolderPermission
+	// FolderPermissionOverrideSlice is an alias for a slice of pointers to FolderPermissionOverride.
+	// This should almost always be used instead of []FolderPermissionOverride.
+	FolderPermissionOverrideSlice []*FolderPermissionOverride
 
-	folderPermissionQuery struct {
+	folderPermissionOverrideQuery struct {
 		*queries.Query
 	}
 )
 
 // Cache for insert, update and upsert
 var (
-	folderPermissionType                 = reflect.TypeOf(&FolderPermission{})
-	folderPermissionMapping              = queries.MakeStructMapping(folderPermissionType)
-	folderPermissionPrimaryKeyMapping, _ = queries.BindMapping(folderPermissionType, folderPermissionMapping, folderPermissionPrimaryKeyColumns)
-	folderPermissionInsertCacheMut       sync.RWMutex
-	folderPermissionInsertCache          = make(map[string]insertCache)
-	folderPermissionUpdateCacheMut       sync.RWMutex
-	folderPermissionUpdateCache          = make(map[string]updateCache)
-	folderPermissionUpsertCacheMut       sync.RWMutex
-	folderPermissionUpsertCache          = make(map[string]insertCache)
+	folderPermissionOverrideType                 = reflect.TypeOf(&FolderPermissionOverride{})
+	folderPermissionOverrideMapping              = queries.MakeStructMapping(folderPermissionOverrideType)
+	folderPermissionOverridePrimaryKeyMapping, _ = queries.BindMapping(folderPermissionOverrideType, folderPermissionOverrideMapping, folderPermissionOverridePrimaryKeyColumns)
+	folderPermissionOverrideInsertCacheMut       sync.RWMutex
+	folderPermissionOverrideInsertCache          = make(map[string]insertCache)
+	folderPermissionOverrideUpdateCacheMut       sync.RWMutex
+	folderPermissionOverrideUpdateCache          = make(map[string]updateCache)
+	folderPermissionOverrideUpsertCacheMut       sync.RWMutex
+	folderPermissionOverrideUpsertCache          = make(map[string]insertCache)
 )
 
 var (
@@ -243,9 +250,9 @@ var (
 	_ = qmhelper.Where
 )
 
-// One returns a single folderPermission record from the query.
-func (q folderPermissionQuery) One(ctx context.Context, exec boil.ContextExecutor) (*FolderPermission, error) {
-	o := &FolderPermission{}
+// One returns a single folderPermissionOverride record from the query.
+func (q folderPermissionOverrideQuery) One(ctx context.Context, exec boil.ContextExecutor) (*FolderPermissionOverride, error) {
+	o := &FolderPermissionOverride{}
 
 	queries.SetLimit(q.Query, 1)
 
@@ -254,26 +261,26 @@ func (q folderPermissionQuery) One(ctx context.Context, exec boil.ContextExecuto
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: failed to execute a one query for folder_permissions")
+		return nil, errors.Wrap(err, "models: failed to execute a one query for folder_permission_overrides")
 	}
 
 	return o, nil
 }
 
-// All returns all FolderPermission records from the query.
-func (q folderPermissionQuery) All(ctx context.Context, exec boil.ContextExecutor) (FolderPermissionSlice, error) {
-	var o []*FolderPermission
+// All returns all FolderPermissionOverride records from the query.
+func (q folderPermissionOverrideQuery) All(ctx context.Context, exec boil.ContextExecutor) (FolderPermissionOverrideSlice, error) {
+	var o []*FolderPermissionOverride
 
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
-		return nil, errors.Wrap(err, "models: failed to assign all query results to FolderPermission slice")
+		return nil, errors.Wrap(err, "models: failed to assign all query results to FolderPermissionOverride slice")
 	}
 
 	return o, nil
 }
 
-// Count returns the count of all FolderPermission records in the query.
-func (q folderPermissionQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+// Count returns the count of all FolderPermissionOverride records in the query.
+func (q folderPermissionOverrideQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -281,14 +288,14 @@ func (q folderPermissionQuery) Count(ctx context.Context, exec boil.ContextExecu
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to count folder_permissions rows")
+		return 0, errors.Wrap(err, "models: failed to count folder_permission_overrides rows")
 	}
 
 	return count, nil
 }
 
 // Exists checks if the row exists in the table.
-func (q folderPermissionQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+func (q folderPermissionOverrideQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -297,14 +304,14 @@ func (q folderPermissionQuery) Exists(ctx context.Context, exec boil.ContextExec
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "models: failed to check if folder_permissions exists")
+		return false, errors.Wrap(err, "models: failed to check if folder_permission_overrides exists")
 	}
 
 	return count > 0, nil
 }
 
 // CreatedByUser pointed to by the foreign key.
-func (o *FolderPermission) CreatedByUser(mods ...qm.QueryMod) userQuery {
+func (o *FolderPermissionOverride) CreatedByUser(mods ...qm.QueryMod) userQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("\"id\" = ?", o.CreatedBy),
 	}
@@ -315,7 +322,7 @@ func (o *FolderPermission) CreatedByUser(mods ...qm.QueryMod) userQuery {
 }
 
 // Folder pointed to by the foreign key.
-func (o *FolderPermission) Folder(mods ...qm.QueryMod) folderQuery {
+func (o *FolderPermissionOverride) Folder(mods ...qm.QueryMod) folderQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("\"id\" = ?", o.FolderID),
 	}
@@ -326,18 +333,18 @@ func (o *FolderPermission) Folder(mods ...qm.QueryMod) folderQuery {
 }
 
 // Permission pointed to by the foreign key.
-func (o *FolderPermission) Permission(mods ...qm.QueryMod) permissionDefinitionQuery {
+func (o *FolderPermissionOverride) Permission(mods ...qm.QueryMod) permissionQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("\"id\" = ?", o.PermissionID),
 	}
 
 	queryMods = append(queryMods, mods...)
 
-	return PermissionDefinitions(queryMods...)
+	return Permissions(queryMods...)
 }
 
 // PortalRole pointed to by the foreign key.
-func (o *FolderPermission) PortalRole(mods ...qm.QueryMod) portalRoleQuery {
+func (o *FolderPermissionOverride) PortalRole(mods ...qm.QueryMod) portalRoleQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("\"id\" = ?", o.PortalRoleID),
 	}
@@ -348,7 +355,7 @@ func (o *FolderPermission) PortalRole(mods ...qm.QueryMod) portalRoleQuery {
 }
 
 // User pointed to by the foreign key.
-func (o *FolderPermission) User(mods ...qm.QueryMod) userQuery {
+func (o *FolderPermissionOverride) User(mods ...qm.QueryMod) userQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("\"id\" = ?", o.UserID),
 	}
@@ -360,28 +367,28 @@ func (o *FolderPermission) User(mods ...qm.QueryMod) userQuery {
 
 // LoadCreatedByUser allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (folderPermissionL) LoadCreatedByUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermission any, mods queries.Applicator) error {
-	var slice []*FolderPermission
-	var object *FolderPermission
+func (folderPermissionOverrideL) LoadCreatedByUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermissionOverride any, mods queries.Applicator) error {
+	var slice []*FolderPermissionOverride
+	var object *FolderPermissionOverride
 
 	if singular {
 		var ok bool
-		object, ok = maybeFolderPermission.(*FolderPermission)
+		object, ok = maybeFolderPermissionOverride.(*FolderPermissionOverride)
 		if !ok {
-			object = new(FolderPermission)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermission)
+			object = new(FolderPermissionOverride)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermissionOverride))
 			}
 		}
 	} else {
-		s, ok := maybeFolderPermission.(*[]*FolderPermission)
+		s, ok := maybeFolderPermissionOverride.(*[]*FolderPermissionOverride)
 		if ok {
 			slice = *s
 		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermission)
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermissionOverride))
 			}
 		}
 	}
@@ -389,14 +396,14 @@ func (folderPermissionL) LoadCreatedByUser(ctx context.Context, e boil.ContextEx
 	args := make(map[any]struct{})
 	if singular {
 		if object.R == nil {
-			object.R = &folderPermissionR{}
+			object.R = &folderPermissionOverrideR{}
 		}
 		args[object.CreatedBy] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &folderPermissionR{}
+				obj.R = &folderPermissionOverrideR{}
 			}
 
 			args[obj.CreatedBy] = struct{}{}
@@ -450,7 +457,7 @@ func (folderPermissionL) LoadCreatedByUser(ctx context.Context, e boil.ContextEx
 		if foreign.R == nil {
 			foreign.R = &userR{}
 		}
-		foreign.R.CreatedByFolderPermissions = append(foreign.R.CreatedByFolderPermissions, object)
+		foreign.R.CreatedByFolderPermissionOverrides = append(foreign.R.CreatedByFolderPermissionOverrides, object)
 		return nil
 	}
 
@@ -461,7 +468,7 @@ func (folderPermissionL) LoadCreatedByUser(ctx context.Context, e boil.ContextEx
 				if foreign.R == nil {
 					foreign.R = &userR{}
 				}
-				foreign.R.CreatedByFolderPermissions = append(foreign.R.CreatedByFolderPermissions, local)
+				foreign.R.CreatedByFolderPermissionOverrides = append(foreign.R.CreatedByFolderPermissionOverrides, local)
 				break
 			}
 		}
@@ -472,28 +479,28 @@ func (folderPermissionL) LoadCreatedByUser(ctx context.Context, e boil.ContextEx
 
 // LoadFolder allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (folderPermissionL) LoadFolder(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermission any, mods queries.Applicator) error {
-	var slice []*FolderPermission
-	var object *FolderPermission
+func (folderPermissionOverrideL) LoadFolder(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermissionOverride any, mods queries.Applicator) error {
+	var slice []*FolderPermissionOverride
+	var object *FolderPermissionOverride
 
 	if singular {
 		var ok bool
-		object, ok = maybeFolderPermission.(*FolderPermission)
+		object, ok = maybeFolderPermissionOverride.(*FolderPermissionOverride)
 		if !ok {
-			object = new(FolderPermission)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermission)
+			object = new(FolderPermissionOverride)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermissionOverride))
 			}
 		}
 	} else {
-		s, ok := maybeFolderPermission.(*[]*FolderPermission)
+		s, ok := maybeFolderPermissionOverride.(*[]*FolderPermissionOverride)
 		if ok {
 			slice = *s
 		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermission)
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermissionOverride))
 			}
 		}
 	}
@@ -501,14 +508,14 @@ func (folderPermissionL) LoadFolder(ctx context.Context, e boil.ContextExecutor,
 	args := make(map[any]struct{})
 	if singular {
 		if object.R == nil {
-			object.R = &folderPermissionR{}
+			object.R = &folderPermissionOverrideR{}
 		}
 		args[object.FolderID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &folderPermissionR{}
+				obj.R = &folderPermissionOverrideR{}
 			}
 
 			args[obj.FolderID] = struct{}{}
@@ -562,7 +569,7 @@ func (folderPermissionL) LoadFolder(ctx context.Context, e boil.ContextExecutor,
 		if foreign.R == nil {
 			foreign.R = &folderR{}
 		}
-		foreign.R.FolderPermissions = append(foreign.R.FolderPermissions, object)
+		foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, object)
 		return nil
 	}
 
@@ -573,7 +580,7 @@ func (folderPermissionL) LoadFolder(ctx context.Context, e boil.ContextExecutor,
 				if foreign.R == nil {
 					foreign.R = &folderR{}
 				}
-				foreign.R.FolderPermissions = append(foreign.R.FolderPermissions, local)
+				foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, local)
 				break
 			}
 		}
@@ -584,28 +591,28 @@ func (folderPermissionL) LoadFolder(ctx context.Context, e boil.ContextExecutor,
 
 // LoadPermission allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (folderPermissionL) LoadPermission(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermission any, mods queries.Applicator) error {
-	var slice []*FolderPermission
-	var object *FolderPermission
+func (folderPermissionOverrideL) LoadPermission(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermissionOverride any, mods queries.Applicator) error {
+	var slice []*FolderPermissionOverride
+	var object *FolderPermissionOverride
 
 	if singular {
 		var ok bool
-		object, ok = maybeFolderPermission.(*FolderPermission)
+		object, ok = maybeFolderPermissionOverride.(*FolderPermissionOverride)
 		if !ok {
-			object = new(FolderPermission)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermission)
+			object = new(FolderPermissionOverride)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermissionOverride))
 			}
 		}
 	} else {
-		s, ok := maybeFolderPermission.(*[]*FolderPermission)
+		s, ok := maybeFolderPermissionOverride.(*[]*FolderPermissionOverride)
 		if ok {
 			slice = *s
 		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermission)
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermissionOverride))
 			}
 		}
 	}
@@ -613,14 +620,14 @@ func (folderPermissionL) LoadPermission(ctx context.Context, e boil.ContextExecu
 	args := make(map[any]struct{})
 	if singular {
 		if object.R == nil {
-			object.R = &folderPermissionR{}
+			object.R = &folderPermissionOverrideR{}
 		}
 		args[object.PermissionID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &folderPermissionR{}
+				obj.R = &folderPermissionOverrideR{}
 			}
 
 			args[obj.PermissionID] = struct{}{}
@@ -640,8 +647,8 @@ func (folderPermissionL) LoadPermission(ctx context.Context, e boil.ContextExecu
 	}
 
 	query := NewQuery(
-		qm.From(`permission_definitions`),
-		qm.WhereIn(`permission_definitions.id in ?`, argsSlice...),
+		qm.From(`permissions`),
+		qm.WhereIn(`permissions.id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -649,19 +656,19 @@ func (folderPermissionL) LoadPermission(ctx context.Context, e boil.ContextExecu
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load PermissionDefinition")
+		return errors.Wrap(err, "failed to eager load Permission")
 	}
 
-	var resultSlice []*PermissionDefinition
+	var resultSlice []*Permission
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice PermissionDefinition")
+		return errors.Wrap(err, "failed to bind eager loaded slice Permission")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for permission_definitions")
+		return errors.Wrap(err, "failed to close results of eager load for permissions")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for permission_definitions")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for permissions")
 	}
 
 	if len(resultSlice) == 0 {
@@ -672,9 +679,9 @@ func (folderPermissionL) LoadPermission(ctx context.Context, e boil.ContextExecu
 		foreign := resultSlice[0]
 		object.R.Permission = foreign
 		if foreign.R == nil {
-			foreign.R = &permissionDefinitionR{}
+			foreign.R = &permissionR{}
 		}
-		foreign.R.PermissionFolderPermissions = append(foreign.R.PermissionFolderPermissions, object)
+		foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, object)
 		return nil
 	}
 
@@ -683,9 +690,9 @@ func (folderPermissionL) LoadPermission(ctx context.Context, e boil.ContextExecu
 			if local.PermissionID == foreign.ID {
 				local.R.Permission = foreign
 				if foreign.R == nil {
-					foreign.R = &permissionDefinitionR{}
+					foreign.R = &permissionR{}
 				}
-				foreign.R.PermissionFolderPermissions = append(foreign.R.PermissionFolderPermissions, local)
+				foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, local)
 				break
 			}
 		}
@@ -696,28 +703,28 @@ func (folderPermissionL) LoadPermission(ctx context.Context, e boil.ContextExecu
 
 // LoadPortalRole allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (folderPermissionL) LoadPortalRole(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermission any, mods queries.Applicator) error {
-	var slice []*FolderPermission
-	var object *FolderPermission
+func (folderPermissionOverrideL) LoadPortalRole(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermissionOverride any, mods queries.Applicator) error {
+	var slice []*FolderPermissionOverride
+	var object *FolderPermissionOverride
 
 	if singular {
 		var ok bool
-		object, ok = maybeFolderPermission.(*FolderPermission)
+		object, ok = maybeFolderPermissionOverride.(*FolderPermissionOverride)
 		if !ok {
-			object = new(FolderPermission)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermission)
+			object = new(FolderPermissionOverride)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermissionOverride))
 			}
 		}
 	} else {
-		s, ok := maybeFolderPermission.(*[]*FolderPermission)
+		s, ok := maybeFolderPermissionOverride.(*[]*FolderPermissionOverride)
 		if ok {
 			slice = *s
 		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermission)
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermissionOverride))
 			}
 		}
 	}
@@ -725,7 +732,7 @@ func (folderPermissionL) LoadPortalRole(ctx context.Context, e boil.ContextExecu
 	args := make(map[any]struct{})
 	if singular {
 		if object.R == nil {
-			object.R = &folderPermissionR{}
+			object.R = &folderPermissionOverrideR{}
 		}
 		if !queries.IsNil(object.PortalRoleID) {
 			args[object.PortalRoleID] = struct{}{}
@@ -734,7 +741,7 @@ func (folderPermissionL) LoadPortalRole(ctx context.Context, e boil.ContextExecu
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &folderPermissionR{}
+				obj.R = &folderPermissionOverrideR{}
 			}
 
 			if !queries.IsNil(obj.PortalRoleID) {
@@ -790,7 +797,7 @@ func (folderPermissionL) LoadPortalRole(ctx context.Context, e boil.ContextExecu
 		if foreign.R == nil {
 			foreign.R = &portalRoleR{}
 		}
-		foreign.R.FolderPermissions = append(foreign.R.FolderPermissions, object)
+		foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, object)
 		return nil
 	}
 
@@ -801,7 +808,7 @@ func (folderPermissionL) LoadPortalRole(ctx context.Context, e boil.ContextExecu
 				if foreign.R == nil {
 					foreign.R = &portalRoleR{}
 				}
-				foreign.R.FolderPermissions = append(foreign.R.FolderPermissions, local)
+				foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, local)
 				break
 			}
 		}
@@ -812,28 +819,28 @@ func (folderPermissionL) LoadPortalRole(ctx context.Context, e boil.ContextExecu
 
 // LoadUser allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (folderPermissionL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermission any, mods queries.Applicator) error {
-	var slice []*FolderPermission
-	var object *FolderPermission
+func (folderPermissionOverrideL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermissionOverride any, mods queries.Applicator) error {
+	var slice []*FolderPermissionOverride
+	var object *FolderPermissionOverride
 
 	if singular {
 		var ok bool
-		object, ok = maybeFolderPermission.(*FolderPermission)
+		object, ok = maybeFolderPermissionOverride.(*FolderPermissionOverride)
 		if !ok {
-			object = new(FolderPermission)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermission)
+			object = new(FolderPermissionOverride)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermissionOverride))
 			}
 		}
 	} else {
-		s, ok := maybeFolderPermission.(*[]*FolderPermission)
+		s, ok := maybeFolderPermissionOverride.(*[]*FolderPermissionOverride)
 		if ok {
 			slice = *s
 		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermission)
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermissionOverride)
 			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermission))
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermissionOverride))
 			}
 		}
 	}
@@ -841,7 +848,7 @@ func (folderPermissionL) LoadUser(ctx context.Context, e boil.ContextExecutor, s
 	args := make(map[any]struct{})
 	if singular {
 		if object.R == nil {
-			object.R = &folderPermissionR{}
+			object.R = &folderPermissionOverrideR{}
 		}
 		if !queries.IsNil(object.UserID) {
 			args[object.UserID] = struct{}{}
@@ -850,7 +857,7 @@ func (folderPermissionL) LoadUser(ctx context.Context, e boil.ContextExecutor, s
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &folderPermissionR{}
+				obj.R = &folderPermissionOverrideR{}
 			}
 
 			if !queries.IsNil(obj.UserID) {
@@ -906,7 +913,7 @@ func (folderPermissionL) LoadUser(ctx context.Context, e boil.ContextExecutor, s
 		if foreign.R == nil {
 			foreign.R = &userR{}
 		}
-		foreign.R.FolderPermissions = append(foreign.R.FolderPermissions, object)
+		foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, object)
 		return nil
 	}
 
@@ -917,7 +924,7 @@ func (folderPermissionL) LoadUser(ctx context.Context, e boil.ContextExecutor, s
 				if foreign.R == nil {
 					foreign.R = &userR{}
 				}
-				foreign.R.FolderPermissions = append(foreign.R.FolderPermissions, local)
+				foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, local)
 				break
 			}
 		}
@@ -926,10 +933,10 @@ func (folderPermissionL) LoadUser(ctx context.Context, e boil.ContextExecutor, s
 	return nil
 }
 
-// SetCreatedByUser of the folderPermission to the related item.
+// SetCreatedByUser of the folderPermissionOverride to the related item.
 // Sets o.R.CreatedByUser to related.
-// Adds o to related.R.CreatedByFolderPermissions.
-func (o *FolderPermission) SetCreatedByUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
+// Adds o to related.R.CreatedByFolderPermissionOverrides.
+func (o *FolderPermissionOverride) SetCreatedByUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -938,9 +945,9 @@ func (o *FolderPermission) SetCreatedByUser(ctx context.Context, exec boil.Conte
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE \"folder_permissions\" SET %s WHERE %s",
+		"UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, []string{"created_by"}),
-		strmangle.WhereClause("\"", "\"", 2, folderPermissionPrimaryKeyColumns),
+		strmangle.WhereClause("\"", "\"", 2, folderPermissionOverridePrimaryKeyColumns),
 	)
 	values := []any{related.ID, o.ID}
 
@@ -955,7 +962,7 @@ func (o *FolderPermission) SetCreatedByUser(ctx context.Context, exec boil.Conte
 
 	o.CreatedBy = related.ID
 	if o.R == nil {
-		o.R = &folderPermissionR{
+		o.R = &folderPermissionOverrideR{
 			CreatedByUser: related,
 		}
 	} else {
@@ -964,19 +971,19 @@ func (o *FolderPermission) SetCreatedByUser(ctx context.Context, exec boil.Conte
 
 	if related.R == nil {
 		related.R = &userR{
-			CreatedByFolderPermissions: FolderPermissionSlice{o},
+			CreatedByFolderPermissionOverrides: FolderPermissionOverrideSlice{o},
 		}
 	} else {
-		related.R.CreatedByFolderPermissions = append(related.R.CreatedByFolderPermissions, o)
+		related.R.CreatedByFolderPermissionOverrides = append(related.R.CreatedByFolderPermissionOverrides, o)
 	}
 
 	return nil
 }
 
-// SetFolder of the folderPermission to the related item.
+// SetFolder of the folderPermissionOverride to the related item.
 // Sets o.R.Folder to related.
-// Adds o to related.R.FolderPermissions.
-func (o *FolderPermission) SetFolder(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Folder) error {
+// Adds o to related.R.FolderPermissionOverrides.
+func (o *FolderPermissionOverride) SetFolder(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Folder) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -985,9 +992,9 @@ func (o *FolderPermission) SetFolder(ctx context.Context, exec boil.ContextExecu
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE \"folder_permissions\" SET %s WHERE %s",
+		"UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, []string{"folder_id"}),
-		strmangle.WhereClause("\"", "\"", 2, folderPermissionPrimaryKeyColumns),
+		strmangle.WhereClause("\"", "\"", 2, folderPermissionOverridePrimaryKeyColumns),
 	)
 	values := []any{related.ID, o.ID}
 
@@ -1002,7 +1009,7 @@ func (o *FolderPermission) SetFolder(ctx context.Context, exec boil.ContextExecu
 
 	o.FolderID = related.ID
 	if o.R == nil {
-		o.R = &folderPermissionR{
+		o.R = &folderPermissionOverrideR{
 			Folder: related,
 		}
 	} else {
@@ -1011,19 +1018,19 @@ func (o *FolderPermission) SetFolder(ctx context.Context, exec boil.ContextExecu
 
 	if related.R == nil {
 		related.R = &folderR{
-			FolderPermissions: FolderPermissionSlice{o},
+			FolderPermissionOverrides: FolderPermissionOverrideSlice{o},
 		}
 	} else {
-		related.R.FolderPermissions = append(related.R.FolderPermissions, o)
+		related.R.FolderPermissionOverrides = append(related.R.FolderPermissionOverrides, o)
 	}
 
 	return nil
 }
 
-// SetPermission of the folderPermission to the related item.
+// SetPermission of the folderPermissionOverride to the related item.
 // Sets o.R.Permission to related.
-// Adds o to related.R.PermissionFolderPermissions.
-func (o *FolderPermission) SetPermission(ctx context.Context, exec boil.ContextExecutor, insert bool, related *PermissionDefinition) error {
+// Adds o to related.R.FolderPermissionOverrides.
+func (o *FolderPermissionOverride) SetPermission(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Permission) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -1032,9 +1039,9 @@ func (o *FolderPermission) SetPermission(ctx context.Context, exec boil.ContextE
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE \"folder_permissions\" SET %s WHERE %s",
+		"UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, []string{"permission_id"}),
-		strmangle.WhereClause("\"", "\"", 2, folderPermissionPrimaryKeyColumns),
+		strmangle.WhereClause("\"", "\"", 2, folderPermissionOverridePrimaryKeyColumns),
 	)
 	values := []any{related.ID, o.ID}
 
@@ -1049,7 +1056,7 @@ func (o *FolderPermission) SetPermission(ctx context.Context, exec boil.ContextE
 
 	o.PermissionID = related.ID
 	if o.R == nil {
-		o.R = &folderPermissionR{
+		o.R = &folderPermissionOverrideR{
 			Permission: related,
 		}
 	} else {
@@ -1057,20 +1064,20 @@ func (o *FolderPermission) SetPermission(ctx context.Context, exec boil.ContextE
 	}
 
 	if related.R == nil {
-		related.R = &permissionDefinitionR{
-			PermissionFolderPermissions: FolderPermissionSlice{o},
+		related.R = &permissionR{
+			FolderPermissionOverrides: FolderPermissionOverrideSlice{o},
 		}
 	} else {
-		related.R.PermissionFolderPermissions = append(related.R.PermissionFolderPermissions, o)
+		related.R.FolderPermissionOverrides = append(related.R.FolderPermissionOverrides, o)
 	}
 
 	return nil
 }
 
-// SetPortalRole of the folderPermission to the related item.
+// SetPortalRole of the folderPermissionOverride to the related item.
 // Sets o.R.PortalRole to related.
-// Adds o to related.R.FolderPermissions.
-func (o *FolderPermission) SetPortalRole(ctx context.Context, exec boil.ContextExecutor, insert bool, related *PortalRole) error {
+// Adds o to related.R.FolderPermissionOverrides.
+func (o *FolderPermissionOverride) SetPortalRole(ctx context.Context, exec boil.ContextExecutor, insert bool, related *PortalRole) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -1079,9 +1086,9 @@ func (o *FolderPermission) SetPortalRole(ctx context.Context, exec boil.ContextE
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE \"folder_permissions\" SET %s WHERE %s",
+		"UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, []string{"portal_role_id"}),
-		strmangle.WhereClause("\"", "\"", 2, folderPermissionPrimaryKeyColumns),
+		strmangle.WhereClause("\"", "\"", 2, folderPermissionOverridePrimaryKeyColumns),
 	)
 	values := []any{related.ID, o.ID}
 
@@ -1096,7 +1103,7 @@ func (o *FolderPermission) SetPortalRole(ctx context.Context, exec boil.ContextE
 
 	queries.Assign(&o.PortalRoleID, related.ID)
 	if o.R == nil {
-		o.R = &folderPermissionR{
+		o.R = &folderPermissionOverrideR{
 			PortalRole: related,
 		}
 	} else {
@@ -1105,10 +1112,10 @@ func (o *FolderPermission) SetPortalRole(ctx context.Context, exec boil.ContextE
 
 	if related.R == nil {
 		related.R = &portalRoleR{
-			FolderPermissions: FolderPermissionSlice{o},
+			FolderPermissionOverrides: FolderPermissionOverrideSlice{o},
 		}
 	} else {
-		related.R.FolderPermissions = append(related.R.FolderPermissions, o)
+		related.R.FolderPermissionOverrides = append(related.R.FolderPermissionOverrides, o)
 	}
 
 	return nil
@@ -1117,7 +1124,7 @@ func (o *FolderPermission) SetPortalRole(ctx context.Context, exec boil.ContextE
 // RemovePortalRole relationship.
 // Sets o.R.PortalRole to nil.
 // Removes o from all passed in related items' relationships struct.
-func (o *FolderPermission) RemovePortalRole(ctx context.Context, exec boil.ContextExecutor, related *PortalRole) error {
+func (o *FolderPermissionOverride) RemovePortalRole(ctx context.Context, exec boil.ContextExecutor, related *PortalRole) error {
 	var err error
 
 	queries.SetScanner(&o.PortalRoleID, nil)
@@ -1132,25 +1139,25 @@ func (o *FolderPermission) RemovePortalRole(ctx context.Context, exec boil.Conte
 		return nil
 	}
 
-	for i, ri := range related.R.FolderPermissions {
+	for i, ri := range related.R.FolderPermissionOverrides {
 		if queries.Equal(o.PortalRoleID, ri.PortalRoleID) {
 			continue
 		}
 
-		ln := len(related.R.FolderPermissions)
+		ln := len(related.R.FolderPermissionOverrides)
 		if ln > 1 && i < ln-1 {
-			related.R.FolderPermissions[i] = related.R.FolderPermissions[ln-1]
+			related.R.FolderPermissionOverrides[i] = related.R.FolderPermissionOverrides[ln-1]
 		}
-		related.R.FolderPermissions = related.R.FolderPermissions[:ln-1]
+		related.R.FolderPermissionOverrides = related.R.FolderPermissionOverrides[:ln-1]
 		break
 	}
 	return nil
 }
 
-// SetUser of the folderPermission to the related item.
+// SetUser of the folderPermissionOverride to the related item.
 // Sets o.R.User to related.
-// Adds o to related.R.FolderPermissions.
-func (o *FolderPermission) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
+// Adds o to related.R.FolderPermissionOverrides.
+func (o *FolderPermissionOverride) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -1159,9 +1166,9 @@ func (o *FolderPermission) SetUser(ctx context.Context, exec boil.ContextExecuto
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE \"folder_permissions\" SET %s WHERE %s",
+		"UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
-		strmangle.WhereClause("\"", "\"", 2, folderPermissionPrimaryKeyColumns),
+		strmangle.WhereClause("\"", "\"", 2, folderPermissionOverridePrimaryKeyColumns),
 	)
 	values := []any{related.ID, o.ID}
 
@@ -1176,7 +1183,7 @@ func (o *FolderPermission) SetUser(ctx context.Context, exec boil.ContextExecuto
 
 	queries.Assign(&o.UserID, related.ID)
 	if o.R == nil {
-		o.R = &folderPermissionR{
+		o.R = &folderPermissionOverrideR{
 			User: related,
 		}
 	} else {
@@ -1185,10 +1192,10 @@ func (o *FolderPermission) SetUser(ctx context.Context, exec boil.ContextExecuto
 
 	if related.R == nil {
 		related.R = &userR{
-			FolderPermissions: FolderPermissionSlice{o},
+			FolderPermissionOverrides: FolderPermissionOverrideSlice{o},
 		}
 	} else {
-		related.R.FolderPermissions = append(related.R.FolderPermissions, o)
+		related.R.FolderPermissionOverrides = append(related.R.FolderPermissionOverrides, o)
 	}
 
 	return nil
@@ -1197,7 +1204,7 @@ func (o *FolderPermission) SetUser(ctx context.Context, exec boil.ContextExecuto
 // RemoveUser relationship.
 // Sets o.R.User to nil.
 // Removes o from all passed in related items' relationships struct.
-func (o *FolderPermission) RemoveUser(ctx context.Context, exec boil.ContextExecutor, related *User) error {
+func (o *FolderPermissionOverride) RemoveUser(ctx context.Context, exec boil.ContextExecutor, related *User) error {
 	var err error
 
 	queries.SetScanner(&o.UserID, nil)
@@ -1212,63 +1219,63 @@ func (o *FolderPermission) RemoveUser(ctx context.Context, exec boil.ContextExec
 		return nil
 	}
 
-	for i, ri := range related.R.FolderPermissions {
+	for i, ri := range related.R.FolderPermissionOverrides {
 		if queries.Equal(o.UserID, ri.UserID) {
 			continue
 		}
 
-		ln := len(related.R.FolderPermissions)
+		ln := len(related.R.FolderPermissionOverrides)
 		if ln > 1 && i < ln-1 {
-			related.R.FolderPermissions[i] = related.R.FolderPermissions[ln-1]
+			related.R.FolderPermissionOverrides[i] = related.R.FolderPermissionOverrides[ln-1]
 		}
-		related.R.FolderPermissions = related.R.FolderPermissions[:ln-1]
+		related.R.FolderPermissionOverrides = related.R.FolderPermissionOverrides[:ln-1]
 		break
 	}
 	return nil
 }
 
-// FolderPermissions retrieves all the records using an executor.
-func FolderPermissions(mods ...qm.QueryMod) folderPermissionQuery {
-	mods = append(mods, qm.From("\"folder_permissions\""))
+// FolderPermissionOverrides retrieves all the records using an executor.
+func FolderPermissionOverrides(mods ...qm.QueryMod) folderPermissionOverrideQuery {
+	mods = append(mods, qm.From("\"folder_permission_overrides\""))
 	q := NewQuery(mods...)
 	if len(queries.GetSelect(q)) == 0 {
-		queries.SetSelect(q, []string{"\"folder_permissions\".*"})
+		queries.SetSelect(q, []string{"\"folder_permission_overrides\".*"})
 	}
 
-	return folderPermissionQuery{q}
+	return folderPermissionOverrideQuery{q}
 }
 
-// FindFolderPermission retrieves a single record by ID with an executor.
+// FindFolderPermissionOverride retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindFolderPermission(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*FolderPermission, error) {
-	folderPermissionObj := &FolderPermission{}
+func FindFolderPermissionOverride(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*FolderPermissionOverride, error) {
+	folderPermissionOverrideObj := &FolderPermissionOverride{}
 
 	sel := "*"
 	if len(selectCols) > 0 {
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"folder_permissions\" where \"id\"=$1", sel,
+		"select %s from \"folder_permission_overrides\" where \"id\"=$1", sel,
 	)
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(ctx, exec, folderPermissionObj)
+	err := q.Bind(ctx, exec, folderPermissionOverrideObj)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: unable to select from folder_permissions")
+		return nil, errors.Wrap(err, "models: unable to select from folder_permission_overrides")
 	}
 
-	return folderPermissionObj, nil
+	return folderPermissionOverrideObj, nil
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *FolderPermission) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
+func (o *FolderPermissionOverride) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no folder_permissions provided for insertion")
+		return errors.New("models: no folder_permission_overrides provided for insertion")
 	}
 
 	var err error
@@ -1280,34 +1287,34 @@ func (o *FolderPermission) Insert(ctx context.Context, exec boil.ContextExecutor
 		}
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(folderPermissionColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(folderPermissionOverrideColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
-	folderPermissionInsertCacheMut.RLock()
-	cache, cached := folderPermissionInsertCache[key]
-	folderPermissionInsertCacheMut.RUnlock()
+	folderPermissionOverrideInsertCacheMut.RLock()
+	cache, cached := folderPermissionOverrideInsertCache[key]
+	folderPermissionOverrideInsertCacheMut.RUnlock()
 
 	if !cached {
 		wl, returnColumns := columns.InsertColumnSet(
-			folderPermissionAllColumns,
-			folderPermissionColumnsWithDefault,
-			folderPermissionColumnsWithoutDefault,
+			folderPermissionOverrideAllColumns,
+			folderPermissionOverrideColumnsWithDefault,
+			folderPermissionOverrideColumnsWithoutDefault,
 			nzDefaults,
 		)
-		wl = strmangle.SetComplement(wl, folderPermissionGeneratedColumns)
+		wl = strmangle.SetComplement(wl, folderPermissionOverrideGeneratedColumns)
 
-		cache.valueMapping, err = queries.BindMapping(folderPermissionType, folderPermissionMapping, wl)
+		cache.valueMapping, err = queries.BindMapping(folderPermissionOverrideType, folderPermissionOverrideMapping, wl)
 		if err != nil {
 			return err
 		}
-		cache.retMapping, err = queries.BindMapping(folderPermissionType, folderPermissionMapping, returnColumns)
+		cache.retMapping, err = queries.BindMapping(folderPermissionOverrideType, folderPermissionOverrideMapping, returnColumns)
 		if err != nil {
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO \"folder_permissions\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO \"folder_permission_overrides\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO \"folder_permissions\" %sDEFAULT VALUES%s"
+			cache.query = "INSERT INTO \"folder_permission_overrides\" %sDEFAULT VALUES%s"
 		}
 
 		var queryOutput, queryReturning string
@@ -1335,47 +1342,47 @@ func (o *FolderPermission) Insert(ctx context.Context, exec boil.ContextExecutor
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "models: unable to insert into folder_permissions")
+		return errors.Wrap(err, "models: unable to insert into folder_permission_overrides")
 	}
 
 	if !cached {
-		folderPermissionInsertCacheMut.Lock()
-		folderPermissionInsertCache[key] = cache
-		folderPermissionInsertCacheMut.Unlock()
+		folderPermissionOverrideInsertCacheMut.Lock()
+		folderPermissionOverrideInsertCache[key] = cache
+		folderPermissionOverrideInsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Update uses an executor to update the FolderPermission.
+// Update uses an executor to update the FolderPermissionOverride.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *FolderPermission) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+func (o *FolderPermissionOverride) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
 	var err error
 	key := makeCacheKey(columns, nil)
-	folderPermissionUpdateCacheMut.RLock()
-	cache, cached := folderPermissionUpdateCache[key]
-	folderPermissionUpdateCacheMut.RUnlock()
+	folderPermissionOverrideUpdateCacheMut.RLock()
+	cache, cached := folderPermissionOverrideUpdateCache[key]
+	folderPermissionOverrideUpdateCacheMut.RUnlock()
 
 	if !cached {
 		wl := columns.UpdateColumnSet(
-			folderPermissionAllColumns,
-			folderPermissionPrimaryKeyColumns,
+			folderPermissionOverrideAllColumns,
+			folderPermissionOverridePrimaryKeyColumns,
 		)
-		wl = strmangle.SetComplement(wl, folderPermissionGeneratedColumns)
+		wl = strmangle.SetComplement(wl, folderPermissionOverrideGeneratedColumns)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return 0, errors.New("models: unable to update folder_permissions, could not build whitelist")
+			return 0, errors.New("models: unable to update folder_permission_overrides, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE \"folder_permissions\" SET %s WHERE %s",
+		cache.query = fmt.Sprintf("UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
 			strmangle.SetParamNames("\"", "\"", 1, wl),
-			strmangle.WhereClause("\"", "\"", len(wl)+1, folderPermissionPrimaryKeyColumns),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, folderPermissionOverridePrimaryKeyColumns),
 		)
-		cache.valueMapping, err = queries.BindMapping(folderPermissionType, folderPermissionMapping, append(wl, folderPermissionPrimaryKeyColumns...))
+		cache.valueMapping, err = queries.BindMapping(folderPermissionOverrideType, folderPermissionOverrideMapping, append(wl, folderPermissionOverridePrimaryKeyColumns...))
 		if err != nil {
 			return 0, err
 		}
@@ -1391,42 +1398,42 @@ func (o *FolderPermission) Update(ctx context.Context, exec boil.ContextExecutor
 	var result sql.Result
 	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update folder_permissions row")
+		return 0, errors.Wrap(err, "models: unable to update folder_permission_overrides row")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by update for folder_permissions")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by update for folder_permission_overrides")
 	}
 
 	if !cached {
-		folderPermissionUpdateCacheMut.Lock()
-		folderPermissionUpdateCache[key] = cache
-		folderPermissionUpdateCacheMut.Unlock()
+		folderPermissionOverrideUpdateCacheMut.Lock()
+		folderPermissionOverrideUpdateCache[key] = cache
+		folderPermissionOverrideUpdateCacheMut.Unlock()
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q folderPermissionQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
+func (q folderPermissionOverrideQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update all for folder_permissions")
+		return 0, errors.Wrap(err, "models: unable to update all for folder_permission_overrides")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for folder_permissions")
+		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for folder_permission_overrides")
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o FolderPermissionSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
+func (o FolderPermissionOverrideSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -1448,13 +1455,13 @@ func (o FolderPermissionSlice) UpdateAll(ctx context.Context, exec boil.ContextE
 
 	// Append all of the primary key values for each column
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), folderPermissionPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), folderPermissionOverridePrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE \"folder_permissions\" SET %s WHERE %s",
+	sql := fmt.Sprintf("UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, folderPermissionPrimaryKeyColumns, len(o)))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, folderPermissionOverridePrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1463,21 +1470,21 @@ func (o FolderPermissionSlice) UpdateAll(ctx context.Context, exec boil.ContextE
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update all in folderPermission slice")
+		return 0, errors.Wrap(err, "models: unable to update all in folderPermissionOverride slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all folderPermission")
+		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all folderPermissionOverride")
 	}
 	return rowsAff, nil
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *FolderPermission) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
+func (o *FolderPermissionOverride) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
-		return errors.New("models: no folder_permissions provided for upsert")
+		return errors.New("models: no folder_permission_overrides provided for upsert")
 	}
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
@@ -1487,7 +1494,7 @@ func (o *FolderPermission) Upsert(ctx context.Context, exec boil.ContextExecutor
 		}
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(folderPermissionColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(folderPermissionOverrideColumnsWithDefault, o)
 
 	// Build cache key in-line uglily - mysql vs psql problems
 	buf := strmangle.GetBuffer()
@@ -1517,51 +1524,51 @@ func (o *FolderPermission) Upsert(ctx context.Context, exec boil.ContextExecutor
 	key := buf.String()
 	strmangle.PutBuffer(buf)
 
-	folderPermissionUpsertCacheMut.RLock()
-	cache, cached := folderPermissionUpsertCache[key]
-	folderPermissionUpsertCacheMut.RUnlock()
+	folderPermissionOverrideUpsertCacheMut.RLock()
+	cache, cached := folderPermissionOverrideUpsertCache[key]
+	folderPermissionOverrideUpsertCacheMut.RUnlock()
 
 	var err error
 
 	if !cached {
 		insert, _ := insertColumns.InsertColumnSet(
-			folderPermissionAllColumns,
-			folderPermissionColumnsWithDefault,
-			folderPermissionColumnsWithoutDefault,
+			folderPermissionOverrideAllColumns,
+			folderPermissionOverrideColumnsWithDefault,
+			folderPermissionOverrideColumnsWithoutDefault,
 			nzDefaults,
 		)
 
 		update := updateColumns.UpdateColumnSet(
-			folderPermissionAllColumns,
-			folderPermissionPrimaryKeyColumns,
+			folderPermissionOverrideAllColumns,
+			folderPermissionOverridePrimaryKeyColumns,
 		)
 
-		insert = strmangle.SetComplement(insert, folderPermissionGeneratedColumns)
-		update = strmangle.SetComplement(update, folderPermissionGeneratedColumns)
+		insert = strmangle.SetComplement(insert, folderPermissionOverrideGeneratedColumns)
+		update = strmangle.SetComplement(update, folderPermissionOverrideGeneratedColumns)
 
 		if updateOnConflict && len(update) == 0 {
-			return errors.New("models: unable to upsert folder_permissions, could not build update column list")
+			return errors.New("models: unable to upsert folder_permission_overrides, could not build update column list")
 		}
 
-		ret := strmangle.SetComplement(folderPermissionAllColumns, strmangle.SetIntersect(insert, update))
+		ret := strmangle.SetComplement(folderPermissionOverrideAllColumns, strmangle.SetIntersect(insert, update))
 
 		conflict := conflictColumns
 		if len(conflict) == 0 && updateOnConflict && len(update) != 0 {
-			if len(folderPermissionPrimaryKeyColumns) == 0 {
-				return errors.New("models: unable to upsert folder_permissions, could not build conflict column list")
+			if len(folderPermissionOverridePrimaryKeyColumns) == 0 {
+				return errors.New("models: unable to upsert folder_permission_overrides, could not build conflict column list")
 			}
 
-			conflict = make([]string, len(folderPermissionPrimaryKeyColumns))
-			copy(conflict, folderPermissionPrimaryKeyColumns)
+			conflict = make([]string, len(folderPermissionOverridePrimaryKeyColumns))
+			copy(conflict, folderPermissionOverridePrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQueryPostgres(dialect, "\"folder_permissions\"", updateOnConflict, ret, update, conflict, insert, opts...)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"folder_permission_overrides\"", updateOnConflict, ret, update, conflict, insert, opts...)
 
-		cache.valueMapping, err = queries.BindMapping(folderPermissionType, folderPermissionMapping, insert)
+		cache.valueMapping, err = queries.BindMapping(folderPermissionOverrideType, folderPermissionOverrideMapping, insert)
 		if err != nil {
 			return err
 		}
 		if len(ret) != 0 {
-			cache.retMapping, err = queries.BindMapping(folderPermissionType, folderPermissionMapping, ret)
+			cache.retMapping, err = queries.BindMapping(folderPermissionOverrideType, folderPermissionOverrideMapping, ret)
 			if err != nil {
 				return err
 			}
@@ -1589,27 +1596,27 @@ func (o *FolderPermission) Upsert(ctx context.Context, exec boil.ContextExecutor
 		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
-		return errors.Wrap(err, "models: unable to upsert folder_permissions")
+		return errors.Wrap(err, "models: unable to upsert folder_permission_overrides")
 	}
 
 	if !cached {
-		folderPermissionUpsertCacheMut.Lock()
-		folderPermissionUpsertCache[key] = cache
-		folderPermissionUpsertCacheMut.Unlock()
+		folderPermissionOverrideUpsertCacheMut.Lock()
+		folderPermissionOverrideUpsertCache[key] = cache
+		folderPermissionOverrideUpsertCacheMut.Unlock()
 	}
 
 	return nil
 }
 
-// Delete deletes a single FolderPermission record with an executor.
+// Delete deletes a single FolderPermissionOverride record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *FolderPermission) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o *FolderPermissionOverride) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
-		return 0, errors.New("models: no FolderPermission provided for delete")
+		return 0, errors.New("models: no FolderPermissionOverride provided for delete")
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), folderPermissionPrimaryKeyMapping)
-	sql := "DELETE FROM \"folder_permissions\" WHERE \"id\"=$1"
+	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), folderPermissionOverridePrimaryKeyMapping)
+	sql := "DELETE FROM \"folder_permission_overrides\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1618,52 +1625,52 @@ func (o *FolderPermission) Delete(ctx context.Context, exec boil.ContextExecutor
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete from folder_permissions")
+		return 0, errors.Wrap(err, "models: unable to delete from folder_permission_overrides")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for folder_permissions")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for folder_permission_overrides")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all matching rows.
-func (q folderPermissionQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (q folderPermissionOverrideQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
-		return 0, errors.New("models: no folderPermissionQuery provided for delete all")
+		return 0, errors.New("models: no folderPermissionOverrideQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete all from folder_permissions")
+		return 0, errors.Wrap(err, "models: unable to delete all from folder_permission_overrides")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for folder_permissions")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for folder_permission_overrides")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o FolderPermissionSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o FolderPermissionOverrideSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
 	var args []any
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), folderPermissionPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), folderPermissionOverridePrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM \"folder_permissions\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, folderPermissionPrimaryKeyColumns, len(o))
+	sql := "DELETE FROM \"folder_permission_overrides\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, folderPermissionOverridePrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1672,12 +1679,12 @@ func (o FolderPermissionSlice) DeleteAll(ctx context.Context, exec boil.ContextE
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete all from folderPermission slice")
+		return 0, errors.Wrap(err, "models: unable to delete all from folderPermissionOverride slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for folder_permissions")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for folder_permission_overrides")
 	}
 
 	return rowsAff, nil
@@ -1685,8 +1692,8 @@ func (o FolderPermissionSlice) DeleteAll(ctx context.Context, exec boil.ContextE
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *FolderPermission) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindFolderPermission(ctx, exec, o.ID)
+func (o *FolderPermissionOverride) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindFolderPermissionOverride(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1697,26 +1704,26 @@ func (o *FolderPermission) Reload(ctx context.Context, exec boil.ContextExecutor
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *FolderPermissionSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (o *FolderPermissionOverrideSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
 
-	slice := FolderPermissionSlice{}
+	slice := FolderPermissionOverrideSlice{}
 	var args []any
 	for _, obj := range *o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), folderPermissionPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), folderPermissionOverridePrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT \"folder_permissions\".* FROM \"folder_permissions\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, folderPermissionPrimaryKeyColumns, len(*o))
+	sql := "SELECT \"folder_permission_overrides\".* FROM \"folder_permission_overrides\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, folderPermissionOverridePrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
 	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to reload all in FolderPermissionSlice")
+		return errors.Wrap(err, "models: unable to reload all in FolderPermissionOverrideSlice")
 	}
 
 	*o = slice
@@ -1724,10 +1731,10 @@ func (o *FolderPermissionSlice) ReloadAll(ctx context.Context, exec boil.Context
 	return nil
 }
 
-// FolderPermissionExists checks if the FolderPermission row exists.
-func FolderPermissionExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
+// FolderPermissionOverrideExists checks if the FolderPermissionOverride row exists.
+func FolderPermissionOverrideExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"folder_permissions\" where \"id\"=$1 limit 1)"
+	sql := "select exists(select 1 from \"folder_permission_overrides\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1738,13 +1745,13 @@ func FolderPermissionExists(ctx context.Context, exec boil.ContextExecutor, iD i
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "models: unable to check if folder_permissions exists")
+		return false, errors.Wrap(err, "models: unable to check if folder_permission_overrides exists")
 	}
 
 	return exists, nil
 }
 
-// Exists checks if the FolderPermission row exists.
-func (o *FolderPermission) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return FolderPermissionExists(ctx, exec, o.ID)
+// Exists checks if the FolderPermissionOverride row exists.
+func (o *FolderPermissionOverride) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+	return FolderPermissionOverrideExists(ctx, exec, o.ID)
 }

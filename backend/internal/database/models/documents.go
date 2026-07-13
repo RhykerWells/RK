@@ -84,44 +84,6 @@ var DocumentTableColumns = struct {
 
 // Generated where
 
-type whereHelpernull_Int64 struct{ field string }
-
-func (w whereHelpernull_Int64) EQ(x null.Int64) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Int64) NEQ(x null.Int64) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Int64) LT(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Int64) LTE(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Int64) GT(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Int64) GTE(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelpernull_Int64) IN(slice []int64) qm.QueryMod {
-	values := make([]any, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelpernull_Int64) NIN(slice []int64) qm.QueryMod {
-	values := make([]any, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
-func (w whereHelpernull_Int64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Int64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
 var DocumentWhere = struct {
 	ID              whereHelperint64
 	FolderID        whereHelperint64
@@ -153,6 +115,7 @@ var DocumentRels = struct {
 	DocumentFiles               string
 	SourceDocumentDocumentLinks string
 	TargetDocumentDocumentLinks string
+	DocumentPermissionOverrides string
 	DocumentVersions            string
 }{
 	CreatedByUser:               "CreatedByUser",
@@ -162,19 +125,21 @@ var DocumentRels = struct {
 	DocumentFiles:               "DocumentFiles",
 	SourceDocumentDocumentLinks: "SourceDocumentDocumentLinks",
 	TargetDocumentDocumentLinks: "TargetDocumentDocumentLinks",
+	DocumentPermissionOverrides: "DocumentPermissionOverrides",
 	DocumentVersions:            "DocumentVersions",
 }
 
 // documentR is where relationships are stored.
 type documentR struct {
-	CreatedByUser               *User                `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
-	Folder                      *Folder              `boil:"Folder" json:"Folder" toml:"Folder" yaml:"Folder"`
-	Owner                       *User                `boil:"Owner" json:"Owner" toml:"Owner" yaml:"Owner"`
-	UpdatedByUser               *User                `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
-	DocumentFiles               DocumentFileSlice    `boil:"DocumentFiles" json:"DocumentFiles" toml:"DocumentFiles" yaml:"DocumentFiles"`
-	SourceDocumentDocumentLinks DocumentLinkSlice    `boil:"SourceDocumentDocumentLinks" json:"SourceDocumentDocumentLinks" toml:"SourceDocumentDocumentLinks" yaml:"SourceDocumentDocumentLinks"`
-	TargetDocumentDocumentLinks DocumentLinkSlice    `boil:"TargetDocumentDocumentLinks" json:"TargetDocumentDocumentLinks" toml:"TargetDocumentDocumentLinks" yaml:"TargetDocumentDocumentLinks"`
-	DocumentVersions            DocumentVersionSlice `boil:"DocumentVersions" json:"DocumentVersions" toml:"DocumentVersions" yaml:"DocumentVersions"`
+	CreatedByUser               *User                           `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
+	Folder                      *Folder                         `boil:"Folder" json:"Folder" toml:"Folder" yaml:"Folder"`
+	Owner                       *User                           `boil:"Owner" json:"Owner" toml:"Owner" yaml:"Owner"`
+	UpdatedByUser               *User                           `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
+	DocumentFiles               DocumentFileSlice               `boil:"DocumentFiles" json:"DocumentFiles" toml:"DocumentFiles" yaml:"DocumentFiles"`
+	SourceDocumentDocumentLinks DocumentLinkSlice               `boil:"SourceDocumentDocumentLinks" json:"SourceDocumentDocumentLinks" toml:"SourceDocumentDocumentLinks" yaml:"SourceDocumentDocumentLinks"`
+	TargetDocumentDocumentLinks DocumentLinkSlice               `boil:"TargetDocumentDocumentLinks" json:"TargetDocumentDocumentLinks" toml:"TargetDocumentDocumentLinks" yaml:"TargetDocumentDocumentLinks"`
+	DocumentPermissionOverrides DocumentPermissionOverrideSlice `boil:"DocumentPermissionOverrides" json:"DocumentPermissionOverrides" toml:"DocumentPermissionOverrides" yaml:"DocumentPermissionOverrides"`
+	DocumentVersions            DocumentVersionSlice            `boil:"DocumentVersions" json:"DocumentVersions" toml:"DocumentVersions" yaml:"DocumentVersions"`
 }
 
 // NewStruct creates a new relationship struct
@@ -292,6 +257,22 @@ func (r *documentR) GetTargetDocumentDocumentLinks() DocumentLinkSlice {
 	}
 
 	return r.TargetDocumentDocumentLinks
+}
+
+func (o *Document) GetDocumentPermissionOverrides() DocumentPermissionOverrideSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetDocumentPermissionOverrides()
+}
+
+func (r *documentR) GetDocumentPermissionOverrides() DocumentPermissionOverrideSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.DocumentPermissionOverrides
 }
 
 func (o *Document) GetDocumentVersions() DocumentVersionSlice {
@@ -496,6 +477,20 @@ func (o *Document) TargetDocumentDocumentLinks(mods ...qm.QueryMod) documentLink
 	)
 
 	return DocumentLinks(queryMods...)
+}
+
+// DocumentPermissionOverrides retrieves all the document_permission_override's DocumentPermissionOverrides with an executor.
+func (o *Document) DocumentPermissionOverrides(mods ...qm.QueryMod) documentPermissionOverrideQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"document_permission_overrides\".\"document_id\"=?", o.ID),
+	)
+
+	return DocumentPermissionOverrides(queryMods...)
 }
 
 // DocumentVersions retrieves all the document_version's DocumentVersions with an executor.
@@ -1286,6 +1281,112 @@ func (documentL) LoadTargetDocumentDocumentLinks(ctx context.Context, e boil.Con
 	return nil
 }
 
+// LoadDocumentPermissionOverrides allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (documentL) LoadDocumentPermissionOverrides(ctx context.Context, e boil.ContextExecutor, singular bool, maybeDocument any, mods queries.Applicator) error {
+	var slice []*Document
+	var object *Document
+
+	if singular {
+		var ok bool
+		object, ok = maybeDocument.(*Document)
+		if !ok {
+			object = new(Document)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeDocument)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeDocument))
+			}
+		}
+	} else {
+		s, ok := maybeDocument.(*[]*Document)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeDocument)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeDocument))
+			}
+		}
+	}
+
+	args := make(map[any]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &documentR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &documentR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]any, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`document_permission_overrides`),
+		qm.WhereIn(`document_permission_overrides.document_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load document_permission_overrides")
+	}
+
+	var resultSlice []*DocumentPermissionOverride
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice document_permission_overrides")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on document_permission_overrides")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for document_permission_overrides")
+	}
+
+	if singular {
+		object.R.DocumentPermissionOverrides = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &documentPermissionOverrideR{}
+			}
+			foreign.R.Document = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.DocumentID {
+				local.R.DocumentPermissionOverrides = append(local.R.DocumentPermissionOverrides, foreign)
+				if foreign.R == nil {
+					foreign.R = &documentPermissionOverrideR{}
+				}
+				foreign.R.Document = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // LoadDocumentVersions allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
 func (documentL) LoadDocumentVersions(ctx context.Context, e boil.ContextExecutor, singular bool, maybeDocument any, mods queries.Applicator) error {
@@ -1800,6 +1901,59 @@ func (o *Document) AddTargetDocumentDocumentLinks(ctx context.Context, exec boil
 			}
 		} else {
 			rel.R.TargetDocument = o
+		}
+	}
+	return nil
+}
+
+// AddDocumentPermissionOverrides adds the given related objects to the existing relationships
+// of the document, optionally inserting them as new records.
+// Appends related to o.R.DocumentPermissionOverrides.
+// Sets related.R.Document appropriately.
+func (o *Document) AddDocumentPermissionOverrides(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*DocumentPermissionOverride) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.DocumentID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"document_permission_overrides\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"document_id"}),
+				strmangle.WhereClause("\"", "\"", 2, documentPermissionOverridePrimaryKeyColumns),
+			)
+			values := []any{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.DocumentID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &documentR{
+			DocumentPermissionOverrides: related,
+		}
+	} else {
+		o.R.DocumentPermissionOverrides = append(o.R.DocumentPermissionOverrides, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &documentPermissionOverrideR{
+				Document: o,
+			}
+		} else {
+			rel.R.Document = o
 		}
 	}
 	return nil
