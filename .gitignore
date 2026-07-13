@@ -1,3 +1,5 @@
 # Development files
 docs/
 
+*.env
+!example.*.env
