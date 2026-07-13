@@ -53,19 +53,18 @@ func Connect(config *config.Config) error {
 		"Database connected successfully",
 	)
 
-	log.Info(
-		"Initialising database schemas",
-	)
-
-	initSchemas(DB)
-
+	initSchemas(log)
 
 	return nil
 }
 
-func initSchemas(db *sql.DB) {
+func initSchemas(log *slog.Logger) {
+	log.Info(
+		"Initialising database schemas",
+	)
+
 	for i, schema := range Schemas {
-		_, err := db.Exec(schema.SQL)
+		_, err := DB.Exec(schema.SQL)
 		if err != nil {
 			log.Error(
 				"Failed initialising postgres db schema",
