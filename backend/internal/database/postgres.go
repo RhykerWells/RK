@@ -19,7 +19,8 @@ func Connect(config *config.Config) error {
 		"Connecting to Database",
 	)
 
-	DB, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Database.Host, config.Database.Port, config.Database.User, config.Database.Password, config.Database.Name))
+	var err error
+	DB, err = sql.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Database.Host, config.Database.Port, config.Database.User, config.Database.Password, config.Database.Name))
 	if err != nil {
 		log.Error(
 			"Failed to create database handle",
