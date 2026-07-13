@@ -24,79 +24,100 @@ import (
 
 // PortalRole is an object representing the database table.
 type PortalRole struct {
-	ID          int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	PortalID    int64       `boil:"portal_id" json:"portal_id" toml:"portal_id" yaml:"portal_id"`
-	Name        string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Description null.String `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
-	CreatedBy   int64       `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	UpdatedBy   null.Int64  `boil:"updated_by" json:"updated_by,omitempty" toml:"updated_by" yaml:"updated_by,omitempty"`
-	CreatedAt   time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt   time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID            int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	PortalID      int64       `boil:"portal_id" json:"portal_id" toml:"portal_id" yaml:"portal_id"`
+	Name          string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Description   null.String `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
+	Colour        null.String `boil:"colour" json:"colour,omitempty" toml:"colour" yaml:"colour,omitempty"`
+	Position      int64       `boil:"position" json:"position" toml:"position" yaml:"position"`
+	DiscordRoleID null.String `boil:"discord_role_id" json:"discord_role_id,omitempty" toml:"discord_role_id" yaml:"discord_role_id,omitempty"`
+	CreatedBy     int64       `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
+	UpdatedBy     null.Int64  `boil:"updated_by" json:"updated_by,omitempty" toml:"updated_by" yaml:"updated_by,omitempty"`
+	CreatedAt     time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt     time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *portalRoleR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L portalRoleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var PortalRoleColumns = struct {
-	ID          string
-	PortalID    string
-	Name        string
-	Description string
-	CreatedBy   string
-	UpdatedBy   string
-	CreatedAt   string
-	UpdatedAt   string
+	ID            string
+	PortalID      string
+	Name          string
+	Description   string
+	Colour        string
+	Position      string
+	DiscordRoleID string
+	CreatedBy     string
+	UpdatedBy     string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:          "id",
-	PortalID:    "portal_id",
-	Name:        "name",
-	Description: "description",
-	CreatedBy:   "created_by",
-	UpdatedBy:   "updated_by",
-	CreatedAt:   "created_at",
-	UpdatedAt:   "updated_at",
+	ID:            "id",
+	PortalID:      "portal_id",
+	Name:          "name",
+	Description:   "description",
+	Colour:        "colour",
+	Position:      "position",
+	DiscordRoleID: "discord_role_id",
+	CreatedBy:     "created_by",
+	UpdatedBy:     "updated_by",
+	CreatedAt:     "created_at",
+	UpdatedAt:     "updated_at",
 }
 
 var PortalRoleTableColumns = struct {
-	ID          string
-	PortalID    string
-	Name        string
-	Description string
-	CreatedBy   string
-	UpdatedBy   string
-	CreatedAt   string
-	UpdatedAt   string
+	ID            string
+	PortalID      string
+	Name          string
+	Description   string
+	Colour        string
+	Position      string
+	DiscordRoleID string
+	CreatedBy     string
+	UpdatedBy     string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	ID:          "portal_roles.id",
-	PortalID:    "portal_roles.portal_id",
-	Name:        "portal_roles.name",
-	Description: "portal_roles.description",
-	CreatedBy:   "portal_roles.created_by",
-	UpdatedBy:   "portal_roles.updated_by",
-	CreatedAt:   "portal_roles.created_at",
-	UpdatedAt:   "portal_roles.updated_at",
+	ID:            "portal_roles.id",
+	PortalID:      "portal_roles.portal_id",
+	Name:          "portal_roles.name",
+	Description:   "portal_roles.description",
+	Colour:        "portal_roles.colour",
+	Position:      "portal_roles.position",
+	DiscordRoleID: "portal_roles.discord_role_id",
+	CreatedBy:     "portal_roles.created_by",
+	UpdatedBy:     "portal_roles.updated_by",
+	CreatedAt:     "portal_roles.created_at",
+	UpdatedAt:     "portal_roles.updated_at",
 }
 
 // Generated where
 
 var PortalRoleWhere = struct {
-	ID          whereHelperint64
-	PortalID    whereHelperint64
-	Name        whereHelperstring
-	Description whereHelpernull_String
-	CreatedBy   whereHelperint64
-	UpdatedBy   whereHelpernull_Int64
-	CreatedAt   whereHelpertime_Time
-	UpdatedAt   whereHelpertime_Time
+	ID            whereHelperint64
+	PortalID      whereHelperint64
+	Name          whereHelperstring
+	Description   whereHelpernull_String
+	Colour        whereHelpernull_String
+	Position      whereHelperint64
+	DiscordRoleID whereHelpernull_String
+	CreatedBy     whereHelperint64
+	UpdatedBy     whereHelpernull_Int64
+	CreatedAt     whereHelpertime_Time
+	UpdatedAt     whereHelpertime_Time
 }{
-	ID:          whereHelperint64{field: "\"portal_roles\".\"id\""},
-	PortalID:    whereHelperint64{field: "\"portal_roles\".\"portal_id\""},
-	Name:        whereHelperstring{field: "\"portal_roles\".\"name\""},
-	Description: whereHelpernull_String{field: "\"portal_roles\".\"description\""},
-	CreatedBy:   whereHelperint64{field: "\"portal_roles\".\"created_by\""},
-	UpdatedBy:   whereHelpernull_Int64{field: "\"portal_roles\".\"updated_by\""},
-	CreatedAt:   whereHelpertime_Time{field: "\"portal_roles\".\"created_at\""},
-	UpdatedAt:   whereHelpertime_Time{field: "\"portal_roles\".\"updated_at\""},
+	ID:            whereHelperint64{field: "\"portal_roles\".\"id\""},
+	PortalID:      whereHelperint64{field: "\"portal_roles\".\"portal_id\""},
+	Name:          whereHelperstring{field: "\"portal_roles\".\"name\""},
+	Description:   whereHelpernull_String{field: "\"portal_roles\".\"description\""},
+	Colour:        whereHelpernull_String{field: "\"portal_roles\".\"colour\""},
+	Position:      whereHelperint64{field: "\"portal_roles\".\"position\""},
+	DiscordRoleID: whereHelpernull_String{field: "\"portal_roles\".\"discord_role_id\""},
+	CreatedBy:     whereHelperint64{field: "\"portal_roles\".\"created_by\""},
+	UpdatedBy:     whereHelpernull_Int64{field: "\"portal_roles\".\"updated_by\""},
+	CreatedAt:     whereHelpertime_Time{field: "\"portal_roles\".\"created_at\""},
+	UpdatedAt:     whereHelpertime_Time{field: "\"portal_roles\".\"updated_at\""},
 }
 
 // PortalRoleRels is where relationship names are stored.
@@ -106,7 +127,7 @@ var PortalRoleRels = struct {
 	UpdatedByUser               string
 	DocumentPermissionOverrides string
 	FolderPermissionOverrides   string
-	PortalMemberships           string
+	PortalMembershipRoles       string
 	PortalRolePermissions       string
 }{
 	CreatedByUser:               "CreatedByUser",
@@ -114,7 +135,7 @@ var PortalRoleRels = struct {
 	UpdatedByUser:               "UpdatedByUser",
 	DocumentPermissionOverrides: "DocumentPermissionOverrides",
 	FolderPermissionOverrides:   "FolderPermissionOverrides",
-	PortalMemberships:           "PortalMemberships",
+	PortalMembershipRoles:       "PortalMembershipRoles",
 	PortalRolePermissions:       "PortalRolePermissions",
 }
 
@@ -125,7 +146,7 @@ type portalRoleR struct {
 	UpdatedByUser               *User                           `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
 	DocumentPermissionOverrides DocumentPermissionOverrideSlice `boil:"DocumentPermissionOverrides" json:"DocumentPermissionOverrides" toml:"DocumentPermissionOverrides" yaml:"DocumentPermissionOverrides"`
 	FolderPermissionOverrides   FolderPermissionOverrideSlice   `boil:"FolderPermissionOverrides" json:"FolderPermissionOverrides" toml:"FolderPermissionOverrides" yaml:"FolderPermissionOverrides"`
-	PortalMemberships           PortalMembershipSlice           `boil:"PortalMemberships" json:"PortalMemberships" toml:"PortalMemberships" yaml:"PortalMemberships"`
+	PortalMembershipRoles       PortalMembershipRoleSlice       `boil:"PortalMembershipRoles" json:"PortalMembershipRoles" toml:"PortalMembershipRoles" yaml:"PortalMembershipRoles"`
 	PortalRolePermissions       PortalRolePermissionSlice       `boil:"PortalRolePermissions" json:"PortalRolePermissions" toml:"PortalRolePermissions" yaml:"PortalRolePermissions"`
 }
 
@@ -214,20 +235,20 @@ func (r *portalRoleR) GetFolderPermissionOverrides() FolderPermissionOverrideSli
 	return r.FolderPermissionOverrides
 }
 
-func (o *PortalRole) GetPortalMemberships() PortalMembershipSlice {
+func (o *PortalRole) GetPortalMembershipRoles() PortalMembershipRoleSlice {
 	if o == nil {
 		return nil
 	}
 
-	return o.R.GetPortalMemberships()
+	return o.R.GetPortalMembershipRoles()
 }
 
-func (r *portalRoleR) GetPortalMemberships() PortalMembershipSlice {
+func (r *portalRoleR) GetPortalMembershipRoles() PortalMembershipRoleSlice {
 	if r == nil {
 		return nil
 	}
 
-	return r.PortalMemberships
+	return r.PortalMembershipRoles
 }
 
 func (o *PortalRole) GetPortalRolePermissions() PortalRolePermissionSlice {
@@ -250,9 +271,9 @@ func (r *portalRoleR) GetPortalRolePermissions() PortalRolePermissionSlice {
 type portalRoleL struct{}
 
 var (
-	portalRoleAllColumns            = []string{"id", "portal_id", "name", "description", "created_by", "updated_by", "created_at", "updated_at"}
+	portalRoleAllColumns            = []string{"id", "portal_id", "name", "description", "colour", "position", "discord_role_id", "created_by", "updated_by", "created_at", "updated_at"}
 	portalRoleColumnsWithoutDefault = []string{"portal_id", "name", "created_by"}
-	portalRoleColumnsWithDefault    = []string{"id", "description", "updated_by", "created_at", "updated_at"}
+	portalRoleColumnsWithDefault    = []string{"id", "description", "colour", "position", "discord_role_id", "updated_by", "created_at", "updated_at"}
 	portalRolePrimaryKeyColumns     = []string{"id"}
 	portalRoleGeneratedColumns      = []string{"id"}
 )
@@ -409,18 +430,18 @@ func (o *PortalRole) FolderPermissionOverrides(mods ...qm.QueryMod) folderPermis
 	return FolderPermissionOverrides(queryMods...)
 }
 
-// PortalMemberships retrieves all the portal_membership's PortalMemberships with an executor.
-func (o *PortalRole) PortalMemberships(mods ...qm.QueryMod) portalMembershipQuery {
+// PortalMembershipRoles retrieves all the portal_membership_role's PortalMembershipRoles with an executor.
+func (o *PortalRole) PortalMembershipRoles(mods ...qm.QueryMod) portalMembershipRoleQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"portal_memberships\".\"portal_role_id\"=?", o.ID),
+		qm.Where("\"portal_membership_roles\".\"portal_role_id\"=?", o.ID),
 	)
 
-	return PortalMemberships(queryMods...)
+	return PortalMembershipRoles(queryMods...)
 }
 
 // PortalRolePermissions retrieves all the portal_role_permission's PortalRolePermissions with an executor.
@@ -989,9 +1010,9 @@ func (portalRoleL) LoadFolderPermissionOverrides(ctx context.Context, e boil.Con
 	return nil
 }
 
-// LoadPortalMemberships allows an eager lookup of values, cached into the
+// LoadPortalMembershipRoles allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (portalRoleL) LoadPortalMemberships(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortalRole any, mods queries.Applicator) error {
+func (portalRoleL) LoadPortalMembershipRoles(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortalRole any, mods queries.Applicator) error {
 	var slice []*PortalRole
 	var object *PortalRole
 
@@ -1044,8 +1065,8 @@ func (portalRoleL) LoadPortalMemberships(ctx context.Context, e boil.ContextExec
 	}
 
 	query := NewQuery(
-		qm.From(`portal_memberships`),
-		qm.WhereIn(`portal_memberships.portal_role_id in ?`, argsSlice...),
+		qm.From(`portal_membership_roles`),
+		qm.WhereIn(`portal_membership_roles.portal_role_id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -1053,26 +1074,26 @@ func (portalRoleL) LoadPortalMemberships(ctx context.Context, e boil.ContextExec
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load portal_memberships")
+		return errors.Wrap(err, "failed to eager load portal_membership_roles")
 	}
 
-	var resultSlice []*PortalMembership
+	var resultSlice []*PortalMembershipRole
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice portal_memberships")
+		return errors.Wrap(err, "failed to bind eager loaded slice portal_membership_roles")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on portal_memberships")
+		return errors.Wrap(err, "failed to close results in eager load on portal_membership_roles")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for portal_memberships")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for portal_membership_roles")
 	}
 
 	if singular {
-		object.R.PortalMemberships = resultSlice
+		object.R.PortalMembershipRoles = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &portalMembershipR{}
+				foreign.R = &portalMembershipRoleR{}
 			}
 			foreign.R.PortalRole = object
 		}
@@ -1082,9 +1103,9 @@ func (portalRoleL) LoadPortalMemberships(ctx context.Context, e boil.ContextExec
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
 			if local.ID == foreign.PortalRoleID {
-				local.R.PortalMemberships = append(local.R.PortalMemberships, foreign)
+				local.R.PortalMembershipRoles = append(local.R.PortalMembershipRoles, foreign)
 				if foreign.R == nil {
-					foreign.R = &portalMembershipR{}
+					foreign.R = &portalMembershipRoleR{}
 				}
 				foreign.R.PortalRole = local
 				break
@@ -1629,11 +1650,11 @@ func (o *PortalRole) RemoveFolderPermissionOverrides(ctx context.Context, exec b
 	return nil
 }
 
-// AddPortalMemberships adds the given related objects to the existing relationships
+// AddPortalMembershipRoles adds the given related objects to the existing relationships
 // of the portal_role, optionally inserting them as new records.
-// Appends related to o.R.PortalMemberships.
+// Appends related to o.R.PortalMembershipRoles.
 // Sets related.R.PortalRole appropriately.
-func (o *PortalRole) AddPortalMemberships(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*PortalMembership) error {
+func (o *PortalRole) AddPortalMembershipRoles(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*PortalMembershipRole) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -1643,9 +1664,9 @@ func (o *PortalRole) AddPortalMemberships(ctx context.Context, exec boil.Context
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"portal_memberships\" SET %s WHERE %s",
+				"UPDATE \"portal_membership_roles\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"portal_role_id"}),
-				strmangle.WhereClause("\"", "\"", 2, portalMembershipPrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, portalMembershipRolePrimaryKeyColumns),
 			)
 			values := []any{o.ID, rel.ID}
 
@@ -1664,15 +1685,15 @@ func (o *PortalRole) AddPortalMemberships(ctx context.Context, exec boil.Context
 
 	if o.R == nil {
 		o.R = &portalRoleR{
-			PortalMemberships: related,
+			PortalMembershipRoles: related,
 		}
 	} else {
-		o.R.PortalMemberships = append(o.R.PortalMemberships, related...)
+		o.R.PortalMembershipRoles = append(o.R.PortalMembershipRoles, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &portalMembershipR{
+			rel.R = &portalMembershipRoleR{
 				PortalRole: o,
 			}
 		} else {

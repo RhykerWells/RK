@@ -24,92 +24,90 @@ import (
 
 // FolderPermissionOverride is an object representing the database table.
 type FolderPermissionOverride struct {
-	ID           int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	FolderID     int64      `boil:"folder_id" json:"folder_id" toml:"folder_id" yaml:"folder_id"`
-	PortalRoleID null.Int64 `boil:"portal_role_id" json:"portal_role_id,omitempty" toml:"portal_role_id" yaml:"portal_role_id,omitempty"`
-	UserID       null.Int64 `boil:"user_id" json:"user_id,omitempty" toml:"user_id" yaml:"user_id,omitempty"`
-	PermissionID int64      `boil:"permission_id" json:"permission_id" toml:"permission_id" yaml:"permission_id"`
-	Allow        bool       `boil:"allow" json:"allow" toml:"allow" yaml:"allow"`
-	CreatedBy    int64      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	CreatedAt    time.Time  `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	ID            int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	FolderID      int64      `boil:"folder_id" json:"folder_id" toml:"folder_id" yaml:"folder_id"`
+	PortalRoleID  null.Int64 `boil:"portal_role_id" json:"portal_role_id,omitempty" toml:"portal_role_id" yaml:"portal_role_id,omitempty"`
+	UserID        null.Int64 `boil:"user_id" json:"user_id,omitempty" toml:"user_id" yaml:"user_id,omitempty"`
+	PermissionKey string     `boil:"permission_key" json:"permission_key" toml:"permission_key" yaml:"permission_key"`
+	Allow         bool       `boil:"allow" json:"allow" toml:"allow" yaml:"allow"`
+	CreatedBy     int64      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
+	CreatedAt     time.Time  `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *folderPermissionOverrideR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L folderPermissionOverrideL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var FolderPermissionOverrideColumns = struct {
-	ID           string
-	FolderID     string
-	PortalRoleID string
-	UserID       string
-	PermissionID string
-	Allow        string
-	CreatedBy    string
-	CreatedAt    string
+	ID            string
+	FolderID      string
+	PortalRoleID  string
+	UserID        string
+	PermissionKey string
+	Allow         string
+	CreatedBy     string
+	CreatedAt     string
 }{
-	ID:           "id",
-	FolderID:     "folder_id",
-	PortalRoleID: "portal_role_id",
-	UserID:       "user_id",
-	PermissionID: "permission_id",
-	Allow:        "allow",
-	CreatedBy:    "created_by",
-	CreatedAt:    "created_at",
+	ID:            "id",
+	FolderID:      "folder_id",
+	PortalRoleID:  "portal_role_id",
+	UserID:        "user_id",
+	PermissionKey: "permission_key",
+	Allow:         "allow",
+	CreatedBy:     "created_by",
+	CreatedAt:     "created_at",
 }
 
 var FolderPermissionOverrideTableColumns = struct {
-	ID           string
-	FolderID     string
-	PortalRoleID string
-	UserID       string
-	PermissionID string
-	Allow        string
-	CreatedBy    string
-	CreatedAt    string
+	ID            string
+	FolderID      string
+	PortalRoleID  string
+	UserID        string
+	PermissionKey string
+	Allow         string
+	CreatedBy     string
+	CreatedAt     string
 }{
-	ID:           "folder_permission_overrides.id",
-	FolderID:     "folder_permission_overrides.folder_id",
-	PortalRoleID: "folder_permission_overrides.portal_role_id",
-	UserID:       "folder_permission_overrides.user_id",
-	PermissionID: "folder_permission_overrides.permission_id",
-	Allow:        "folder_permission_overrides.allow",
-	CreatedBy:    "folder_permission_overrides.created_by",
-	CreatedAt:    "folder_permission_overrides.created_at",
+	ID:            "folder_permission_overrides.id",
+	FolderID:      "folder_permission_overrides.folder_id",
+	PortalRoleID:  "folder_permission_overrides.portal_role_id",
+	UserID:        "folder_permission_overrides.user_id",
+	PermissionKey: "folder_permission_overrides.permission_key",
+	Allow:         "folder_permission_overrides.allow",
+	CreatedBy:     "folder_permission_overrides.created_by",
+	CreatedAt:     "folder_permission_overrides.created_at",
 }
 
 // Generated where
 
 var FolderPermissionOverrideWhere = struct {
-	ID           whereHelperint64
-	FolderID     whereHelperint64
-	PortalRoleID whereHelpernull_Int64
-	UserID       whereHelpernull_Int64
-	PermissionID whereHelperint64
-	Allow        whereHelperbool
-	CreatedBy    whereHelperint64
-	CreatedAt    whereHelpertime_Time
+	ID            whereHelperint64
+	FolderID      whereHelperint64
+	PortalRoleID  whereHelpernull_Int64
+	UserID        whereHelpernull_Int64
+	PermissionKey whereHelperstring
+	Allow         whereHelperbool
+	CreatedBy     whereHelperint64
+	CreatedAt     whereHelpertime_Time
 }{
-	ID:           whereHelperint64{field: "\"folder_permission_overrides\".\"id\""},
-	FolderID:     whereHelperint64{field: "\"folder_permission_overrides\".\"folder_id\""},
-	PortalRoleID: whereHelpernull_Int64{field: "\"folder_permission_overrides\".\"portal_role_id\""},
-	UserID:       whereHelpernull_Int64{field: "\"folder_permission_overrides\".\"user_id\""},
-	PermissionID: whereHelperint64{field: "\"folder_permission_overrides\".\"permission_id\""},
-	Allow:        whereHelperbool{field: "\"folder_permission_overrides\".\"allow\""},
-	CreatedBy:    whereHelperint64{field: "\"folder_permission_overrides\".\"created_by\""},
-	CreatedAt:    whereHelpertime_Time{field: "\"folder_permission_overrides\".\"created_at\""},
+	ID:            whereHelperint64{field: "\"folder_permission_overrides\".\"id\""},
+	FolderID:      whereHelperint64{field: "\"folder_permission_overrides\".\"folder_id\""},
+	PortalRoleID:  whereHelpernull_Int64{field: "\"folder_permission_overrides\".\"portal_role_id\""},
+	UserID:        whereHelpernull_Int64{field: "\"folder_permission_overrides\".\"user_id\""},
+	PermissionKey: whereHelperstring{field: "\"folder_permission_overrides\".\"permission_key\""},
+	Allow:         whereHelperbool{field: "\"folder_permission_overrides\".\"allow\""},
+	CreatedBy:     whereHelperint64{field: "\"folder_permission_overrides\".\"created_by\""},
+	CreatedAt:     whereHelpertime_Time{field: "\"folder_permission_overrides\".\"created_at\""},
 }
 
 // FolderPermissionOverrideRels is where relationship names are stored.
 var FolderPermissionOverrideRels = struct {
 	CreatedByUser string
 	Folder        string
-	Permission    string
 	PortalRole    string
 	User          string
 }{
 	CreatedByUser: "CreatedByUser",
 	Folder:        "Folder",
-	Permission:    "Permission",
 	PortalRole:    "PortalRole",
 	User:          "User",
 }
@@ -118,7 +116,6 @@ var FolderPermissionOverrideRels = struct {
 type folderPermissionOverrideR struct {
 	CreatedByUser *User       `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
 	Folder        *Folder     `boil:"Folder" json:"Folder" toml:"Folder" yaml:"Folder"`
-	Permission    *Permission `boil:"Permission" json:"Permission" toml:"Permission" yaml:"Permission"`
 	PortalRole    *PortalRole `boil:"PortalRole" json:"PortalRole" toml:"PortalRole" yaml:"PortalRole"`
 	User          *User       `boil:"User" json:"User" toml:"User" yaml:"User"`
 }
@@ -160,22 +157,6 @@ func (r *folderPermissionOverrideR) GetFolder() *Folder {
 	return r.Folder
 }
 
-func (o *FolderPermissionOverride) GetPermission() *Permission {
-	if o == nil {
-		return nil
-	}
-
-	return o.R.GetPermission()
-}
-
-func (r *folderPermissionOverrideR) GetPermission() *Permission {
-	if r == nil {
-		return nil
-	}
-
-	return r.Permission
-}
-
 func (o *FolderPermissionOverride) GetPortalRole() *PortalRole {
 	if o == nil {
 		return nil
@@ -212,8 +193,8 @@ func (r *folderPermissionOverrideR) GetUser() *User {
 type folderPermissionOverrideL struct{}
 
 var (
-	folderPermissionOverrideAllColumns            = []string{"id", "folder_id", "portal_role_id", "user_id", "permission_id", "allow", "created_by", "created_at"}
-	folderPermissionOverrideColumnsWithoutDefault = []string{"folder_id", "permission_id", "allow", "created_by"}
+	folderPermissionOverrideAllColumns            = []string{"id", "folder_id", "portal_role_id", "user_id", "permission_key", "allow", "created_by", "created_at"}
+	folderPermissionOverrideColumnsWithoutDefault = []string{"folder_id", "permission_key", "allow", "created_by"}
 	folderPermissionOverrideColumnsWithDefault    = []string{"id", "portal_role_id", "user_id", "created_at"}
 	folderPermissionOverridePrimaryKeyColumns     = []string{"id"}
 	folderPermissionOverrideGeneratedColumns      = []string{"id"}
@@ -330,17 +311,6 @@ func (o *FolderPermissionOverride) Folder(mods ...qm.QueryMod) folderQuery {
 	queryMods = append(queryMods, mods...)
 
 	return Folders(queryMods...)
-}
-
-// Permission pointed to by the foreign key.
-func (o *FolderPermissionOverride) Permission(mods ...qm.QueryMod) permissionQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.PermissionID),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	return Permissions(queryMods...)
 }
 
 // PortalRole pointed to by the foreign key.
@@ -579,118 +549,6 @@ func (folderPermissionOverrideL) LoadFolder(ctx context.Context, e boil.ContextE
 				local.R.Folder = foreign
 				if foreign.R == nil {
 					foreign.R = &folderR{}
-				}
-				foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, local)
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// LoadPermission allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (folderPermissionOverrideL) LoadPermission(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFolderPermissionOverride any, mods queries.Applicator) error {
-	var slice []*FolderPermissionOverride
-	var object *FolderPermissionOverride
-
-	if singular {
-		var ok bool
-		object, ok = maybeFolderPermissionOverride.(*FolderPermissionOverride)
-		if !ok {
-			object = new(FolderPermissionOverride)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeFolderPermissionOverride)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeFolderPermissionOverride))
-			}
-		}
-	} else {
-		s, ok := maybeFolderPermissionOverride.(*[]*FolderPermissionOverride)
-		if ok {
-			slice = *s
-		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeFolderPermissionOverride)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeFolderPermissionOverride))
-			}
-		}
-	}
-
-	args := make(map[any]struct{})
-	if singular {
-		if object.R == nil {
-			object.R = &folderPermissionOverrideR{}
-		}
-		args[object.PermissionID] = struct{}{}
-
-	} else {
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &folderPermissionOverrideR{}
-			}
-
-			args[obj.PermissionID] = struct{}{}
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	argsSlice := make([]any, len(args))
-	i := 0
-	for arg := range args {
-		argsSlice[i] = arg
-		i++
-	}
-
-	query := NewQuery(
-		qm.From(`permissions`),
-		qm.WhereIn(`permissions.id in ?`, argsSlice...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load Permission")
-	}
-
-	var resultSlice []*Permission
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice Permission")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for permissions")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for permissions")
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.Permission = foreign
-		if foreign.R == nil {
-			foreign.R = &permissionR{}
-		}
-		foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if local.PermissionID == foreign.ID {
-				local.R.Permission = foreign
-				if foreign.R == nil {
-					foreign.R = &permissionR{}
 				}
 				foreign.R.FolderPermissionOverrides = append(foreign.R.FolderPermissionOverrides, local)
 				break
@@ -1018,53 +876,6 @@ func (o *FolderPermissionOverride) SetFolder(ctx context.Context, exec boil.Cont
 
 	if related.R == nil {
 		related.R = &folderR{
-			FolderPermissionOverrides: FolderPermissionOverrideSlice{o},
-		}
-	} else {
-		related.R.FolderPermissionOverrides = append(related.R.FolderPermissionOverrides, o)
-	}
-
-	return nil
-}
-
-// SetPermission of the folderPermissionOverride to the related item.
-// Sets o.R.Permission to related.
-// Adds o to related.R.FolderPermissionOverrides.
-func (o *FolderPermissionOverride) SetPermission(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Permission) error {
-	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
-		}
-	}
-
-	updateQuery := fmt.Sprintf(
-		"UPDATE \"folder_permission_overrides\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"permission_id"}),
-		strmangle.WhereClause("\"", "\"", 2, folderPermissionOverridePrimaryKeyColumns),
-	)
-	values := []any{related.ID, o.ID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	o.PermissionID = related.ID
-	if o.R == nil {
-		o.R = &folderPermissionOverrideR{
-			Permission: related,
-		}
-	} else {
-		o.R.Permission = related
-	}
-
-	if related.R == nil {
-		related.R = &permissionR{
 			FolderPermissionOverrides: FolderPermissionOverrideSlice{o},
 		}
 	} else {

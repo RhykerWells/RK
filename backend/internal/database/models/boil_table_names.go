@@ -12,8 +12,7 @@ var TableNames = struct {
 	Files                       string
 	FolderPermissionOverrides   string
 	Folders                     string
-	GlobalRoles                 string
-	Permissions                 string
+	PortalMembershipRoles       string
 	PortalMemberships           string
 	PortalRolePermissions       string
 	PortalRoles                 string
@@ -28,8 +27,7 @@ var TableNames = struct {
 	Files:                       "files",
 	FolderPermissionOverrides:   "folder_permission_overrides",
 	Folders:                     "folders",
-	GlobalRoles:                 "global_roles",
-	Permissions:                 "permissions",
+	PortalMembershipRoles:       "portal_membership_roles",
 	PortalMemberships:           "portal_memberships",
 	PortalRolePermissions:       "portal_role_permissions",
 	PortalRoles:                 "portal_roles",

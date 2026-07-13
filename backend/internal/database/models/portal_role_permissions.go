@@ -23,87 +23,68 @@ import (
 
 // PortalRolePermission is an object representing the database table.
 type PortalRolePermission struct {
-	ID           int64 `boil:"id" json:"id" toml:"id" yaml:"id"`
-	PortalRoleID int64 `boil:"portal_role_id" json:"portal_role_id" toml:"portal_role_id" yaml:"portal_role_id"`
-	PermissionID int64 `boil:"permission_id" json:"permission_id" toml:"permission_id" yaml:"permission_id"`
-	Allow        bool  `boil:"allow" json:"allow" toml:"allow" yaml:"allow"`
+	ID            int64  `boil:"id" json:"id" toml:"id" yaml:"id"`
+	PortalRoleID  int64  `boil:"portal_role_id" json:"portal_role_id" toml:"portal_role_id" yaml:"portal_role_id"`
+	PermissionKey string `boil:"permission_key" json:"permission_key" toml:"permission_key" yaml:"permission_key"`
+	Allow         bool   `boil:"allow" json:"allow" toml:"allow" yaml:"allow"`
 
 	R *portalRolePermissionR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L portalRolePermissionL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var PortalRolePermissionColumns = struct {
-	ID           string
-	PortalRoleID string
-	PermissionID string
-	Allow        string
+	ID            string
+	PortalRoleID  string
+	PermissionKey string
+	Allow         string
 }{
-	ID:           "id",
-	PortalRoleID: "portal_role_id",
-	PermissionID: "permission_id",
-	Allow:        "allow",
+	ID:            "id",
+	PortalRoleID:  "portal_role_id",
+	PermissionKey: "permission_key",
+	Allow:         "allow",
 }
 
 var PortalRolePermissionTableColumns = struct {
-	ID           string
-	PortalRoleID string
-	PermissionID string
-	Allow        string
+	ID            string
+	PortalRoleID  string
+	PermissionKey string
+	Allow         string
 }{
-	ID:           "portal_role_permissions.id",
-	PortalRoleID: "portal_role_permissions.portal_role_id",
-	PermissionID: "portal_role_permissions.permission_id",
-	Allow:        "portal_role_permissions.allow",
+	ID:            "portal_role_permissions.id",
+	PortalRoleID:  "portal_role_permissions.portal_role_id",
+	PermissionKey: "portal_role_permissions.permission_key",
+	Allow:         "portal_role_permissions.allow",
 }
 
 // Generated where
 
 var PortalRolePermissionWhere = struct {
-	ID           whereHelperint64
-	PortalRoleID whereHelperint64
-	PermissionID whereHelperint64
-	Allow        whereHelperbool
+	ID            whereHelperint64
+	PortalRoleID  whereHelperint64
+	PermissionKey whereHelperstring
+	Allow         whereHelperbool
 }{
-	ID:           whereHelperint64{field: "\"portal_role_permissions\".\"id\""},
-	PortalRoleID: whereHelperint64{field: "\"portal_role_permissions\".\"portal_role_id\""},
-	PermissionID: whereHelperint64{field: "\"portal_role_permissions\".\"permission_id\""},
-	Allow:        whereHelperbool{field: "\"portal_role_permissions\".\"allow\""},
+	ID:            whereHelperint64{field: "\"portal_role_permissions\".\"id\""},
+	PortalRoleID:  whereHelperint64{field: "\"portal_role_permissions\".\"portal_role_id\""},
+	PermissionKey: whereHelperstring{field: "\"portal_role_permissions\".\"permission_key\""},
+	Allow:         whereHelperbool{field: "\"portal_role_permissions\".\"allow\""},
 }
 
 // PortalRolePermissionRels is where relationship names are stored.
 var PortalRolePermissionRels = struct {
-	Permission string
 	PortalRole string
 }{
-	Permission: "Permission",
 	PortalRole: "PortalRole",
 }
 
 // portalRolePermissionR is where relationships are stored.
 type portalRolePermissionR struct {
-	Permission *Permission `boil:"Permission" json:"Permission" toml:"Permission" yaml:"Permission"`
 	PortalRole *PortalRole `boil:"PortalRole" json:"PortalRole" toml:"PortalRole" yaml:"PortalRole"`
 }
 
 // NewStruct creates a new relationship struct
 func (*portalRolePermissionR) NewStruct() *portalRolePermissionR {
 	return &portalRolePermissionR{}
-}
-
-func (o *PortalRolePermission) GetPermission() *Permission {
-	if o == nil {
-		return nil
-	}
-
-	return o.R.GetPermission()
-}
-
-func (r *portalRolePermissionR) GetPermission() *Permission {
-	if r == nil {
-		return nil
-	}
-
-	return r.Permission
 }
 
 func (o *PortalRolePermission) GetPortalRole() *PortalRole {
@@ -126,8 +107,8 @@ func (r *portalRolePermissionR) GetPortalRole() *PortalRole {
 type portalRolePermissionL struct{}
 
 var (
-	portalRolePermissionAllColumns            = []string{"id", "portal_role_id", "permission_id", "allow"}
-	portalRolePermissionColumnsWithoutDefault = []string{"portal_role_id", "permission_id", "allow"}
+	portalRolePermissionAllColumns            = []string{"id", "portal_role_id", "permission_key", "allow"}
+	portalRolePermissionColumnsWithoutDefault = []string{"portal_role_id", "permission_key", "allow"}
 	portalRolePermissionColumnsWithDefault    = []string{"id"}
 	portalRolePermissionPrimaryKeyColumns     = []string{"id"}
 	portalRolePermissionGeneratedColumns      = []string{"id"}
@@ -224,17 +205,6 @@ func (q portalRolePermissionQuery) Exists(ctx context.Context, exec boil.Context
 	return count > 0, nil
 }
 
-// Permission pointed to by the foreign key.
-func (o *PortalRolePermission) Permission(mods ...qm.QueryMod) permissionQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.PermissionID),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	return Permissions(queryMods...)
-}
-
 // PortalRole pointed to by the foreign key.
 func (o *PortalRolePermission) PortalRole(mods ...qm.QueryMod) portalRoleQuery {
 	queryMods := []qm.QueryMod{
@@ -244,118 +214,6 @@ func (o *PortalRolePermission) PortalRole(mods ...qm.QueryMod) portalRoleQuery {
 	queryMods = append(queryMods, mods...)
 
 	return PortalRoles(queryMods...)
-}
-
-// LoadPermission allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (portalRolePermissionL) LoadPermission(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortalRolePermission any, mods queries.Applicator) error {
-	var slice []*PortalRolePermission
-	var object *PortalRolePermission
-
-	if singular {
-		var ok bool
-		object, ok = maybePortalRolePermission.(*PortalRolePermission)
-		if !ok {
-			object = new(PortalRolePermission)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybePortalRolePermission)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybePortalRolePermission))
-			}
-		}
-	} else {
-		s, ok := maybePortalRolePermission.(*[]*PortalRolePermission)
-		if ok {
-			slice = *s
-		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybePortalRolePermission)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybePortalRolePermission))
-			}
-		}
-	}
-
-	args := make(map[any]struct{})
-	if singular {
-		if object.R == nil {
-			object.R = &portalRolePermissionR{}
-		}
-		args[object.PermissionID] = struct{}{}
-
-	} else {
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &portalRolePermissionR{}
-			}
-
-			args[obj.PermissionID] = struct{}{}
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	argsSlice := make([]any, len(args))
-	i := 0
-	for arg := range args {
-		argsSlice[i] = arg
-		i++
-	}
-
-	query := NewQuery(
-		qm.From(`permissions`),
-		qm.WhereIn(`permissions.id in ?`, argsSlice...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load Permission")
-	}
-
-	var resultSlice []*Permission
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice Permission")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for permissions")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for permissions")
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.Permission = foreign
-		if foreign.R == nil {
-			foreign.R = &permissionR{}
-		}
-		foreign.R.PortalRolePermissions = append(foreign.R.PortalRolePermissions, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if local.PermissionID == foreign.ID {
-				local.R.Permission = foreign
-				if foreign.R == nil {
-					foreign.R = &permissionR{}
-				}
-				foreign.R.PortalRolePermissions = append(foreign.R.PortalRolePermissions, local)
-				break
-			}
-		}
-	}
-
-	return nil
 }
 
 // LoadPortalRole allows an eager lookup of values, cached into the
@@ -465,53 +323,6 @@ func (portalRolePermissionL) LoadPortalRole(ctx context.Context, e boil.ContextE
 				break
 			}
 		}
-	}
-
-	return nil
-}
-
-// SetPermission of the portalRolePermission to the related item.
-// Sets o.R.Permission to related.
-// Adds o to related.R.PortalRolePermissions.
-func (o *PortalRolePermission) SetPermission(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Permission) error {
-	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
-		}
-	}
-
-	updateQuery := fmt.Sprintf(
-		"UPDATE \"portal_role_permissions\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"permission_id"}),
-		strmangle.WhereClause("\"", "\"", 2, portalRolePermissionPrimaryKeyColumns),
-	)
-	values := []any{related.ID, o.ID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	o.PermissionID = related.ID
-	if o.R == nil {
-		o.R = &portalRolePermissionR{
-			Permission: related,
-		}
-	} else {
-		o.R.Permission = related
-	}
-
-	if related.R == nil {
-		related.R = &permissionR{
-			PortalRolePermissions: PortalRolePermissionSlice{o},
-		}
-	} else {
-		related.R.PortalRolePermissions = append(related.R.PortalRolePermissions, o)
 	}
 
 	return nil

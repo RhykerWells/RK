@@ -24,82 +24,82 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID           int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	GlobalRoleID int64       `boil:"global_role_id" json:"global_role_id" toml:"global_role_id" yaml:"global_role_id"`
-	AuthType     string      `boil:"auth_type" json:"auth_type" toml:"auth_type" yaml:"auth_type"`
-	Username     null.String `boil:"username" json:"username,omitempty" toml:"username" yaml:"username,omitempty"`
-	PasswordHash null.String `boil:"password_hash" json:"password_hash,omitempty" toml:"password_hash" yaml:"password_hash,omitempty"`
-	DiscordID    null.String `boil:"discord_id" json:"discord_id,omitempty" toml:"discord_id" yaml:"discord_id,omitempty"`
-	DisplayName  string      `boil:"display_name" json:"display_name" toml:"display_name" yaml:"display_name"`
-	Email        null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
-	AvatarURL    null.String `boil:"avatar_url" json:"avatar_url,omitempty" toml:"avatar_url" yaml:"avatar_url,omitempty"`
-	IsActive     bool        `boil:"is_active" json:"is_active" toml:"is_active" yaml:"is_active"`
-	LastLoginAt  null.Time   `boil:"last_login_at" json:"last_login_at,omitempty" toml:"last_login_at" yaml:"last_login_at,omitempty"`
-	CreatedAt    time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt    time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID              int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	AuthType        string      `boil:"auth_type" json:"auth_type" toml:"auth_type" yaml:"auth_type"`
+	Username        null.String `boil:"username" json:"username,omitempty" toml:"username" yaml:"username,omitempty"`
+	PasswordHash    null.String `boil:"password_hash" json:"password_hash,omitempty" toml:"password_hash" yaml:"password_hash,omitempty"`
+	DiscordID       null.String `boil:"discord_id" json:"discord_id,omitempty" toml:"discord_id" yaml:"discord_id,omitempty"`
+	DisplayName     string      `boil:"display_name" json:"display_name" toml:"display_name" yaml:"display_name"`
+	Email           null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
+	AvatarURL       null.String `boil:"avatar_url" json:"avatar_url,omitempty" toml:"avatar_url" yaml:"avatar_url,omitempty"`
+	IsActive        bool        `boil:"is_active" json:"is_active" toml:"is_active" yaml:"is_active"`
+	LastLoginAt     null.Time   `boil:"last_login_at" json:"last_login_at,omitempty" toml:"last_login_at" yaml:"last_login_at,omitempty"`
+	CreatedAt       time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt       time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	IsAdministrator bool        `boil:"is_administrator" json:"is_administrator" toml:"is_administrator" yaml:"is_administrator"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserColumns = struct {
-	ID           string
-	GlobalRoleID string
-	AuthType     string
-	Username     string
-	PasswordHash string
-	DiscordID    string
-	DisplayName  string
-	Email        string
-	AvatarURL    string
-	IsActive     string
-	LastLoginAt  string
-	CreatedAt    string
-	UpdatedAt    string
+	ID              string
+	AuthType        string
+	Username        string
+	PasswordHash    string
+	DiscordID       string
+	DisplayName     string
+	Email           string
+	AvatarURL       string
+	IsActive        string
+	LastLoginAt     string
+	CreatedAt       string
+	UpdatedAt       string
+	IsAdministrator string
 }{
-	ID:           "id",
-	GlobalRoleID: "global_role_id",
-	AuthType:     "auth_type",
-	Username:     "username",
-	PasswordHash: "password_hash",
-	DiscordID:    "discord_id",
-	DisplayName:  "display_name",
-	Email:        "email",
-	AvatarURL:    "avatar_url",
-	IsActive:     "is_active",
-	LastLoginAt:  "last_login_at",
-	CreatedAt:    "created_at",
-	UpdatedAt:    "updated_at",
+	ID:              "id",
+	AuthType:        "auth_type",
+	Username:        "username",
+	PasswordHash:    "password_hash",
+	DiscordID:       "discord_id",
+	DisplayName:     "display_name",
+	Email:           "email",
+	AvatarURL:       "avatar_url",
+	IsActive:        "is_active",
+	LastLoginAt:     "last_login_at",
+	CreatedAt:       "created_at",
+	UpdatedAt:       "updated_at",
+	IsAdministrator: "is_administrator",
 }
 
 var UserTableColumns = struct {
-	ID           string
-	GlobalRoleID string
-	AuthType     string
-	Username     string
-	PasswordHash string
-	DiscordID    string
-	DisplayName  string
-	Email        string
-	AvatarURL    string
-	IsActive     string
-	LastLoginAt  string
-	CreatedAt    string
-	UpdatedAt    string
+	ID              string
+	AuthType        string
+	Username        string
+	PasswordHash    string
+	DiscordID       string
+	DisplayName     string
+	Email           string
+	AvatarURL       string
+	IsActive        string
+	LastLoginAt     string
+	CreatedAt       string
+	UpdatedAt       string
+	IsAdministrator string
 }{
-	ID:           "users.id",
-	GlobalRoleID: "users.global_role_id",
-	AuthType:     "users.auth_type",
-	Username:     "users.username",
-	PasswordHash: "users.password_hash",
-	DiscordID:    "users.discord_id",
-	DisplayName:  "users.display_name",
-	Email:        "users.email",
-	AvatarURL:    "users.avatar_url",
-	IsActive:     "users.is_active",
-	LastLoginAt:  "users.last_login_at",
-	CreatedAt:    "users.created_at",
-	UpdatedAt:    "users.updated_at",
+	ID:              "users.id",
+	AuthType:        "users.auth_type",
+	Username:        "users.username",
+	PasswordHash:    "users.password_hash",
+	DiscordID:       "users.discord_id",
+	DisplayName:     "users.display_name",
+	Email:           "users.email",
+	AvatarURL:       "users.avatar_url",
+	IsActive:        "users.is_active",
+	LastLoginAt:     "users.last_login_at",
+	CreatedAt:       "users.created_at",
+	UpdatedAt:       "users.updated_at",
+	IsAdministrator: "users.is_administrator",
 }
 
 // Generated where
@@ -129,38 +129,37 @@ func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsN
 func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var UserWhere = struct {
-	ID           whereHelperint64
-	GlobalRoleID whereHelperint64
-	AuthType     whereHelperstring
-	Username     whereHelpernull_String
-	PasswordHash whereHelpernull_String
-	DiscordID    whereHelpernull_String
-	DisplayName  whereHelperstring
-	Email        whereHelpernull_String
-	AvatarURL    whereHelpernull_String
-	IsActive     whereHelperbool
-	LastLoginAt  whereHelpernull_Time
-	CreatedAt    whereHelpertime_Time
-	UpdatedAt    whereHelpertime_Time
+	ID              whereHelperint64
+	AuthType        whereHelperstring
+	Username        whereHelpernull_String
+	PasswordHash    whereHelpernull_String
+	DiscordID       whereHelpernull_String
+	DisplayName     whereHelperstring
+	Email           whereHelpernull_String
+	AvatarURL       whereHelpernull_String
+	IsActive        whereHelperbool
+	LastLoginAt     whereHelpernull_Time
+	CreatedAt       whereHelpertime_Time
+	UpdatedAt       whereHelpertime_Time
+	IsAdministrator whereHelperbool
 }{
-	ID:           whereHelperint64{field: "\"users\".\"id\""},
-	GlobalRoleID: whereHelperint64{field: "\"users\".\"global_role_id\""},
-	AuthType:     whereHelperstring{field: "\"users\".\"auth_type\""},
-	Username:     whereHelpernull_String{field: "\"users\".\"username\""},
-	PasswordHash: whereHelpernull_String{field: "\"users\".\"password_hash\""},
-	DiscordID:    whereHelpernull_String{field: "\"users\".\"discord_id\""},
-	DisplayName:  whereHelperstring{field: "\"users\".\"display_name\""},
-	Email:        whereHelpernull_String{field: "\"users\".\"email\""},
-	AvatarURL:    whereHelpernull_String{field: "\"users\".\"avatar_url\""},
-	IsActive:     whereHelperbool{field: "\"users\".\"is_active\""},
-	LastLoginAt:  whereHelpernull_Time{field: "\"users\".\"last_login_at\""},
-	CreatedAt:    whereHelpertime_Time{field: "\"users\".\"created_at\""},
-	UpdatedAt:    whereHelpertime_Time{field: "\"users\".\"updated_at\""},
+	ID:              whereHelperint64{field: "\"users\".\"id\""},
+	AuthType:        whereHelperstring{field: "\"users\".\"auth_type\""},
+	Username:        whereHelpernull_String{field: "\"users\".\"username\""},
+	PasswordHash:    whereHelpernull_String{field: "\"users\".\"password_hash\""},
+	DiscordID:       whereHelpernull_String{field: "\"users\".\"discord_id\""},
+	DisplayName:     whereHelperstring{field: "\"users\".\"display_name\""},
+	Email:           whereHelpernull_String{field: "\"users\".\"email\""},
+	AvatarURL:       whereHelpernull_String{field: "\"users\".\"avatar_url\""},
+	IsActive:        whereHelperbool{field: "\"users\".\"is_active\""},
+	LastLoginAt:     whereHelpernull_Time{field: "\"users\".\"last_login_at\""},
+	CreatedAt:       whereHelpertime_Time{field: "\"users\".\"created_at\""},
+	UpdatedAt:       whereHelpertime_Time{field: "\"users\".\"updated_at\""},
+	IsAdministrator: whereHelperbool{field: "\"users\".\"is_administrator\""},
 }
 
 // UserRels is where relationship names are stored.
 var UserRels = struct {
-	GlobalRole                           string
 	CreatedByDocumentFiles               string
 	CreatedByDocumentLinks               string
 	CreatedByDocumentPermissionOverrides string
@@ -180,7 +179,6 @@ var UserRels = struct {
 	CreatedByPortals                     string
 	UpdatedByPortals                     string
 }{
-	GlobalRole:                           "GlobalRole",
 	CreatedByDocumentFiles:               "CreatedByDocumentFiles",
 	CreatedByDocumentLinks:               "CreatedByDocumentLinks",
 	CreatedByDocumentPermissionOverrides: "CreatedByDocumentPermissionOverrides",
@@ -203,7 +201,6 @@ var UserRels = struct {
 
 // userR is where relationships are stored.
 type userR struct {
-	GlobalRole                           *GlobalRole                     `boil:"GlobalRole" json:"GlobalRole" toml:"GlobalRole" yaml:"GlobalRole"`
 	CreatedByDocumentFiles               DocumentFileSlice               `boil:"CreatedByDocumentFiles" json:"CreatedByDocumentFiles" toml:"CreatedByDocumentFiles" yaml:"CreatedByDocumentFiles"`
 	CreatedByDocumentLinks               DocumentLinkSlice               `boil:"CreatedByDocumentLinks" json:"CreatedByDocumentLinks" toml:"CreatedByDocumentLinks" yaml:"CreatedByDocumentLinks"`
 	CreatedByDocumentPermissionOverrides DocumentPermissionOverrideSlice `boil:"CreatedByDocumentPermissionOverrides" json:"CreatedByDocumentPermissionOverrides" toml:"CreatedByDocumentPermissionOverrides" yaml:"CreatedByDocumentPermissionOverrides"`
@@ -227,22 +224,6 @@ type userR struct {
 // NewStruct creates a new relationship struct
 func (*userR) NewStruct() *userR {
 	return &userR{}
-}
-
-func (o *User) GetGlobalRole() *GlobalRole {
-	if o == nil {
-		return nil
-	}
-
-	return o.R.GetGlobalRole()
-}
-
-func (r *userR) GetGlobalRole() *GlobalRole {
-	if r == nil {
-		return nil
-	}
-
-	return r.GlobalRole
 }
 
 func (o *User) GetCreatedByDocumentFiles() DocumentFileSlice {
@@ -537,9 +518,9 @@ func (r *userR) GetUpdatedByPortals() PortalSlice {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "global_role_id", "auth_type", "username", "password_hash", "discord_id", "display_name", "email", "avatar_url", "is_active", "last_login_at", "created_at", "updated_at"}
-	userColumnsWithoutDefault = []string{"global_role_id", "auth_type", "display_name"}
-	userColumnsWithDefault    = []string{"id", "username", "password_hash", "discord_id", "email", "avatar_url", "is_active", "last_login_at", "created_at", "updated_at"}
+	userAllColumns            = []string{"id", "auth_type", "username", "password_hash", "discord_id", "display_name", "email", "avatar_url", "is_active", "last_login_at", "created_at", "updated_at", "is_administrator"}
+	userColumnsWithoutDefault = []string{"auth_type", "display_name"}
+	userColumnsWithDefault    = []string{"id", "username", "password_hash", "discord_id", "email", "avatar_url", "is_active", "last_login_at", "created_at", "updated_at", "is_administrator"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{"id"}
 )
@@ -633,17 +614,6 @@ func (q userQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 	}
 
 	return count > 0, nil
-}
-
-// GlobalRole pointed to by the foreign key.
-func (o *User) GlobalRole(mods ...qm.QueryMod) globalRoleQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.GlobalRoleID),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	return GlobalRoles(queryMods...)
 }
 
 // CreatedByDocumentFiles retrieves all the document_file's DocumentFiles with an executor via created_by column.
@@ -896,118 +866,6 @@ func (o *User) UpdatedByPortals(mods ...qm.QueryMod) portalQuery {
 	)
 
 	return Portals(queryMods...)
-}
-
-// LoadGlobalRole allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (userL) LoadGlobalRole(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser any, mods queries.Applicator) error {
-	var slice []*User
-	var object *User
-
-	if singular {
-		var ok bool
-		object, ok = maybeUser.(*User)
-		if !ok {
-			object = new(User)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeUser)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeUser))
-			}
-		}
-	} else {
-		s, ok := maybeUser.(*[]*User)
-		if ok {
-			slice = *s
-		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeUser)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeUser))
-			}
-		}
-	}
-
-	args := make(map[any]struct{})
-	if singular {
-		if object.R == nil {
-			object.R = &userR{}
-		}
-		args[object.GlobalRoleID] = struct{}{}
-
-	} else {
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &userR{}
-			}
-
-			args[obj.GlobalRoleID] = struct{}{}
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	argsSlice := make([]any, len(args))
-	i := 0
-	for arg := range args {
-		argsSlice[i] = arg
-		i++
-	}
-
-	query := NewQuery(
-		qm.From(`global_roles`),
-		qm.WhereIn(`global_roles.id in ?`, argsSlice...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load GlobalRole")
-	}
-
-	var resultSlice []*GlobalRole
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice GlobalRole")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for global_roles")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for global_roles")
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.GlobalRole = foreign
-		if foreign.R == nil {
-			foreign.R = &globalRoleR{}
-		}
-		foreign.R.Users = append(foreign.R.Users, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if local.GlobalRoleID == foreign.ID {
-				local.R.GlobalRole = foreign
-				if foreign.R == nil {
-					foreign.R = &globalRoleR{}
-				}
-				foreign.R.Users = append(foreign.R.Users, local)
-				break
-			}
-		}
-	}
-
-	return nil
 }
 
 // LoadCreatedByDocumentFiles allows an eager lookup of values, cached into the
@@ -2913,53 +2771,6 @@ func (userL) LoadUpdatedByPortals(ctx context.Context, e boil.ContextExecutor, s
 				break
 			}
 		}
-	}
-
-	return nil
-}
-
-// SetGlobalRole of the user to the related item.
-// Sets o.R.GlobalRole to related.
-// Adds o to related.R.Users.
-func (o *User) SetGlobalRole(ctx context.Context, exec boil.ContextExecutor, insert bool, related *GlobalRole) error {
-	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
-		}
-	}
-
-	updateQuery := fmt.Sprintf(
-		"UPDATE \"users\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"global_role_id"}),
-		strmangle.WhereClause("\"", "\"", 2, userPrimaryKeyColumns),
-	)
-	values := []any{related.ID, o.ID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	o.GlobalRoleID = related.ID
-	if o.R == nil {
-		o.R = &userR{
-			GlobalRole: related,
-		}
-	} else {
-		o.R.GlobalRole = related
-	}
-
-	if related.R == nil {
-		related.R = &globalRoleR{
-			Users: UserSlice{o},
-		}
-	} else {
-		related.R.Users = append(related.R.Users, o)
 	}
 
 	return nil

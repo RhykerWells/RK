@@ -24,57 +24,57 @@ import (
 
 // DocumentPermissionOverride is an object representing the database table.
 type DocumentPermissionOverride struct {
-	ID           int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	DocumentID   int64      `boil:"document_id" json:"document_id" toml:"document_id" yaml:"document_id"`
-	PortalRoleID null.Int64 `boil:"portal_role_id" json:"portal_role_id,omitempty" toml:"portal_role_id" yaml:"portal_role_id,omitempty"`
-	UserID       null.Int64 `boil:"user_id" json:"user_id,omitempty" toml:"user_id" yaml:"user_id,omitempty"`
-	PermissionID int64      `boil:"permission_id" json:"permission_id" toml:"permission_id" yaml:"permission_id"`
-	Allow        bool       `boil:"allow" json:"allow" toml:"allow" yaml:"allow"`
-	CreatedBy    int64      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	CreatedAt    time.Time  `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	ID            int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	DocumentID    int64      `boil:"document_id" json:"document_id" toml:"document_id" yaml:"document_id"`
+	PortalRoleID  null.Int64 `boil:"portal_role_id" json:"portal_role_id,omitempty" toml:"portal_role_id" yaml:"portal_role_id,omitempty"`
+	UserID        null.Int64 `boil:"user_id" json:"user_id,omitempty" toml:"user_id" yaml:"user_id,omitempty"`
+	PermissionKey string     `boil:"permission_key" json:"permission_key" toml:"permission_key" yaml:"permission_key"`
+	Allow         bool       `boil:"allow" json:"allow" toml:"allow" yaml:"allow"`
+	CreatedBy     int64      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
+	CreatedAt     time.Time  `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *documentPermissionOverrideR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L documentPermissionOverrideL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var DocumentPermissionOverrideColumns = struct {
-	ID           string
-	DocumentID   string
-	PortalRoleID string
-	UserID       string
-	PermissionID string
-	Allow        string
-	CreatedBy    string
-	CreatedAt    string
+	ID            string
+	DocumentID    string
+	PortalRoleID  string
+	UserID        string
+	PermissionKey string
+	Allow         string
+	CreatedBy     string
+	CreatedAt     string
 }{
-	ID:           "id",
-	DocumentID:   "document_id",
-	PortalRoleID: "portal_role_id",
-	UserID:       "user_id",
-	PermissionID: "permission_id",
-	Allow:        "allow",
-	CreatedBy:    "created_by",
-	CreatedAt:    "created_at",
+	ID:            "id",
+	DocumentID:    "document_id",
+	PortalRoleID:  "portal_role_id",
+	UserID:        "user_id",
+	PermissionKey: "permission_key",
+	Allow:         "allow",
+	CreatedBy:     "created_by",
+	CreatedAt:     "created_at",
 }
 
 var DocumentPermissionOverrideTableColumns = struct {
-	ID           string
-	DocumentID   string
-	PortalRoleID string
-	UserID       string
-	PermissionID string
-	Allow        string
-	CreatedBy    string
-	CreatedAt    string
+	ID            string
+	DocumentID    string
+	PortalRoleID  string
+	UserID        string
+	PermissionKey string
+	Allow         string
+	CreatedBy     string
+	CreatedAt     string
 }{
-	ID:           "document_permission_overrides.id",
-	DocumentID:   "document_permission_overrides.document_id",
-	PortalRoleID: "document_permission_overrides.portal_role_id",
-	UserID:       "document_permission_overrides.user_id",
-	PermissionID: "document_permission_overrides.permission_id",
-	Allow:        "document_permission_overrides.allow",
-	CreatedBy:    "document_permission_overrides.created_by",
-	CreatedAt:    "document_permission_overrides.created_at",
+	ID:            "document_permission_overrides.id",
+	DocumentID:    "document_permission_overrides.document_id",
+	PortalRoleID:  "document_permission_overrides.portal_role_id",
+	UserID:        "document_permission_overrides.user_id",
+	PermissionKey: "document_permission_overrides.permission_key",
+	Allow:         "document_permission_overrides.allow",
+	CreatedBy:     "document_permission_overrides.created_by",
+	CreatedAt:     "document_permission_overrides.created_at",
 }
 
 // Generated where
@@ -127,36 +127,34 @@ func (w whereHelperbool) GT(x bool) qm.QueryMod  { return qmhelper.Where(w.field
 func (w whereHelperbool) GTE(x bool) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
 
 var DocumentPermissionOverrideWhere = struct {
-	ID           whereHelperint64
-	DocumentID   whereHelperint64
-	PortalRoleID whereHelpernull_Int64
-	UserID       whereHelpernull_Int64
-	PermissionID whereHelperint64
-	Allow        whereHelperbool
-	CreatedBy    whereHelperint64
-	CreatedAt    whereHelpertime_Time
+	ID            whereHelperint64
+	DocumentID    whereHelperint64
+	PortalRoleID  whereHelpernull_Int64
+	UserID        whereHelpernull_Int64
+	PermissionKey whereHelperstring
+	Allow         whereHelperbool
+	CreatedBy     whereHelperint64
+	CreatedAt     whereHelpertime_Time
 }{
-	ID:           whereHelperint64{field: "\"document_permission_overrides\".\"id\""},
-	DocumentID:   whereHelperint64{field: "\"document_permission_overrides\".\"document_id\""},
-	PortalRoleID: whereHelpernull_Int64{field: "\"document_permission_overrides\".\"portal_role_id\""},
-	UserID:       whereHelpernull_Int64{field: "\"document_permission_overrides\".\"user_id\""},
-	PermissionID: whereHelperint64{field: "\"document_permission_overrides\".\"permission_id\""},
-	Allow:        whereHelperbool{field: "\"document_permission_overrides\".\"allow\""},
-	CreatedBy:    whereHelperint64{field: "\"document_permission_overrides\".\"created_by\""},
-	CreatedAt:    whereHelpertime_Time{field: "\"document_permission_overrides\".\"created_at\""},
+	ID:            whereHelperint64{field: "\"document_permission_overrides\".\"id\""},
+	DocumentID:    whereHelperint64{field: "\"document_permission_overrides\".\"document_id\""},
+	PortalRoleID:  whereHelpernull_Int64{field: "\"document_permission_overrides\".\"portal_role_id\""},
+	UserID:        whereHelpernull_Int64{field: "\"document_permission_overrides\".\"user_id\""},
+	PermissionKey: whereHelperstring{field: "\"document_permission_overrides\".\"permission_key\""},
+	Allow:         whereHelperbool{field: "\"document_permission_overrides\".\"allow\""},
+	CreatedBy:     whereHelperint64{field: "\"document_permission_overrides\".\"created_by\""},
+	CreatedAt:     whereHelpertime_Time{field: "\"document_permission_overrides\".\"created_at\""},
 }
 
 // DocumentPermissionOverrideRels is where relationship names are stored.
 var DocumentPermissionOverrideRels = struct {
 	CreatedByUser string
 	Document      string
-	Permission    string
 	PortalRole    string
 	User          string
 }{
 	CreatedByUser: "CreatedByUser",
 	Document:      "Document",
-	Permission:    "Permission",
 	PortalRole:    "PortalRole",
 	User:          "User",
 }
@@ -165,7 +163,6 @@ var DocumentPermissionOverrideRels = struct {
 type documentPermissionOverrideR struct {
 	CreatedByUser *User       `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
 	Document      *Document   `boil:"Document" json:"Document" toml:"Document" yaml:"Document"`
-	Permission    *Permission `boil:"Permission" json:"Permission" toml:"Permission" yaml:"Permission"`
 	PortalRole    *PortalRole `boil:"PortalRole" json:"PortalRole" toml:"PortalRole" yaml:"PortalRole"`
 	User          *User       `boil:"User" json:"User" toml:"User" yaml:"User"`
 }
@@ -207,22 +204,6 @@ func (r *documentPermissionOverrideR) GetDocument() *Document {
 	return r.Document
 }
 
-func (o *DocumentPermissionOverride) GetPermission() *Permission {
-	if o == nil {
-		return nil
-	}
-
-	return o.R.GetPermission()
-}
-
-func (r *documentPermissionOverrideR) GetPermission() *Permission {
-	if r == nil {
-		return nil
-	}
-
-	return r.Permission
-}
-
 func (o *DocumentPermissionOverride) GetPortalRole() *PortalRole {
 	if o == nil {
 		return nil
@@ -259,8 +240,8 @@ func (r *documentPermissionOverrideR) GetUser() *User {
 type documentPermissionOverrideL struct{}
 
 var (
-	documentPermissionOverrideAllColumns            = []string{"id", "document_id", "portal_role_id", "user_id", "permission_id", "allow", "created_by", "created_at"}
-	documentPermissionOverrideColumnsWithoutDefault = []string{"document_id", "permission_id", "allow", "created_by"}
+	documentPermissionOverrideAllColumns            = []string{"id", "document_id", "portal_role_id", "user_id", "permission_key", "allow", "created_by", "created_at"}
+	documentPermissionOverrideColumnsWithoutDefault = []string{"document_id", "permission_key", "allow", "created_by"}
 	documentPermissionOverrideColumnsWithDefault    = []string{"id", "portal_role_id", "user_id", "created_at"}
 	documentPermissionOverridePrimaryKeyColumns     = []string{"id"}
 	documentPermissionOverrideGeneratedColumns      = []string{"id"}
@@ -377,17 +358,6 @@ func (o *DocumentPermissionOverride) Document(mods ...qm.QueryMod) documentQuery
 	queryMods = append(queryMods, mods...)
 
 	return Documents(queryMods...)
-}
-
-// Permission pointed to by the foreign key.
-func (o *DocumentPermissionOverride) Permission(mods ...qm.QueryMod) permissionQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.PermissionID),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	return Permissions(queryMods...)
 }
 
 // PortalRole pointed to by the foreign key.
@@ -626,118 +596,6 @@ func (documentPermissionOverrideL) LoadDocument(ctx context.Context, e boil.Cont
 				local.R.Document = foreign
 				if foreign.R == nil {
 					foreign.R = &documentR{}
-				}
-				foreign.R.DocumentPermissionOverrides = append(foreign.R.DocumentPermissionOverrides, local)
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// LoadPermission allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (documentPermissionOverrideL) LoadPermission(ctx context.Context, e boil.ContextExecutor, singular bool, maybeDocumentPermissionOverride any, mods queries.Applicator) error {
-	var slice []*DocumentPermissionOverride
-	var object *DocumentPermissionOverride
-
-	if singular {
-		var ok bool
-		object, ok = maybeDocumentPermissionOverride.(*DocumentPermissionOverride)
-		if !ok {
-			object = new(DocumentPermissionOverride)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeDocumentPermissionOverride)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeDocumentPermissionOverride))
-			}
-		}
-	} else {
-		s, ok := maybeDocumentPermissionOverride.(*[]*DocumentPermissionOverride)
-		if ok {
-			slice = *s
-		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeDocumentPermissionOverride)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeDocumentPermissionOverride))
-			}
-		}
-	}
-
-	args := make(map[any]struct{})
-	if singular {
-		if object.R == nil {
-			object.R = &documentPermissionOverrideR{}
-		}
-		args[object.PermissionID] = struct{}{}
-
-	} else {
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &documentPermissionOverrideR{}
-			}
-
-			args[obj.PermissionID] = struct{}{}
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	argsSlice := make([]any, len(args))
-	i := 0
-	for arg := range args {
-		argsSlice[i] = arg
-		i++
-	}
-
-	query := NewQuery(
-		qm.From(`permissions`),
-		qm.WhereIn(`permissions.id in ?`, argsSlice...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load Permission")
-	}
-
-	var resultSlice []*Permission
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice Permission")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for permissions")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for permissions")
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.Permission = foreign
-		if foreign.R == nil {
-			foreign.R = &permissionR{}
-		}
-		foreign.R.DocumentPermissionOverrides = append(foreign.R.DocumentPermissionOverrides, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if local.PermissionID == foreign.ID {
-				local.R.Permission = foreign
-				if foreign.R == nil {
-					foreign.R = &permissionR{}
 				}
 				foreign.R.DocumentPermissionOverrides = append(foreign.R.DocumentPermissionOverrides, local)
 				break
@@ -1065,53 +923,6 @@ func (o *DocumentPermissionOverride) SetDocument(ctx context.Context, exec boil.
 
 	if related.R == nil {
 		related.R = &documentR{
-			DocumentPermissionOverrides: DocumentPermissionOverrideSlice{o},
-		}
-	} else {
-		related.R.DocumentPermissionOverrides = append(related.R.DocumentPermissionOverrides, o)
-	}
-
-	return nil
-}
-
-// SetPermission of the documentPermissionOverride to the related item.
-// Sets o.R.Permission to related.
-// Adds o to related.R.DocumentPermissionOverrides.
-func (o *DocumentPermissionOverride) SetPermission(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Permission) error {
-	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
-		}
-	}
-
-	updateQuery := fmt.Sprintf(
-		"UPDATE \"document_permission_overrides\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"permission_id"}),
-		strmangle.WhereClause("\"", "\"", 2, documentPermissionOverridePrimaryKeyColumns),
-	)
-	values := []any{related.ID, o.ID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	o.PermissionID = related.ID
-	if o.R == nil {
-		o.R = &documentPermissionOverrideR{
-			Permission: related,
-		}
-	} else {
-		o.R.Permission = related
-	}
-
-	if related.R == nil {
-		related.R = &permissionR{
 			DocumentPermissionOverrides: DocumentPermissionOverrideSlice{o},
 		}
 	} else {

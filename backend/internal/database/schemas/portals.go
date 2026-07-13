@@ -51,6 +51,13 @@ func PortalSchemas() []Schema {
 					name TEXT NOT NULL,
 					description TEXT,
 
+					-- visual/ordering metadata for roles in the UI
+					colour TEXT,
+					position BIGINT NOT NULL DEFAULT 0,
+
+					-- optional mapping to a Discord role id (string)
+					discord_role_id TEXT,
+
 					created_by BIGINT NOT NULL,
 					updated_by BIGINT,
 
@@ -91,7 +98,6 @@ func PortalSchemas() []Schema {
 
 					portal_id BIGINT NOT NULL,
 					user_id BIGINT NOT NULL,
-					portal_role_id BIGINT NOT NULL,
 
 					created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -108,14 +114,37 @@ func PortalSchemas() []Schema {
 						ON DELETE CASCADE
 						ON UPDATE CASCADE,
 
-					CONSTRAINT portal_memberships_role_fk
-						FOREIGN KEY (portal_role_id)
-						REFERENCES portal_roles(id)
-						ON DELETE RESTRICT
-						ON UPDATE CASCADE,
-
 					CONSTRAINT portal_memberships_unique
 						UNIQUE (portal_id, user_id)
+				);
+			`,
+		},
+
+		{
+			Name: "Portal Membership Roles",
+			SQL: `
+				CREATE TABLE IF NOT EXISTS portal_membership_roles (
+					id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+					portal_membership_id BIGINT NOT NULL,
+					portal_role_id BIGINT NOT NULL,
+
+					created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+					CONSTRAINT portal_membership_roles_membership_fk
+						FOREIGN KEY (portal_membership_id)
+						REFERENCES portal_memberships(id)
+						ON DELETE CASCADE
+						ON UPDATE CASCADE,
+
+					CONSTRAINT portal_membership_roles_role_fk
+						FOREIGN KEY (portal_role_id)
+						REFERENCES portal_roles(id)
+						ON DELETE CASCADE
+						ON UPDATE CASCADE,
+
+					CONSTRAINT portal_membership_roles_unique
+						UNIQUE (portal_membership_id, portal_role_id)
 				);
 			`,
 		},

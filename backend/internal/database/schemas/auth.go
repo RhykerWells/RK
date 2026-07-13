@@ -3,34 +3,11 @@ package schemas
 func AuthSchemas() []Schema {
 	return []Schema{
 		{
-			Name: "Global Roles",
-			SQL: `
-				CREATE TABLE IF NOT EXISTS global_roles (
-
-					id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-
-					name TEXT NOT NULL,
-					description TEXT,
-
-					created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-					updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-					CONSTRAINT global_roles_name_check
-						CHECK (length(trim(name)) > 0),
-
-					CONSTRAINT global_roles_name_unique
-						UNIQUE (name)
-				);
-			`,
-		},
-		{
 			Name: "Users",
 			SQL: `
 				CREATE TABLE IF NOT EXISTS users (
 
 					id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-
-					global_role_id BIGINT NOT NULL,
 
 					auth_type TEXT NOT NULL,
 
@@ -49,11 +26,7 @@ func AuthSchemas() []Schema {
 					created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-					CONSTRAINT users_global_role_fk
-						FOREIGN KEY (global_role_id)
-						REFERENCES global_roles(id)
-						ON DELETE RESTRICT
-						ON UPDATE CASCADE,
+					is_administrator BOOLEAN NOT NULL DEFAULT FALSE
 
 					CONSTRAINT users_auth_type_check
 						CHECK (auth_type IN ('local', 'discord')),

@@ -23,83 +23,76 @@ import (
 
 // PortalMembership is an object representing the database table.
 type PortalMembership struct {
-	ID           int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	PortalID     int64     `boil:"portal_id" json:"portal_id" toml:"portal_id" yaml:"portal_id"`
-	UserID       int64     `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	PortalRoleID int64     `boil:"portal_role_id" json:"portal_role_id" toml:"portal_role_id" yaml:"portal_role_id"`
-	CreatedAt    time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt    time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID        int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	PortalID  int64     `boil:"portal_id" json:"portal_id" toml:"portal_id" yaml:"portal_id"`
+	UserID    int64     `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *portalMembershipR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L portalMembershipL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var PortalMembershipColumns = struct {
-	ID           string
-	PortalID     string
-	UserID       string
-	PortalRoleID string
-	CreatedAt    string
-	UpdatedAt    string
+	ID        string
+	PortalID  string
+	UserID    string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:           "id",
-	PortalID:     "portal_id",
-	UserID:       "user_id",
-	PortalRoleID: "portal_role_id",
-	CreatedAt:    "created_at",
-	UpdatedAt:    "updated_at",
+	ID:        "id",
+	PortalID:  "portal_id",
+	UserID:    "user_id",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var PortalMembershipTableColumns = struct {
-	ID           string
-	PortalID     string
-	UserID       string
-	PortalRoleID string
-	CreatedAt    string
-	UpdatedAt    string
+	ID        string
+	PortalID  string
+	UserID    string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:           "portal_memberships.id",
-	PortalID:     "portal_memberships.portal_id",
-	UserID:       "portal_memberships.user_id",
-	PortalRoleID: "portal_memberships.portal_role_id",
-	CreatedAt:    "portal_memberships.created_at",
-	UpdatedAt:    "portal_memberships.updated_at",
+	ID:        "portal_memberships.id",
+	PortalID:  "portal_memberships.portal_id",
+	UserID:    "portal_memberships.user_id",
+	CreatedAt: "portal_memberships.created_at",
+	UpdatedAt: "portal_memberships.updated_at",
 }
 
 // Generated where
 
 var PortalMembershipWhere = struct {
-	ID           whereHelperint64
-	PortalID     whereHelperint64
-	UserID       whereHelperint64
-	PortalRoleID whereHelperint64
-	CreatedAt    whereHelpertime_Time
-	UpdatedAt    whereHelpertime_Time
+	ID        whereHelperint64
+	PortalID  whereHelperint64
+	UserID    whereHelperint64
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
-	ID:           whereHelperint64{field: "\"portal_memberships\".\"id\""},
-	PortalID:     whereHelperint64{field: "\"portal_memberships\".\"portal_id\""},
-	UserID:       whereHelperint64{field: "\"portal_memberships\".\"user_id\""},
-	PortalRoleID: whereHelperint64{field: "\"portal_memberships\".\"portal_role_id\""},
-	CreatedAt:    whereHelpertime_Time{field: "\"portal_memberships\".\"created_at\""},
-	UpdatedAt:    whereHelpertime_Time{field: "\"portal_memberships\".\"updated_at\""},
+	ID:        whereHelperint64{field: "\"portal_memberships\".\"id\""},
+	PortalID:  whereHelperint64{field: "\"portal_memberships\".\"portal_id\""},
+	UserID:    whereHelperint64{field: "\"portal_memberships\".\"user_id\""},
+	CreatedAt: whereHelpertime_Time{field: "\"portal_memberships\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"portal_memberships\".\"updated_at\""},
 }
 
 // PortalMembershipRels is where relationship names are stored.
 var PortalMembershipRels = struct {
-	Portal     string
-	PortalRole string
-	User       string
+	Portal                string
+	User                  string
+	PortalMembershipRoles string
 }{
-	Portal:     "Portal",
-	PortalRole: "PortalRole",
-	User:       "User",
+	Portal:                "Portal",
+	User:                  "User",
+	PortalMembershipRoles: "PortalMembershipRoles",
 }
 
 // portalMembershipR is where relationships are stored.
 type portalMembershipR struct {
-	Portal     *Portal     `boil:"Portal" json:"Portal" toml:"Portal" yaml:"Portal"`
-	PortalRole *PortalRole `boil:"PortalRole" json:"PortalRole" toml:"PortalRole" yaml:"PortalRole"`
-	User       *User       `boil:"User" json:"User" toml:"User" yaml:"User"`
+	Portal                *Portal                   `boil:"Portal" json:"Portal" toml:"Portal" yaml:"Portal"`
+	User                  *User                     `boil:"User" json:"User" toml:"User" yaml:"User"`
+	PortalMembershipRoles PortalMembershipRoleSlice `boil:"PortalMembershipRoles" json:"PortalMembershipRoles" toml:"PortalMembershipRoles" yaml:"PortalMembershipRoles"`
 }
 
 // NewStruct creates a new relationship struct
@@ -123,22 +116,6 @@ func (r *portalMembershipR) GetPortal() *Portal {
 	return r.Portal
 }
 
-func (o *PortalMembership) GetPortalRole() *PortalRole {
-	if o == nil {
-		return nil
-	}
-
-	return o.R.GetPortalRole()
-}
-
-func (r *portalMembershipR) GetPortalRole() *PortalRole {
-	if r == nil {
-		return nil
-	}
-
-	return r.PortalRole
-}
-
 func (o *PortalMembership) GetUser() *User {
 	if o == nil {
 		return nil
@@ -155,12 +132,28 @@ func (r *portalMembershipR) GetUser() *User {
 	return r.User
 }
 
+func (o *PortalMembership) GetPortalMembershipRoles() PortalMembershipRoleSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetPortalMembershipRoles()
+}
+
+func (r *portalMembershipR) GetPortalMembershipRoles() PortalMembershipRoleSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.PortalMembershipRoles
+}
+
 // portalMembershipL is where Load methods for each relationship are stored.
 type portalMembershipL struct{}
 
 var (
-	portalMembershipAllColumns            = []string{"id", "portal_id", "user_id", "portal_role_id", "created_at", "updated_at"}
-	portalMembershipColumnsWithoutDefault = []string{"portal_id", "user_id", "portal_role_id"}
+	portalMembershipAllColumns            = []string{"id", "portal_id", "user_id", "created_at", "updated_at"}
+	portalMembershipColumnsWithoutDefault = []string{"portal_id", "user_id"}
 	portalMembershipColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	portalMembershipPrimaryKeyColumns     = []string{"id"}
 	portalMembershipGeneratedColumns      = []string{"id"}
@@ -268,17 +261,6 @@ func (o *PortalMembership) Portal(mods ...qm.QueryMod) portalQuery {
 	return Portals(queryMods...)
 }
 
-// PortalRole pointed to by the foreign key.
-func (o *PortalMembership) PortalRole(mods ...qm.QueryMod) portalRoleQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.PortalRoleID),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	return PortalRoles(queryMods...)
-}
-
 // User pointed to by the foreign key.
 func (o *PortalMembership) User(mods ...qm.QueryMod) userQuery {
 	queryMods := []qm.QueryMod{
@@ -288,6 +270,20 @@ func (o *PortalMembership) User(mods ...qm.QueryMod) userQuery {
 	queryMods = append(queryMods, mods...)
 
 	return Users(queryMods...)
+}
+
+// PortalMembershipRoles retrieves all the portal_membership_role's PortalMembershipRoles with an executor.
+func (o *PortalMembership) PortalMembershipRoles(mods ...qm.QueryMod) portalMembershipRoleQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"portal_membership_roles\".\"portal_membership_id\"=?", o.ID),
+	)
+
+	return PortalMembershipRoles(queryMods...)
 }
 
 // LoadPortal allows an eager lookup of values, cached into the
@@ -392,118 +388,6 @@ func (portalMembershipL) LoadPortal(ctx context.Context, e boil.ContextExecutor,
 				local.R.Portal = foreign
 				if foreign.R == nil {
 					foreign.R = &portalR{}
-				}
-				foreign.R.PortalMemberships = append(foreign.R.PortalMemberships, local)
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// LoadPortalRole allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (portalMembershipL) LoadPortalRole(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortalMembership any, mods queries.Applicator) error {
-	var slice []*PortalMembership
-	var object *PortalMembership
-
-	if singular {
-		var ok bool
-		object, ok = maybePortalMembership.(*PortalMembership)
-		if !ok {
-			object = new(PortalMembership)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybePortalMembership)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybePortalMembership))
-			}
-		}
-	} else {
-		s, ok := maybePortalMembership.(*[]*PortalMembership)
-		if ok {
-			slice = *s
-		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybePortalMembership)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybePortalMembership))
-			}
-		}
-	}
-
-	args := make(map[any]struct{})
-	if singular {
-		if object.R == nil {
-			object.R = &portalMembershipR{}
-		}
-		args[object.PortalRoleID] = struct{}{}
-
-	} else {
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &portalMembershipR{}
-			}
-
-			args[obj.PortalRoleID] = struct{}{}
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	argsSlice := make([]any, len(args))
-	i := 0
-	for arg := range args {
-		argsSlice[i] = arg
-		i++
-	}
-
-	query := NewQuery(
-		qm.From(`portal_roles`),
-		qm.WhereIn(`portal_roles.id in ?`, argsSlice...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load PortalRole")
-	}
-
-	var resultSlice []*PortalRole
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice PortalRole")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for portal_roles")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for portal_roles")
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.PortalRole = foreign
-		if foreign.R == nil {
-			foreign.R = &portalRoleR{}
-		}
-		foreign.R.PortalMemberships = append(foreign.R.PortalMemberships, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if local.PortalRoleID == foreign.ID {
-				local.R.PortalRole = foreign
-				if foreign.R == nil {
-					foreign.R = &portalRoleR{}
 				}
 				foreign.R.PortalMemberships = append(foreign.R.PortalMemberships, local)
 				break
@@ -626,6 +510,112 @@ func (portalMembershipL) LoadUser(ctx context.Context, e boil.ContextExecutor, s
 	return nil
 }
 
+// LoadPortalMembershipRoles allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (portalMembershipL) LoadPortalMembershipRoles(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortalMembership any, mods queries.Applicator) error {
+	var slice []*PortalMembership
+	var object *PortalMembership
+
+	if singular {
+		var ok bool
+		object, ok = maybePortalMembership.(*PortalMembership)
+		if !ok {
+			object = new(PortalMembership)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybePortalMembership)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybePortalMembership))
+			}
+		}
+	} else {
+		s, ok := maybePortalMembership.(*[]*PortalMembership)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybePortalMembership)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybePortalMembership))
+			}
+		}
+	}
+
+	args := make(map[any]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &portalMembershipR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &portalMembershipR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]any, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`portal_membership_roles`),
+		qm.WhereIn(`portal_membership_roles.portal_membership_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load portal_membership_roles")
+	}
+
+	var resultSlice []*PortalMembershipRole
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice portal_membership_roles")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on portal_membership_roles")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for portal_membership_roles")
+	}
+
+	if singular {
+		object.R.PortalMembershipRoles = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &portalMembershipRoleR{}
+			}
+			foreign.R.PortalMembership = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.PortalMembershipID {
+				local.R.PortalMembershipRoles = append(local.R.PortalMembershipRoles, foreign)
+				if foreign.R == nil {
+					foreign.R = &portalMembershipRoleR{}
+				}
+				foreign.R.PortalMembership = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetPortal of the portalMembership to the related item.
 // Sets o.R.Portal to related.
 // Adds o to related.R.PortalMemberships.
@@ -664,53 +654,6 @@ func (o *PortalMembership) SetPortal(ctx context.Context, exec boil.ContextExecu
 
 	if related.R == nil {
 		related.R = &portalR{
-			PortalMemberships: PortalMembershipSlice{o},
-		}
-	} else {
-		related.R.PortalMemberships = append(related.R.PortalMemberships, o)
-	}
-
-	return nil
-}
-
-// SetPortalRole of the portalMembership to the related item.
-// Sets o.R.PortalRole to related.
-// Adds o to related.R.PortalMemberships.
-func (o *PortalMembership) SetPortalRole(ctx context.Context, exec boil.ContextExecutor, insert bool, related *PortalRole) error {
-	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
-		}
-	}
-
-	updateQuery := fmt.Sprintf(
-		"UPDATE \"portal_memberships\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"portal_role_id"}),
-		strmangle.WhereClause("\"", "\"", 2, portalMembershipPrimaryKeyColumns),
-	)
-	values := []any{related.ID, o.ID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	o.PortalRoleID = related.ID
-	if o.R == nil {
-		o.R = &portalMembershipR{
-			PortalRole: related,
-		}
-	} else {
-		o.R.PortalRole = related
-	}
-
-	if related.R == nil {
-		related.R = &portalRoleR{
 			PortalMemberships: PortalMembershipSlice{o},
 		}
 	} else {
@@ -764,6 +707,59 @@ func (o *PortalMembership) SetUser(ctx context.Context, exec boil.ContextExecuto
 		related.R.PortalMemberships = append(related.R.PortalMemberships, o)
 	}
 
+	return nil
+}
+
+// AddPortalMembershipRoles adds the given related objects to the existing relationships
+// of the portal_membership, optionally inserting them as new records.
+// Appends related to o.R.PortalMembershipRoles.
+// Sets related.R.PortalMembership appropriately.
+func (o *PortalMembership) AddPortalMembershipRoles(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*PortalMembershipRole) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.PortalMembershipID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"portal_membership_roles\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"portal_membership_id"}),
+				strmangle.WhereClause("\"", "\"", 2, portalMembershipRolePrimaryKeyColumns),
+			)
+			values := []any{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.PortalMembershipID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &portalMembershipR{
+			PortalMembershipRoles: related,
+		}
+	} else {
+		o.R.PortalMembershipRoles = append(o.R.PortalMembershipRoles, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &portalMembershipRoleR{
+				PortalMembership: o,
+			}
+		} else {
+			rel.R.PortalMembership = o
+		}
+	}
 	return nil
 }
 
