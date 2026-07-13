@@ -1,0 +1,18 @@
+output = "internal/database/models"
+pkgname = "models"
+
+wipe = true
+
+no-tests = true
+no-hooks = true
+
+strict-verify-mod-version = true
+
+[psql]
+host = "localhost"
+port = 5432
+dbname = "rk"
+user="rk"
+pass="password"
+sslmode = "disable"
+schema = "public"
