@@ -8,13 +8,15 @@ import (
 
 	"github.com/RhykerWells/RK/backend/internal/config"
 	"github.com/RhykerWells/RK/backend/internal/database/schemas"
-	"github.com/RhykerWells/RK/backend/internal/log"
+	"github.com/RhykerWells/RK/backend/internal/logger"
 	"github.com/aarondl/sqlboiler/v4/boil"
 	_ "github.com/lib/pq"
 )
 
-func Connect(config *config.Config) error {
-	var log = log.With("m", "config")
+var log *slog.Logger
+
+func Connect() error {
+	log = logger.With("m", "database")
 
 	log.Info(
 		"Connecting to Database",
@@ -59,7 +61,7 @@ func Connect(config *config.Config) error {
 	return nil
 }
 
-func initSchemas(log *slog.Logger) {
+func initSchemas() {
 	log.Info(
 		"Initialising database schemas",
 	)

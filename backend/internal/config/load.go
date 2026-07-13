@@ -5,12 +5,14 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/RhykerWells/RK/backend/internal/log"
+	"github.com/RhykerWells/RK/backend/internal/logger"
 	"github.com/sethvargo/go-envconfig"
 )
 
+var log *slog.Logger
+
 func Load() *Config {
-	var log = log.With("m", "config")
+	log = logger.With("m", "config")
 
 	log.Info(
 		"Loading Configuration",
