@@ -57,13 +57,13 @@ func User(w http.ResponseWriter, r *http.Request) {
 func UserCreate(w http.ResponseWriter, r *http.Request) {
 	var req users.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		RespondError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	user, err := users.UserCreate(r.Context(), &req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 
@@ -78,7 +78,6 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		IsAdministrator: user.IsAdministrator,
 	}
 
-	w.WriteHeader(http.StatusCreated)
 	RespondJSON(w, http.StatusCreated, map[string]any{
 		"user":   returnedUser,
 	})
@@ -93,20 +92,18 @@ func UserDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrInvalidUserID), errors.Is(err, ErrInvalidMissingRequestType):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-
+			RespondErrorMessage(w, http.StatusBadRequest, err.Error())
 		case errors.Is(err, sql.ErrNoRows):
-			http.Error(w, "user not found", http.StatusNotFound)
-
+			RespondErrorMessage(w, http.StatusNotFound, "user not found")
 		default:
-			http.Error(w, "internal server error", http.StatusInternalServerError)
+			RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
 		}
 		return
 	}
 
 	err = users.UserDelete(ctx, user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 
