@@ -33,21 +33,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	returnedUser := &users.UserResponse{
-		ID:              user.ID,
-		AuthType:        user.AuthType,
-		DiscordID:       user.DiscordID,
-		Username:        user.Username,
-		DisplayName:     user.DisplayName,
-		Email:           user.Email,
-		AvatarURL:       user.AvatarURL,
-		IsAdministrator: user.IsAdministrator,
-	}
-
-	if user.LastLoginAt.Valid {
-		t := user.LastLoginAt.Time
-		returnedUser.LastLoginAt = &t
-	}
+	returnedUser := users.UserModelToResponse(user)
 
 	RespondJSON(w, http.StatusOK, map[string]any{
 		"user": returnedUser,
@@ -67,16 +53,7 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	returnedUser := &users.UserResponse{
-		ID:              user.ID,
-		AuthType:        user.AuthType,
-		Username:        user.Username,
-		DiscordID:       user.DiscordID,
-		DisplayName:     user.DisplayName,
-		Email:           user.Email,
-		AvatarURL:       user.AvatarURL,
-		IsAdministrator: user.IsAdministrator,
-	}
+	returnedUser := users.UserModelToResponse(user)
 
 	RespondJSON(w, http.StatusCreated, map[string]any{
 		"user":   returnedUser,
