@@ -16,8 +16,6 @@ var (
 )
 
 func User(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	userID := pat.Param(r, "id")
 
 	ctx := r.Context()
@@ -26,13 +24,11 @@ func User(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrInvalidUserID), errors.Is(err, ErrInvalidMissingRequestType):
-			http.Error(w, err.Error(), http.StatusBadRequest)
-
+			RespondErrorMessage(w, http.StatusBadRequest, err.Error())
 		case errors.Is(err, sql.ErrNoRows):
-			http.Error(w, "user not found", http.StatusNotFound)
-
+			RespondErrorMessage(w, http.StatusNotFound, "user not found")
 		default:
-			http.Error(w, "internal server error", http.StatusInternalServerError)
+			RespondErrorMessage(w, http.StatusNotFound, "user not found")
 		}
 		return
 	}
@@ -53,16 +49,12 @@ func User(w http.ResponseWriter, r *http.Request) {
 		returnedUser.LastLoginAt = &t
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]any{
-		"status": "ok",
-		"user":   returnedUser,
+	RespondJSON(w, http.StatusOK, map[string]any{
+		"user": returnedUser,
 	})
 }
 
 func UserCreate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var req users.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -87,15 +79,12 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]any{
-		"status": "ok",
+	RespondJSON(w, http.StatusCreated, map[string]any{
 		"user":   returnedUser,
 	})
 }
 
 func UserDelete(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	userID := pat.Param(r, "id")
 
 	ctx := r.Context()
@@ -121,5 +110,5 @@ func UserDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	RespondJSON(w, http.StatusNoContent, nil)
 }
