@@ -35,8 +35,7 @@ func AuthSchemas() []Schema {
 						CHECK (
 							auth_type <> 'local'
 							OR (
-								username IS NOT NULL
-								AND password_hash IS NOT NULL
+								password_hash IS NOT NULL
 								AND discord_id IS NULL
 							)
 						),
@@ -46,9 +45,8 @@ func AuthSchemas() []Schema {
 							auth_type <> 'discord'
 							OR (
 								discord_id IS NOT NULL
-								AND username IS NULL
 								AND password_hash IS NULL
-								)
+							)
 						),
 
 					CONSTRAINT users_username_check
