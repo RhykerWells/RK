@@ -16,7 +16,7 @@ var (
 )
 
 func User(w http.ResponseWriter, r *http.Request) {
-	userID := pat.Param(r, "id")
+	userID := pat.Param(r, "user_id")
 
 	ctx := r.Context()
 
@@ -61,7 +61,7 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func UserDelete(w http.ResponseWriter, r *http.Request) {
-	userID := pat.Param(r, "id")
+	userID := pat.Param(r, "user_id")
 
 	ctx := r.Context()
 

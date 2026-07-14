@@ -10,12 +10,12 @@ var (
 	// Users
 	EndpointUsers      = EndpointAPI + "/users"
 	EndpointUserCreate = EndpointUsers + "/create"
-	EndpointUser       = EndpointUsers + "/:id"
+	EndpointUser       = EndpointUsers + "/:user_id"
 	EndpointUserDelete = EndpointUser + "/delete"
 
 	// Portals
 	EndpointPortals = EndpointAPI + "/portals"
 	EndpointPortalCreate = EndpointPortals + "/create"
-	EndpointPortal = EndpointPortals + "/:id"
+	EndpointPortal = EndpointPortals + "/:portal_id"
 	EndpointPortalDelete = EndpointPortal + "/delete"
 )

@@ -34,7 +34,7 @@ func getUser(ctx context.Context, requestType string, id string) (*models.User, 
 func getPortal(ctx context.Context, idStr string) (*models.Portal, error) {
 	id, convErr := strconv.ParseInt(idStr, 10, 64)
 	if convErr != nil {
-		return nil, ErrInvalidUserID
+		return nil, ErrInvalidPortalID
 	}
 
 	return portals.GetPortalByID(ctx, id)
