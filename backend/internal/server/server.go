@@ -8,6 +8,7 @@ import (
 
 	"github.com/RhykerWells/RK/backend/internal/config"
 	"github.com/RhykerWells/RK/backend/internal/logger"
+	"github.com/RhykerWells/RK/backend/internal/server/handlers"
 	"goji.io/v3"
 )
 
@@ -20,15 +21,26 @@ func Start() {
 	mux := goji.NewMux()
 	Multiplexer = mux
 
-	address := fmt.Sprintf("%s:%d",
-		config.AppConfig.Server.BindAddress,
+	if config.AppConfig.Server.Debug {
+		mux.Use(func(h http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				log.Info("Request received", "method", r.Method, "path", r.URL.Path)
+				h.ServeHTTP(w, r)
+			})
+		})
+	}
+
+	handlers.SetLogger(log)
+	registerRoutes()
+
+	address := fmt.Sprintf(":%d",
 		config.AppConfig.Server.Port,
 	)
 
-	log.Info(fmt.Sprintf("Webserver starting on %s", address))
+	log.Info("Webserver starting", "address", address)
 	err := http.ListenAndServe(address, Multiplexer)
 	if err != nil {
-		log.Error(fmt.Sprintf("Failed to start webserver: %v", err))
+		log.Error("Failed to start webserver", "error", err)
 		os.Exit(1)
 	}
 }
