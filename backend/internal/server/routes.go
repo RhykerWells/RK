@@ -16,4 +16,9 @@ func (s *Server) registerRoutes() {
 	s.Multiplexer.HandleFunc(pat.Get(EndpointUser), handlers.User)
 	s.Multiplexer.HandleFunc(pat.Post(EndpointUserCreate), handlers.UserCreate)
 	s.Multiplexer.HandleFunc(pat.Delete(EndpointUserDelete), handlers.UserDelete)
+
+	// Portals
+	s.Multiplexer.HandleFunc(pat.Get(EndpointPortal), handlers.Portal)
+	s.Multiplexer.HandleFunc(pat.Get(EndpointPortalCreate), handlers.PortalCreate)
+	s.Multiplexer.HandleFunc(pat.Delete(EndpointPortalDelete), handlers.PortalDelete)
 }
