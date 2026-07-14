@@ -11,7 +11,7 @@ func AuthSchemas() []Schema {
 
 					auth_type TEXT NOT NULL,
 
-					username TEXT,
+					username TEXT NOT NULL,
 					password_hash TEXT,
 					discord_id TEXT,
 

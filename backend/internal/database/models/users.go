@@ -26,7 +26,7 @@ import (
 type User struct {
 	ID              int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	AuthType        string      `boil:"auth_type" json:"auth_type" toml:"auth_type" yaml:"auth_type"`
-	Username        null.String `boil:"username" json:"username,omitempty" toml:"username" yaml:"username,omitempty"`
+	Username        string      `boil:"username" json:"username" toml:"username" yaml:"username"`
 	PasswordHash    null.String `boil:"password_hash" json:"password_hash,omitempty" toml:"password_hash" yaml:"password_hash,omitempty"`
 	DiscordID       null.String `boil:"discord_id" json:"discord_id,omitempty" toml:"discord_id" yaml:"discord_id,omitempty"`
 	DisplayName     string      `boil:"display_name" json:"display_name" toml:"display_name" yaml:"display_name"`
@@ -131,7 +131,7 @@ func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsN
 var UserWhere = struct {
 	ID              whereHelperint64
 	AuthType        whereHelperstring
-	Username        whereHelpernull_String
+	Username        whereHelperstring
 	PasswordHash    whereHelpernull_String
 	DiscordID       whereHelpernull_String
 	DisplayName     whereHelperstring
@@ -145,7 +145,7 @@ var UserWhere = struct {
 }{
 	ID:              whereHelperint64{field: "\"users\".\"id\""},
 	AuthType:        whereHelperstring{field: "\"users\".\"auth_type\""},
-	Username:        whereHelpernull_String{field: "\"users\".\"username\""},
+	Username:        whereHelperstring{field: "\"users\".\"username\""},
 	PasswordHash:    whereHelpernull_String{field: "\"users\".\"password_hash\""},
 	DiscordID:       whereHelpernull_String{field: "\"users\".\"discord_id\""},
 	DisplayName:     whereHelperstring{field: "\"users\".\"display_name\""},
@@ -519,8 +519,8 @@ type userL struct{}
 
 var (
 	userAllColumns            = []string{"id", "auth_type", "username", "password_hash", "discord_id", "display_name", "email", "avatar_url", "is_active", "last_login_at", "created_at", "updated_at", "is_administrator"}
-	userColumnsWithoutDefault = []string{"auth_type", "display_name"}
-	userColumnsWithDefault    = []string{"id", "username", "password_hash", "discord_id", "email", "avatar_url", "is_active", "last_login_at", "created_at", "updated_at", "is_administrator"}
+	userColumnsWithoutDefault = []string{"auth_type", "username", "display_name"}
+	userColumnsWithDefault    = []string{"id", "password_hash", "discord_id", "email", "avatar_url", "is_active", "last_login_at", "created_at", "updated_at", "is_administrator"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{"id"}
 )
