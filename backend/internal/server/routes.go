@@ -5,6 +5,6 @@ import (
 	"goji.io/v3/pat"
 )
 
-func registerRoutes() {
-	Multiplexer.HandleFunc(pat.Get("/health"), handlers.Health)
+func (s *Server) registerRoutes() {
+	s.Multiplexer.HandleFunc(pat.Get("/health"), handlers.Health)
 }

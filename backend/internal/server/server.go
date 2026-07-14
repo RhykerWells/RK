@@ -1,10 +1,14 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/RhykerWells/RK/backend/internal/config"
 	"github.com/RhykerWells/RK/backend/internal/logger"
@@ -12,35 +16,73 @@ import (
 	"goji.io/v3"
 )
 
-var log *slog.Logger
-var Multiplexer *goji.Mux
+type Server struct {
+	Multiplexer *goji.Mux
+	Logger      *slog.Logger
+}
 
-func Start() {
-	log = logger.With("m", "server")
-
-	mux := goji.NewMux()
-	Multiplexer = mux
-
-	if config.AppConfig.Server.Debug {
-		mux.Use(func(h http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				log.Info("Request received", "method", r.Method, "path", r.URL.Path)
-				h.ServeHTTP(w, r)
-			})
-		})
+func NewServer() *Server {
+	s := &Server{
+		Multiplexer: goji.NewMux(),
+		Logger:      logger.With("m", "server"),
 	}
 
-	handlers.SetLogger(log)
-	registerRoutes()
+	handlers.SetLogger(s.Logger)
+	s.registerRoutes()
 
-	address := fmt.Sprintf(":%d",
+	return s
+}
+
+func (s *Server) Start() error {
+	address := fmt.Sprintf("%s:%d",
+		config.AppConfig.Server.BindAddress,
 		config.AppConfig.Server.Port,
 	)
 
-	log.Info("Webserver starting", "address", address)
-	err := http.ListenAndServe(address, Multiplexer)
-	if err != nil {
-		log.Error("Failed to start webserver", "error", err)
-		os.Exit(1)
+	httpServer := &http.Server{
+		Addr:    address,
+		Handler: s.Multiplexer,
+	}
+
+	errs := make(chan error, 1)
+	// Start listening in the background
+	go func() {
+		s.Logger.Info("Starting weberver listen and serve",
+			"addr", address,
+		)
+
+		if err := httpServer.ListenAndServe(); err != nil &&
+			err != http.ErrServerClosed {
+			errs <- err
+		}
+	}()
+
+	// Wait for shutdown signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case err := <-errs:
+		s.Logger.Error("Webserver failed to listen and serve",
+			"error", err,
+		)
+
+		return err
+
+	case <-quit:
+		s.Logger.Info("Webserver shutting down")
+
+		ctx, cancel := context.WithTimeout(
+			context.Background(),
+			10*time.Second,
+		)
+		defer cancel()
+
+		if err := httpServer.Shutdown(ctx); err != nil {
+			return err
+		}
+
+		s.Logger.Info("Webserver stopped")
+		return nil
 	}
 }

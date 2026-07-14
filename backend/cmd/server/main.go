@@ -21,5 +21,7 @@ func main() {
 
 	config.Load()
 	database.Connect()
-	server.Start()
+
+	s := server.NewServer()
+	s.Start()
 }
