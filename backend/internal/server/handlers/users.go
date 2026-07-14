@@ -1,13 +1,18 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/RhykerWells/RK/backend/internal/app/users"
-	"github.com/RhykerWells/RK/backend/internal/database/models"
 	"goji.io/v3/pat"
+)
+
+var (
+	ErrInvalidUserID = errors.New("invalid user id")
+	ErrInvalidMissingRequestType = errors.New("invalid or missing request type")
 )
 
 func User(w http.ResponseWriter, r *http.Request) {
@@ -15,30 +20,20 @@ func User(w http.ResponseWriter, r *http.Request) {
 
 	userID := pat.Param(r, "id")
 
-	var (
-		user *models.User
-		err  error
-	)
-
 	ctx := r.Context()
 
-	switch {
-	case r.URL.Query().Get("type") == "id":
-		id, convErr := strconv.ParseInt(userID, 10, 64)
-		if convErr != nil {
-			http.Error(w, "invalid user id", http.StatusBadRequest)
-			return
-		}
-		user, err = users.GetUserByID(ctx, id)
-	case r.URL.Query().Get("type") == "discord":
-		user, err = users.GetUserByDiscordID(ctx, userID)
-	default:
-		http.Error(w, "missing search identifier", http.StatusBadRequest)
-		return
-	}
-
+	user, err := getUser(ctx, r.URL.Query().Get("type"), userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		switch {
+		case errors.Is(err, ErrInvalidUserID), errors.Is(err, ErrInvalidMissingRequestType):
+			http.Error(w, err.Error(), http.StatusBadRequest)
+
+		case errors.Is(err, sql.ErrNoRows):
+			http.Error(w, "user not found", http.StatusNotFound)
+
+		default:
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -103,30 +98,20 @@ func UserDelete(w http.ResponseWriter, r *http.Request) {
 
 	userID := pat.Param(r, "id")
 
-	var (
-		user *models.User
-		err  error
-	)
-
 	ctx := r.Context()
 
-	switch {
-	case r.URL.Query().Get("type") == "id":
-		id, convErr := strconv.ParseInt(userID, 10, 64)
-		if convErr != nil {
-			http.Error(w, "invalid user id", http.StatusBadRequest)
-			return
-		}
-		user, err = users.GetUserByID(ctx, id)
-	case r.URL.Query().Get("type") == "discord":
-		user, err = users.GetUserByDiscordID(ctx, userID)
-	default:
-		http.Error(w, "missing search identifier", http.StatusBadRequest)
-		return
-	}
-
+	user, err := getUser(ctx, r.URL.Query().Get("type"), userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		switch {
+		case errors.Is(err, ErrInvalidUserID), errors.Is(err, ErrInvalidMissingRequestType):
+			http.Error(w, err.Error(), http.StatusBadRequest)
+
+		case errors.Is(err, sql.ErrNoRows):
+			http.Error(w, "user not found", http.StatusNotFound)
+
+		default:
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+		}
 		return
 	}
 
