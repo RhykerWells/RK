@@ -22,9 +22,7 @@ type User struct {
 }
 
 type CreateUserRequest struct {
-	AuthType        string      `json:"auth_type"`
 	Username        string      `json:"username"`
-	PasswordHash    string      `json:"password_hash,omitempty"`
 	DiscordID       null.String `json:"discord_id,omitempty"`
 	DisplayName     string      `json:"display_name"`
 	Email           null.String `json:"email,omitempty"`
