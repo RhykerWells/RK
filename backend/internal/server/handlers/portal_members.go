@@ -90,7 +90,7 @@ func PortalMemberUpdate(w http.ResponseWriter, r *http.Request) {
 
 	member, err := portals.MemberUpdate(ctx, portalModel, memberID, &update)
 	if err != nil {
-		RespondError(w, http.StatusBadRequest, err)
+		RespondError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -99,7 +99,6 @@ func PortalMemberUpdate(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// PortalMemberDelete handles DELETE /api/v1/portals/:portal_id/members/:member_id
 func PortalMemberDelete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := PortalFromContext(ctx)
@@ -112,7 +111,7 @@ func PortalMemberDelete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := portals.MemberDelete(ctx, portalModel, memberID); err != nil {
-		RespondError(w, http.StatusBadRequest, err)
+		RespondError(w, http.StatusInternalServerError, err)
 		return
 	}
 
