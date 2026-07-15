@@ -12,7 +12,7 @@ import (
 
 var (
 	ErrInvalidRoleID = errors.New("invalid role ID")
-	ErrRoleNotFound = errors.New("role not found")
+	ErrRoleNotFound  = errors.New("role not found")
 )
 
 func PortalRoles(w http.ResponseWriter, r *http.Request) {

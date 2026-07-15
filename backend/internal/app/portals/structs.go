@@ -22,12 +22,12 @@ type CreatePortalRequest struct {
 }
 
 type PortalResponse struct {
-	ID        int64        `json:"id"`
-	Name      string       `json:"name"`
-	Domain    string       `json:"domain"`
+	ID        int64                `json:"id"`
+	Name      string               `json:"name"`
+	Domain    string               `json:"domain"`
 	Roles     []PortalRoleResponse `json:"roles,omitempty"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
+	CreatedAt time.Time            `json:"created_at"`
+	UpdatedAt time.Time            `json:"updated_at"`
 }
 
 type PortalRole struct {
@@ -49,10 +49,10 @@ type CreatePortalRoleRequest struct {
 }
 
 type UpdatePortalRoleRequest struct {
-	Name          *string      `json:"name"`
+	Name          *string `json:"name"`
 	Description   *string `json:"description,omitempty"`
-	Colour		  *string `json:"colour,omitempty"`
-	Position	  *int64       `json:"position,omitempty"`
+	Colour        *string `json:"colour,omitempty"`
+	Position      *int64  `json:"position,omitempty"`
 	DiscordRoleID *string `json:"discord_role_id,omitempty"`
 }
 
@@ -70,7 +70,7 @@ type PortalRoleResponse struct {
 type PortalMember struct {
 	ID        int64
 	PortalID  int64
-	User	  users.User
+	User      users.User
 	Roles     []int64
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -81,8 +81,8 @@ type UpdatePortalMemberRequest struct {
 }
 
 type PortalMemberResponse struct {
-	Roles     []int64   `json:"roles,omitempty"`
-	User	  users.UserResponse `json:"user"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Roles     []int64            `json:"roles,omitempty"`
+	User      users.UserResponse `json:"user"`
+	CreatedAt time.Time          `json:"created_at"`
+	UpdatedAt time.Time          `json:"updated_at"`
 }

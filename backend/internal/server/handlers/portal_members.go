@@ -20,7 +20,7 @@ func PortalMembers(w http.ResponseWriter, r *http.Request) {
 	members := portals.PortalMembersFromModel(portalModel)
 
 	RespondJSON(w, http.StatusOK, map[string]any{
-		"members":   members,
+		"members": members,
 	})
 }
 
@@ -67,7 +67,6 @@ func PortalMemberCreate(w http.ResponseWriter, r *http.Request) {
 		"member": portals.PortalMemberFromModel(member),
 	})
 }
-
 
 func PortalMemberUpdate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

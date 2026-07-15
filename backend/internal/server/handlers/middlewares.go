@@ -21,19 +21,19 @@ const ContextPortalKey PortalContextKey = "portal"
 // and stores it in the request context under ContextPortalKey. If the portal cannot
 // be loaded the middleware writes an error response and aborts the chain.
 func WithPortalMW(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        portalIDStr := pat.Param(r, "portal_id")
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		portalIDStr := pat.Param(r, "portal_id")
 
-        ctx := r.Context()
+		ctx := r.Context()
 
-        portalIDInt, err := strconv.ParseInt(portalIDStr, 10, 64)
-        if err != nil {
+		portalIDInt, err := strconv.ParseInt(portalIDStr, 10, 64)
+		if err != nil {
 			RespondError(w, http.StatusBadRequest, ErrInvalidPortalID)
-            return
-        }
+			return
+		}
 
-        portalModel, err := portals.GetPortalByID(ctx, portalIDInt)
-        if err != nil {
+		portalModel, err := portals.GetPortalByID(ctx, portalIDInt)
+		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
 				RespondError(w, http.StatusNotFound, ErrPortalNotFound)
@@ -41,20 +41,20 @@ func WithPortalMW(next http.Handler) http.Handler {
 				RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
 			}
 			return
-        }
+		}
 
-        ctx = context.WithValue(ctx, ContextPortalKey, portalModel)
+		ctx = context.WithValue(ctx, ContextPortalKey, portalModel)
 
-        next.ServeHTTP(w, r.WithContext(ctx))
-    })
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 // PortalFromContext is a helper to retrieve the loaded portal from context.
 func PortalFromContext(ctx context.Context) (*models.Portal, bool) {
-    v := ctx.Value(ContextPortalKey)
-    if v == nil {
-        return nil, false
-    }
-    p, ok := v.(*models.Portal)
-    return p, ok
+	v := ctx.Value(ContextPortalKey)
+	if v == nil {
+		return nil, false
+	}
+	p, ok := v.(*models.Portal)
+	return p, ok
 }

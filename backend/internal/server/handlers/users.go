@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	ErrInvalidUserID = errors.New("invalid user id")
-	ErrUserNotFound = errors.New("user not found")
+	ErrInvalidUserID             = errors.New("invalid user id")
+	ErrUserNotFound              = errors.New("user not found")
 	ErrInvalidMissingRequestType = errors.New("invalid or missing request type")
 )
 
@@ -57,7 +57,7 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 	returnedUser := users.UserModelToResponse(user)
 
 	RespondJSON(w, http.StatusCreated, map[string]any{
-		"user":   returnedUser,
+		"user": returnedUser,
 	})
 }
 

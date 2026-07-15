@@ -10,7 +10,7 @@ type ServerConfig struct {
 	BindAddress  string `env:"RK_BIND_ADDRESS, default=0.0.0.0"`
 	Port         int    `env:"RK_PORT, default=8080"`
 	EnabledHTTPS bool   `env:"RK_ENABLE_HTTPS, default=false"`
-	Debug   	 bool   `env:"RK_DEBUG, default=false"`
+	Debug        bool   `env:"RK_DEBUG, default=false"`
 }
 
 type DatabaseConfig struct {

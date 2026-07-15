@@ -10,7 +10,7 @@ import (
 
 var (
 	ErrInvalidPortalID = errors.New("invalid portal id")
-	ErrPortalNotFound = errors.New("portal not found")
+	ErrPortalNotFound  = errors.New("portal not found")
 )
 
 func Portal(w http.ResponseWriter, r *http.Request) {

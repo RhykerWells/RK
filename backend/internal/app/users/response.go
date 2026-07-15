@@ -4,12 +4,12 @@ import "github.com/RhykerWells/RK/backend/internal/database/models"
 
 func UserModelToResponse(model *models.User) UserResponse {
 	user := UserResponse{
-		ID: model.ID,
-		AuthType: model.AuthType,
-		DiscordID: model.DiscordID,
-		Username: model.Username,
-		DisplayName: model.DisplayName,
-		Email: model.Email,
+		ID:              model.ID,
+		AuthType:        model.AuthType,
+		DiscordID:       model.DiscordID,
+		Username:        model.Username,
+		DisplayName:     model.DisplayName,
+		Email:           model.Email,
 		IsAdministrator: model.IsAdministrator,
 	}
 

@@ -16,9 +16,9 @@ func GetPortalByID(ctx context.Context, id int64) (*models.Portal, error) {
 }
 
 func PortalCreate(ctx context.Context, portal *CreatePortalRequest) (*models.Portal, error) {
-	newPortal := & models.Portal{
-		Name: portal.Name,
-		Domain: portal.Domain,
+	newPortal := &models.Portal{
+		Name:      portal.Name,
+		Domain:    portal.Domain,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -39,7 +39,7 @@ func PortalDelete(ctx context.Context, portal *models.Portal) error {
 	_, err := portal.Delete(ctx, boil.GetContextDB())
 
 	return err
-} 
+}
 
 func GetPortalRoleByID(ctx context.Context, portalModel *models.Portal, roleID int64) (*models.PortalRole, error) {
 	return models.PortalRoles(models.PortalRoleWhere.PortalID.EQ(portalModel.ID), models.PortalRoleWhere.ID.EQ(roleID)).One(ctx, boil.GetContextDB())
@@ -116,8 +116,8 @@ func GetPortalMemberByID(ctx context.Context, portalModel *models.Portal, userID
 
 func PortalMemberCreate(ctx context.Context, portalModel *models.Portal, userID int64) (*models.PortalMembership, error) {
 	newMembership := &models.PortalMembership{
-		PortalID: portalModel.ID,
-		UserID: userID,
+		PortalID:  portalModel.ID,
+		UserID:    userID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
