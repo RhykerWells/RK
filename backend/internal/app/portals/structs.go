@@ -81,8 +81,8 @@ type UpdatePortalMemberRequest struct {
 }
 
 type PortalMemberResponse struct {
-	Roles     []int64            `json:"roles,omitempty"`
-	User      users.UserResponse `json:"user"`
-	CreatedAt time.Time          `json:"created_at"`
-	UpdatedAt time.Time          `json:"updated_at"`
+	Roles     []PortalRoleResponse `json:"roles,omitempty"`
+	User      users.UserResponse   `json:"user"`
+	CreatedAt time.Time            `json:"created_at"`
+	UpdatedAt time.Time            `json:"updated_at"`
 }

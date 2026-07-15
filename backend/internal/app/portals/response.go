@@ -51,16 +51,16 @@ func PortalMembersFromModel(model *models.Portal) []PortalMemberResponse {
 }
 
 func PortalMemberFromModel(model *models.PortalMembership) PortalMemberResponse {
-	roleIDs := make([]int64, 0, len(model.GetPortalMembershipRoles()))
+	roles := make([]PortalRoleResponse, 0, len(model.GetPortalMembershipRoles()))
 
-	for _, role := range model.GetPortalMembershipRoles() {
-		roleIDs = append(roleIDs, role.PortalRoleID)
+	for _, membershipRole := range model.GetPortalMembershipRoles() {
+		roles = append(roles, PortalRoleFromModel(membershipRole.GetPortalRole()))
 	}
 
 	user := model.GetUser()
 
 	return PortalMemberResponse{
-		Roles:     roleIDs,
+		Roles:     roles,
 		User:      users.UserModelToResponse(user),
 		CreatedAt: model.CreatedAt,
 		UpdatedAt: model.UpdatedAt,
