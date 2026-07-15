@@ -28,7 +28,7 @@ func WithPortalMW(next http.Handler) http.Handler {
 
         portalIDInt, err := strconv.ParseInt(portalIDStr, 10, 64)
         if err != nil {
-			RespondErrorMessage(w, http.StatusBadRequest, err.Error())
+			RespondError(w, http.StatusBadRequest, ErrInvalidPortalID)
             return
         }
 
@@ -36,7 +36,7 @@ func WithPortalMW(next http.Handler) http.Handler {
         if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
-				RespondErrorMessage(w, http.StatusNotFound, "portal not found")
+				RespondError(w, http.StatusNotFound, ErrPortalNotFound)
 			default:
 				RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
 			}

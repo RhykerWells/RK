@@ -31,15 +31,6 @@ func getUser(ctx context.Context, requestType string, id string) (*models.User, 
 	return user, err
 }
 
-func getPortal(ctx context.Context, idStr string) (*models.Portal, error) {
-	id, convErr := strconv.ParseInt(idStr, 10, 64)
-	if convErr != nil {
-		return nil, ErrInvalidPortalID
-	}
-
-	return portals.GetPortalByID(ctx, id)
-}
-
 func getPortalRoles(portalModel *models.Portal) ([]portals.PortalRoleResponse) {
 	roles := make([]portals.PortalRoleResponse, 0, len(portalModel.GetPortalRoles()))
 

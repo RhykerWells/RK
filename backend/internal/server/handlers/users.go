@@ -12,6 +12,7 @@ import (
 
 var (
 	ErrInvalidUserID = errors.New("invalid user id")
+	ErrUserNotFound = errors.New("user not found")
 	ErrInvalidMissingRequestType = errors.New("invalid or missing request type")
 )
 
@@ -24,11 +25,11 @@ func User(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrInvalidUserID), errors.Is(err, ErrInvalidMissingRequestType):
-			RespondErrorMessage(w, http.StatusBadRequest, err.Error())
+			RespondError(w, http.StatusBadRequest, err)
 		case errors.Is(err, sql.ErrNoRows):
-			RespondErrorMessage(w, http.StatusNotFound, "user not found")
+			RespondError(w, http.StatusNotFound, ErrUserNotFound)
 		default:
-			RespondErrorMessage(w, http.StatusNotFound, "user not found")
+			RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
 		}
 		return
 	}
@@ -69,9 +70,9 @@ func UserDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrInvalidUserID), errors.Is(err, ErrInvalidMissingRequestType):
-			RespondErrorMessage(w, http.StatusBadRequest, err.Error())
+			RespondError(w, http.StatusBadRequest, err)
 		case errors.Is(err, sql.ErrNoRows):
-			RespondErrorMessage(w, http.StatusNotFound, "user not found")
+			RespondError(w, http.StatusNotFound, ErrUserNotFound)
 		default:
 			RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
 		}
