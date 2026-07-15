@@ -22,7 +22,6 @@ var (
 )
 
 // Init initializes the global logger.
-// It should only be called once, typically from main().
 func Init(level slog.Leveler) {
 	once.Do(func() {
 		log = New(os.Stdout, level)
