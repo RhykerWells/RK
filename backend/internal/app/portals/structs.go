@@ -68,8 +68,8 @@ type PortalMember struct {
 	UpdatedAt time.Time
 }
 
-type CreatePortalMemberRequest struct {
-	UserID int64 `json:"user_id"`
+type UpdatePortalMemberRequest struct {
+	Roles []int64 `json:"roles"`
 }
 
 type PortalMemberResponse struct {

@@ -16,15 +16,7 @@ var (
 func Portal(w http.ResponseWriter, r *http.Request) {
 	portalModel, _ := PortalFromContext(r.Context())
 
-	roles := getPortalRoles(portalModel)
-	returnedPortal := &portals.PortalResponse{
-		ID: portalModel.ID,
-		Name: portalModel.Name,
-		Domain: portalModel.Domain,
-		Roles: roles,
-		CreatedAt: portalModel.CreatedAt,
-		UpdatedAt: portalModel.UpdatedAt,
-	}
+	returnedPortal := portals.PortalModelToResponse(portalModel)
 
 	RespondJSON(w, http.StatusOK, map[string]any{
 		"portal": returnedPortal,
@@ -44,16 +36,10 @@ func PortalCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	returnedPortal := &portals.PortalResponse{
-		ID: portal.ID,
-		Name: portal.Name,
-		Domain: portal.Domain,
-		CreatedAt: portal.CreatedAt,
-		UpdatedAt: portal.UpdatedAt,
-	}
+	returnedPortal := portals.PortalModelToResponse(portal)
 
 	RespondJSON(w, http.StatusCreated, map[string]any{
-		"user":   returnedPortal,
+		"portal": returnedPortal,
 	})
 }
 

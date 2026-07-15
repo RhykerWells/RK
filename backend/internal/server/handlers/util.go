@@ -4,7 +4,6 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/RhykerWells/RK/backend/internal/app/portals"
 	"github.com/RhykerWells/RK/backend/internal/app/users"
 	"github.com/RhykerWells/RK/backend/internal/database/models"
 )
@@ -29,23 +28,4 @@ func getUser(ctx context.Context, requestType string, id string) (*models.User, 
 	}
 
 	return user, err
-}
-
-func getPortalRoles(portalModel *models.Portal) ([]portals.PortalRoleResponse) {
-	roles := make([]portals.PortalRoleResponse, 0, len(portalModel.GetPortalRoles()))
-
-	for _, role := range portalModel.GetPortalRoles() {
-		roles = append(roles, portals.PortalRoleResponse{
-			ID:            role.ID,
-			Name:          role.Name,
-			Description:   role.Description,
-			Colour:        role.Colour,
-			Position:      role.Position,
-			DiscordRoleID: role.DiscordRoleID,
-			CreatedAt:     role.CreatedAt,
-			UpdatedAt:     role.UpdatedAt,
-		})
-	}
-
-	return roles
 }
