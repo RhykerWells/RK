@@ -79,13 +79,19 @@ func PortalRoleUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	role, err := portals.GetPortalRoleByID(ctx, portalModel, roleID)
+	if err != nil {
+		RespondError(w, http.StatusNotFound, ErrRoleNotFound)
+		return
+	}
+
 	var update portals.UpdatePortalRoleRequest
 	if err := json.NewDecoder(r.Body).Decode(&update); err != nil {
 		RespondError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	role, err := portals.PortalRoleUpdate(ctx, portalModel, roleID, &update)
+	role, err = portals.PortalRoleUpdate(ctx, role, &update)
 	if err != nil {
 		RespondError(w, http.StatusInternalServerError, err)
 		return
@@ -107,7 +113,13 @@ func PortalRoleDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = portals.PortalRoleDelete(ctx, portalModel, roleID)
+	role, err := portals.GetPortalRoleByID(ctx, portalModel, roleID)
+	if err != nil {
+		RespondError(w, http.StatusNotFound, ErrRoleNotFound)
+		return
+	}
+
+	err = portals.PortalRoleDelete(ctx, role)
 	if err != nil {
 		RespondError(w, http.StatusInternalServerError, err)
 		return

@@ -79,7 +79,11 @@ func PortalMemberUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Todo user verification (check if found)
+	member, err := portals.GetPortalMemberByID(ctx, portalModel, memberID)
+	if err != nil {
+		RespondError(w, http.StatusNotFound, ErrMemberNotFound)
+		return
+	}
 
 	var update portals.UpdatePortalMemberRequest
 	if err := json.NewDecoder(r.Body).Decode(&update); err != nil {
@@ -87,7 +91,7 @@ func PortalMemberUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	member, err := portals.MemberUpdate(ctx, portalModel, memberID, &update)
+	member, err = portals.MemberUpdate(ctx, member, &update)
 	if err != nil {
 		RespondError(w, http.StatusInternalServerError, err)
 		return
@@ -109,7 +113,13 @@ func PortalMemberDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := portals.MemberDelete(ctx, portalModel, memberID); err != nil {
+	member, err := portals.GetPortalMemberByID(ctx, portalModel, memberID)
+	if err != nil {
+		RespondError(w, http.StatusNotFound, ErrMemberNotFound)
+		return
+	}
+
+	if err := portals.MemberDelete(ctx, member); err != nil {
 		RespondError(w, http.StatusInternalServerError, err)
 		return
 	}
