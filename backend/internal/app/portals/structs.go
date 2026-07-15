@@ -3,6 +3,7 @@ package portals
 import (
 	"time"
 
+	"github.com/RhykerWells/RK/backend/internal/app/users"
 	"github.com/aarondl/null/v8"
 )
 
@@ -61,7 +62,7 @@ type PortalRoleResponse struct {
 type PortalMember struct {
 	ID        int64
 	PortalID  int64
-	UserID    int64
+	User	  users.User
 	Roles     []int64
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -72,10 +73,8 @@ type CreatePortalMemberRequest struct {
 }
 
 type PortalMemberResponse struct {
-	ID        int64     `json:"id"`
-	PortalID  int64     `json:"portal_id"`
-	UserID    int64     `json:"user_id"`
 	Roles     []int64   `json:"roles,omitempty"`
+	User	  users.UserResponse `json:"user"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
