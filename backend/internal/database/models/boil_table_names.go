@@ -17,6 +17,7 @@ var TableNames = struct {
 	PortalRolePermissions       string
 	PortalRoles                 string
 	Portals                     string
+	Sessions                    string
 	Users                       string
 }{
 	DocumentFiles:               "document_files",
@@ -32,5 +33,6 @@ var TableNames = struct {
 	PortalRolePermissions:       "portal_role_permissions",
 	PortalRoles:                 "portal_roles",
 	Portals:                     "portals",
+	Sessions:                    "sessions",
 	Users:                       "users",
 }

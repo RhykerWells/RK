@@ -62,5 +62,23 @@ func AuthSchemas() []Schema {
 				);
 			`,
 		},
+		{
+			Name: "Sessions",
+			SQL: `
+				CREATE TABLE IF NOT EXISTS sessions (
+
+					id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+					user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+					token_hash CHAR(64) NOT NULL UNIQUE,
+
+					expires_at TIMESTAMPTZ NOT NULL,
+
+					created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+				);
+			`,
+		},
 	}
 }
