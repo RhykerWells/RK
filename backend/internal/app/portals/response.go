@@ -20,19 +20,23 @@ func PortalRolesFromModel(model *models.Portal) []PortalRoleResponse {
 	roles := make([]PortalRoleResponse, 0, len(model.GetPortalRoles()))
 
 	for _, role := range model.GetPortalRoles() {
-		roles = append(roles, PortalRoleResponse{
-			ID:            role.ID,
-			Name:          role.Name,
-			Description:   role.Description,
-			Colour:        role.Colour,
-			Position:      role.Position,
-			DiscordRoleID: role.DiscordRoleID,
-			CreatedAt:     role.CreatedAt,
-			UpdatedAt:     role.UpdatedAt,
-		})
+		roles = append(roles, PortalRoleFromModel(role))
 	}
 
 	return roles
+}
+
+func PortalRoleFromModel(model *models.PortalRole) PortalRoleResponse {
+	return PortalRoleResponse{
+		ID:            model.ID,
+		Name:          model.Name,
+		Description:   model.Description,
+		Colour:        model.Colour,
+		Position:      model.Position,
+		DiscordRoleID: model.DiscordRoleID,
+		CreatedAt:     model.CreatedAt,
+		UpdatedAt:     model.UpdatedAt,
+	}
 }
 
 func PortalMembersFromModel(model *models.Portal) ([]PortalMemberResponse) {
