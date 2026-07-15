@@ -42,10 +42,18 @@ type PortalRole struct {
 	UpdatedAt     time.Time
 }
 
-type CreateRoleRequest struct {
+type CreatePortalRoleRequest struct {
 	Name          string      `json:"name"`
 	Description   null.String `json:"description,omitempty"`
 	DiscordRoleID null.String `json:"discord_role_id,omitempty"`
+}
+
+type UpdatePortalRoleRequest struct {
+	Name          *string      `json:"name"`
+	Description   *string `json:"description,omitempty"`
+	Colour		  *string `json:"colour,omitempty"`
+	Position	  *int64       `json:"position,omitempty"`
+	DiscordRoleID *string `json:"discord_role_id,omitempty"`
 }
 
 type PortalRoleResponse struct {

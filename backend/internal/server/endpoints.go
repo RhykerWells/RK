@@ -19,6 +19,10 @@ var (
 	EndpointPortal       = EndpointPortals + "/:portal_id"
 	EndpointPortalDelete = EndpointPortal + "/delete"
 
+	// Portal Roles
+	EndpointPortalRoles = EndpointPortal + "/roles"
+	EndpointPortalRole  = EndpointPortalRoles + "/:role_id"
+
 	// Portal Members
 	EndpointPortalMembers = EndpointPortal + "/members"
 	EndpointPortalMember  = EndpointPortalMembers + "/:user_id"

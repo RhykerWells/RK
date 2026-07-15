@@ -24,6 +24,13 @@ func (s *Server) registerRoutes() {
 	s.Multiplexer.HandleFunc(pat.Get(EndpointPortalCreate), handlers.PortalCreate)
 	s.Multiplexer.Handle(pat.Delete(EndpointPortalDelete), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalDelete)))
 
+	// Portal Roles
+	s.Multiplexer.Handle(pat.Get(EndpointPortalRoles), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRoles)))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalRole), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRole)))
+	s.Multiplexer.Handle(pat.Post(EndpointPortalRoles), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRoleCreate)))
+	s.Multiplexer.Handle(pat.Patch(EndpointPortalRole), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRoleUpdate)))
+	s.Multiplexer.Handle(pat.Delete(EndpointPortalRole), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRoleDelete)))
+
 	// Portal Members
 	s.Multiplexer.Handle(pat.Get(EndpointPortalMembers), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalMembers)))
 	s.Multiplexer.Handle(pat.Get(EndpointPortalMember), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalMember)))
