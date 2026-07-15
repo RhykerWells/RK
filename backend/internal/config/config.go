@@ -3,6 +3,7 @@ package config
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	Discord  DiscordConfig
 }
 
 type ServerConfig struct {
@@ -19,4 +20,9 @@ type DatabaseConfig struct {
 	Name     string `env:"RK_DB_NAME, default=postgres"`
 	User     string `env:"RK_DB_USER, default=postgres"`
 	Password string `env:"RK_DB_PASSWORD, default=postgres"`
+}
+
+type DiscordConfig struct {
+	BotClientID string `env:"RK_DISCORD_CLIENT_ID, default="`
+	BotSecret   string `env:"RK_DISCORD_CLIENT_SECRET, default="`
 }
