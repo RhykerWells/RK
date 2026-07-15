@@ -2,8 +2,8 @@ package users
 
 import "github.com/RhykerWells/RK/backend/internal/database/models"
 
-func UserModelToResponse(model *models.User) *UserResponse {
-	user := &UserResponse{
+func UserModelToResponse(model *models.User) UserResponse {
+	user := UserResponse{
 		ID: model.ID,
 		AuthType: model.AuthType,
 		DiscordID: model.DiscordID,
