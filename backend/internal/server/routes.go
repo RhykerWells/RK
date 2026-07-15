@@ -12,8 +12,15 @@ import (
 // Handlers are assumed to be implemented separately
 // These are only route definitions.
 func (s *Server) registerRoutes() {
+	handlers.InitDiscordOauth()
+
 	// Health
 	s.Multiplexer.HandleFunc(pat.Get(EndpointHealth), handlers.Health)
+
+	// Frontend auth
+	s.Multiplexer.HandleFunc(pat.Get(EndpointAuthLogin), handlers.Login)
+	s.Multiplexer.HandleFunc(pat.Get(EndpointAuthCallback), handlers.Callback)
+	s.Multiplexer.HandleFunc(pat.Get(EndpointAuthLogout), handlers.Logout)
 
 	// Users
 	s.Multiplexer.HandleFunc(pat.Get(EndpointUser), handlers.User)
