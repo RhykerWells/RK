@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/RhykerWells/RK/backend/internal/server/handlers"
+	"github.com/RhykerWells/RK/backend/internal/server/middleware"
 	"goji.io/v3/pat"
 )
 
@@ -20,21 +21,21 @@ func (s *Server) registerRoutes() {
 	s.Multiplexer.HandleFunc(pat.Delete(EndpointUserDelete), handlers.UserDelete)
 
 	// Portals
-	s.Multiplexer.Handle(pat.Get(EndpointPortal), handlers.WithPortalMW(http.HandlerFunc(handlers.Portal)))
+	s.Multiplexer.Handle(pat.Get(EndpointPortal), middleware.WithPortalMW(http.HandlerFunc(handlers.Portal)))
 	s.Multiplexer.HandleFunc(pat.Get(EndpointPortalCreate), handlers.PortalCreate)
-	s.Multiplexer.Handle(pat.Delete(EndpointPortalDelete), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalDelete)))
+	s.Multiplexer.Handle(pat.Delete(EndpointPortalDelete), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalDelete)))
 
 	// Portal Roles
-	s.Multiplexer.Handle(pat.Get(EndpointPortalRoles), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRoles)))
-	s.Multiplexer.Handle(pat.Get(EndpointPortalRole), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRole)))
-	s.Multiplexer.Handle(pat.Post(EndpointPortalRoles), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRoleCreate)))
-	s.Multiplexer.Handle(pat.Patch(EndpointPortalRole), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRoleUpdate)))
-	s.Multiplexer.Handle(pat.Delete(EndpointPortalRole), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalRoleDelete)))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalRoles), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoles)))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalRole), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRole)))
+	s.Multiplexer.Handle(pat.Post(EndpointPortalRoles), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoleCreate)))
+	s.Multiplexer.Handle(pat.Patch(EndpointPortalRole), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoleUpdate)))
+	s.Multiplexer.Handle(pat.Delete(EndpointPortalRole), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoleDelete)))
 
 	// Portal Members
-	s.Multiplexer.Handle(pat.Get(EndpointPortalMembers), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalMembers)))
-	s.Multiplexer.Handle(pat.Get(EndpointPortalMember), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalMember)))
-	s.Multiplexer.Handle(pat.Post(EndpointPortalMember), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalMemberCreate)))
-	s.Multiplexer.Handle(pat.Patch(EndpointPortalMember), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalMemberUpdate)))
-	s.Multiplexer.Handle(pat.Delete(EndpointPortalMember), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalMemberDelete)))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalMembers), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMembers)))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalMember), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMember)))
+	s.Multiplexer.Handle(pat.Post(EndpointPortalMember), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMemberCreate)))
+	s.Multiplexer.Handle(pat.Patch(EndpointPortalMember), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMemberUpdate)))
+	s.Multiplexer.Handle(pat.Delete(EndpointPortalMember), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMemberDelete)))
 }

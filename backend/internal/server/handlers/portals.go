@@ -5,14 +5,16 @@ import (
 	"net/http"
 
 	"github.com/RhykerWells/RK/backend/internal/app/portals"
+	"github.com/RhykerWells/RK/backend/internal/server/middleware"
+	"github.com/RhykerWells/RK/backend/internal/server/response"
 )
 
 func Portal(w http.ResponseWriter, r *http.Request) {
-	portalModel, _ := PortalFromContext(r.Context())
+	portalModel, _ := middleware.PortalFromContext(r.Context())
 
 	returnedPortal := portals.PortalModelToResponse(portalModel)
 
-	RespondJSON(w, http.StatusOK, map[string]any{
+	response.JSON(w, http.StatusOK, map[string]any{
 		"portal": returnedPortal,
 	})
 }
@@ -20,31 +22,31 @@ func Portal(w http.ResponseWriter, r *http.Request) {
 func PortalCreate(w http.ResponseWriter, r *http.Request) {
 	var req portals.CreatePortalRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		RespondError(w, http.StatusInternalServerError, err)
+		response.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	portal, err := portals.PortalCreate(r.Context(), &req)
 	if err != nil {
-		RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
+		response.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	returnedPortal := portals.PortalModelToResponse(portal)
 
-	RespondJSON(w, http.StatusCreated, map[string]any{
+	response.JSON(w, http.StatusCreated, map[string]any{
 		"portal": returnedPortal,
 	})
 }
 
 func PortalDelete(w http.ResponseWriter, r *http.Request) {
-	portalModel, _ := PortalFromContext(r.Context())
+	portalModel, _ := middleware.PortalFromContext(r.Context())
 
 	err := portals.PortalDelete(r.Context(), portalModel)
 	if err != nil {
-		RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
+		response.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	RespondJSON(w, http.StatusNoContent, nil)
+	response.JSON(w, http.StatusNoContent, nil)
 }

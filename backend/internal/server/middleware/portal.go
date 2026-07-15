@@ -1,4 +1,4 @@
-package handlers
+package middleware
 
 import (
 	"context"
@@ -10,13 +10,9 @@ import (
 	"github.com/RhykerWells/RK/backend/internal/app/portals"
 	"github.com/RhykerWells/RK/backend/internal/database/models"
 	. "github.com/RhykerWells/RK/backend/internal/server/errors"
+	"github.com/RhykerWells/RK/backend/internal/server/response"
 	"goji.io/v3/pat"
 )
-
-// PortalContextKey is the context key used to store the loaded portal.
-type PortalContextKey string
-
-const ContextPortalKey PortalContextKey = "portal"
 
 // WithPortalMW loads a portal by the path parameter ("portal_id" or "id")
 // and stores it in the request context under ContextPortalKey. If the portal cannot
@@ -29,7 +25,7 @@ func WithPortalMW(next http.Handler) http.Handler {
 
 		portalIDInt, err := strconv.ParseInt(portalIDStr, 10, 64)
 		if err != nil {
-			RespondError(w, http.StatusBadRequest, ErrInvalidPortalID)
+			response.Error(w, http.StatusBadRequest, ErrInvalidPortalID)
 			return
 		}
 
@@ -37,9 +33,9 @@ func WithPortalMW(next http.Handler) http.Handler {
 		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
-				RespondError(w, http.StatusNotFound, ErrPortalNotFound)
+				response.Error(w, http.StatusNotFound, ErrPortalNotFound)
 			default:
-				RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
+				response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
 			}
 			return
 		}

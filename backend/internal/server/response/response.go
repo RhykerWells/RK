@@ -1,4 +1,4 @@
-package handlers
+package response
 
 import (
 	"encoding/json"
@@ -10,27 +10,21 @@ type ErrorResponse struct {
 	Error  string `json:"error"`
 }
 
-type SuccessResponse struct {
-	Status string `json:"status"`
+func Error(w http.ResponseWriter, status int, err error) {
+	ErrorMessage(w, status, err.Error())
 }
 
-func RespondError(w http.ResponseWriter, status int, err error) {
-	RespondErrorMessage(w, status, err.Error())
-}
-
-func RespondErrorMessage(w http.ResponseWriter, status int, message string) {
+func ErrorMessage(w http.ResponseWriter, status int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-
 	_ = json.NewEncoder(w).Encode(ErrorResponse{
 		Status: "error",
 		Error:  message,
 	})
 }
 
-func RespondJSON(w http.ResponseWriter, status int, data any) {
+func JSON(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-
 	_ = json.NewEncoder(w).Encode(data)
 }

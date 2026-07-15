@@ -8,6 +8,7 @@ import (
 
 	"github.com/RhykerWells/RK/backend/internal/app/users"
 	. "github.com/RhykerWells/RK/backend/internal/server/errors"
+	"github.com/RhykerWells/RK/backend/internal/server/response"
 	"goji.io/v3/pat"
 )
 
@@ -20,18 +21,18 @@ func User(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrInvalidUserID), errors.Is(err, ErrInvalidMissingRequestType):
-			RespondError(w, http.StatusBadRequest, err)
+			response.Error(w, http.StatusBadRequest, err)
 		case errors.Is(err, sql.ErrNoRows):
-			RespondError(w, http.StatusNotFound, ErrUserNotFound)
+			response.Error(w, http.StatusNotFound, ErrUserNotFound)
 		default:
-			RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
+			response.Error(w, http.StatusInternalServerError, err)
 		}
 		return
 	}
 
 	returnedUser := users.UserModelToResponse(user)
 
-	RespondJSON(w, http.StatusOK, map[string]any{
+	response.JSON(w, http.StatusOK, map[string]any{
 		"user": returnedUser,
 	})
 }
@@ -39,19 +40,19 @@ func User(w http.ResponseWriter, r *http.Request) {
 func UserCreate(w http.ResponseWriter, r *http.Request) {
 	var req users.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		RespondError(w, http.StatusInternalServerError, err)
+		response.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	user, err := users.UserCreate(r.Context(), &req)
 	if err != nil {
-		RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
+		response.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	returnedUser := users.UserModelToResponse(user)
 
-	RespondJSON(w, http.StatusCreated, map[string]any{
+	response.JSON(w, http.StatusCreated, map[string]any{
 		"user": returnedUser,
 	})
 }
@@ -65,20 +66,20 @@ func UserDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrInvalidUserID), errors.Is(err, ErrInvalidMissingRequestType):
-			RespondError(w, http.StatusBadRequest, err)
+			response.Error(w, http.StatusBadRequest, err)
 		case errors.Is(err, sql.ErrNoRows):
-			RespondError(w, http.StatusNotFound, ErrUserNotFound)
+			response.Error(w, http.StatusNotFound, ErrUserNotFound)
 		default:
-			RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
+			response.Error(w, http.StatusInternalServerError, err)
 		}
 		return
 	}
 
 	err = users.UserDelete(ctx, user)
 	if err != nil {
-		RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
+		response.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	RespondJSON(w, http.StatusNoContent, nil)
+	response.JSON(w, http.StatusNoContent, nil)
 }
