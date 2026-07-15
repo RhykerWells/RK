@@ -1,30 +1,32 @@
 package permissions
 
+type Permission string
+
 const (
 	// Portal permissions
-	PermissionPortalManage        = "portal.manage"
-	PermissionPortalManageMembers = "portal.manage.members"
-	PermissionPortalManageRoles   = "portal.manage.roles"
+	PermissionPortalManage        Permission = "portal.manage"
+	PermissionPortalManageMembers Permission = "portal.manage.members"
+	PermissionPortalManageRoles   Permission = "portal.manage.roles"
 
 	// Folder permissions
-	PermissionFolderView   = "folder.view"
-	PermissionFolderCreate = "folder.create"
-	PermissionFolderRename = "folder.rename"
-	PermissionFolderDelete = "folder.delete"
+	PermissionFolderView   Permission = "folder.view"
+	PermissionFolderCreate Permission = "folder.create"
+	PermissionFolderRename Permission = "folder.rename"
+	PermissionFolderDelete Permission = "folder.delete"
 
 	// Document permissions
-	PermissionDocumentView   = "document.view"
-	PermissionDocumentCreate = "document.create"
-	PermissionDocumentEdit   = "document.edit"
-	PermissionDocumentDelete = "document.delete"
-	PermissionDocumentShare  = "document.share"
+	PermissionDocumentView   Permission = "document.view"
+	PermissionDocumentCreate Permission = "document.create"
+	PermissionDocumentEdit   Permission = "document.edit"
+	PermissionDocumentDelete Permission = "document.delete"
+	PermissionDocumentShare  Permission = "document.share"
 
 	// File permissions
-	PermissionFileUpload = "file.upload"
-	PermissionFileDelete = "file.delete"
+	PermissionFileUpload Permission = "file.upload"
+	PermissionFileDelete Permission = "file.delete"
 )
 
-var AllPermissions = []string{
+var AllPermissions = []Permission{
 	PermissionPortalManage,
 	PermissionPortalManageMembers,
 	PermissionPortalManageRoles,
