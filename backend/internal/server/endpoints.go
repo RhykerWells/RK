@@ -7,6 +7,11 @@ var (
 
 	EndpointHealth = EndpointAPI + "/health"
 
+	// Frontend auth
+	EndpointAuthLogin    = EndpointAPI + "/login"
+	EndpointAuthCallback = EndpointAPI + "/callback"
+	EndpointAuthLogout   = EndpointAPI + "/logout"
+
 	// Users
 	EndpointUsers      = EndpointAPI + "/users"
 	EndpointUserCreate = EndpointUsers + "/create"
