@@ -1,13 +1,11 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
 
 	"github.com/RhykerWells/RK/backend/internal/app/portals"
-	"goji.io/v3/pat"
 )
 
 var (
@@ -15,22 +13,7 @@ var (
 )
 
 func Portal(w http.ResponseWriter, r *http.Request) {
-	portalIDStr := pat.Param(r, "portal_id")
-
-	ctx := r.Context()
-
-	portalModel, err := getPortal(ctx, portalIDStr)
-	if err != nil {
-		switch {
-		case errors.Is(err, ErrInvalidPortalID):
-			RespondErrorMessage(w, http.StatusBadRequest, err.Error())
-		case errors.Is(err, sql.ErrNoRows):
-			RespondErrorMessage(w, http.StatusNotFound, "portal not found")
-		default:
-			RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
-		}
-		return
-	}
+	portalModel, _ := PortalFromContext(r.Context())
 
 	roles := getPortalRoles(portalModel)
 	returnedPortal := &portals.PortalResponse{
@@ -74,24 +57,9 @@ func PortalCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func PortalDelete(w http.ResponseWriter, r *http.Request) {
-	portalIDStr := pat.Param(r, "portal_id")
+	portalModel, _ := PortalFromContext(r.Context())
 
-	ctx := r.Context()
-
-	portal, err := getPortal(ctx, portalIDStr)
-	if err != nil {
-		switch {
-		case errors.Is(err, ErrInvalidPortalID):
-			RespondErrorMessage(w, http.StatusBadRequest, err.Error())
-		case errors.Is(err, sql.ErrNoRows):
-			RespondErrorMessage(w, http.StatusNotFound, "portal not found")
-		default:
-			RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
-		}
-		return
-	}
-
-	err = portals.PortalDelete(ctx, portal)
+	err := portals.PortalDelete(r.Context(), portalModel)
 	if err != nil {
 		RespondErrorMessage(w, http.StatusInternalServerError, "internal server error")
 		return

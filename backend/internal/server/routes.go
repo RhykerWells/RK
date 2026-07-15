@@ -1,6 +1,8 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/RhykerWells/RK/backend/internal/server/handlers"
 	"goji.io/v3/pat"
 )
@@ -18,7 +20,7 @@ func (s *Server) registerRoutes() {
 	s.Multiplexer.HandleFunc(pat.Delete(EndpointUserDelete), handlers.UserDelete)
 
 	// Portals
-	s.Multiplexer.HandleFunc(pat.Get(EndpointPortal), handlers.Portal)
+	s.Multiplexer.Handle(pat.Get(EndpointPortal), handlers.WithPortalMW(http.HandlerFunc(handlers.Portal)))
 	s.Multiplexer.HandleFunc(pat.Get(EndpointPortalCreate), handlers.PortalCreate)
-	s.Multiplexer.HandleFunc(pat.Delete(EndpointPortalDelete), handlers.PortalDelete)
+	s.Multiplexer.Handle(pat.Delete(EndpointPortalDelete), handlers.WithPortalMW(http.HandlerFunc(handlers.PortalDelete)))
 }
