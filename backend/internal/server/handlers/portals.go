@@ -2,15 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/RhykerWells/RK/backend/internal/app/portals"
-)
-
-var (
-	ErrInvalidPortalID = errors.New("invalid portal id")
-	ErrPortalNotFound  = errors.New("portal not found")
 )
 
 func Portal(w http.ResponseWriter, r *http.Request) {

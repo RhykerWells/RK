@@ -9,6 +9,7 @@ import (
 
 	"github.com/RhykerWells/RK/backend/internal/app/portals"
 	"github.com/RhykerWells/RK/backend/internal/database/models"
+	. "github.com/RhykerWells/RK/backend/internal/server/errors"
 	"goji.io/v3/pat"
 )
 

@@ -2,17 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/RhykerWells/RK/backend/internal/app/portals"
+	. "github.com/RhykerWells/RK/backend/internal/server/errors"
 	"goji.io/v3/pat"
-)
-
-var (
-	ErrInvalidRoleID = errors.New("invalid role ID")
-	ErrRoleNotFound  = errors.New("role not found")
 )
 
 func PortalRoles(w http.ResponseWriter, r *http.Request) {

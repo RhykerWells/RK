@@ -7,13 +7,8 @@ import (
 	"net/http"
 
 	"github.com/RhykerWells/RK/backend/internal/app/users"
+	. "github.com/RhykerWells/RK/backend/internal/server/errors"
 	"goji.io/v3/pat"
-)
-
-var (
-	ErrInvalidUserID             = errors.New("invalid user id")
-	ErrUserNotFound              = errors.New("user not found")
-	ErrInvalidMissingRequestType = errors.New("invalid or missing request type")
 )
 
 func User(w http.ResponseWriter, r *http.Request) {

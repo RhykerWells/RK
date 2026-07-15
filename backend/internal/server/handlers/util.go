@@ -6,6 +6,7 @@ import (
 
 	"github.com/RhykerWells/RK/backend/internal/app/users"
 	"github.com/RhykerWells/RK/backend/internal/database/models"
+	. "github.com/RhykerWells/RK/backend/internal/server/errors"
 )
 
 func getUser(ctx context.Context, requestType string, id string) (*models.User, error) {

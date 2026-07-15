@@ -2,16 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/RhykerWells/RK/backend/internal/app/portals"
+	. "github.com/RhykerWells/RK/backend/internal/server/errors"
 	"goji.io/v3/pat"
-)
-
-var (
-	ErrMemberNotFound = errors.New("member not found")
 )
 
 func PortalMembers(w http.ResponseWriter, r *http.Request) {
