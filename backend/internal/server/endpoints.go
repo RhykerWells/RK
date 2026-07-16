@@ -7,24 +7,23 @@ var (
 
 	EndpointHealth = EndpointAPI + "/health"
 
-	// Frontend auth
+	// Authentication
 	EndpointAuthLogin    = EndpointAPI + "/login"
 	EndpointAuthCallback = EndpointAPI + "/callback"
 	EndpointAuthLogout   = EndpointAPI + "/logout"
-	EndpointMe           = EndpointAPI + "/me"
-	EndpointMeAPI        = EndpointMe + "/api"
+
+	// Current user
+	// Requires login through the dashboard
+	EndpointMe    = EndpointAPI + "/me"
+	EndpointMeAPI = EndpointMe + "/api"
 
 	// Users
-	EndpointUsers      = EndpointAPI + "/users"
-	EndpointUserCreate = EndpointUsers + "/create"
-	EndpointUser       = EndpointUsers + "/:user_id"
-	EndpointUserDelete = EndpointUser + "/delete"
+	EndpointUsers = EndpointAPI + "/users"
+	EndpointUser  = EndpointUsers + "/:user_id"
 
 	// Portals
-	EndpointPortals      = EndpointAPI + "/portals"
-	EndpointPortalCreate = EndpointPortals + "/create"
-	EndpointPortal       = EndpointPortals + "/:portal_id"
-	EndpointPortalDelete = EndpointPortal + "/delete"
+	EndpointPortals = EndpointAPI + "/portals"
+	EndpointPortal  = EndpointPortals + "/:portal_id"
 
 	// Portal Roles
 	EndpointPortalRoles = EndpointPortal + "/roles"
