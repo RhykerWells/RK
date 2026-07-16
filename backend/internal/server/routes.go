@@ -21,6 +21,7 @@ func (s *Server) registerRoutes() {
 	s.Multiplexer.HandleFunc(pat.Get(EndpointAuthLogin), handlers.Login)
 	s.Multiplexer.HandleFunc(pat.Get(EndpointAuthCallback), handlers.Callback)
 	s.Multiplexer.HandleFunc(pat.Get(EndpointAuthLogout), handlers.Logout)
+	s.Multiplexer.Handle(pat.Get(EndpointMe), middleware.WithAuthMW(http.HandlerFunc(handlers.Me)))
 
 	// Users
 	s.Multiplexer.Handle(pat.Get(EndpointUser), middleware.WithAuthMW(http.HandlerFunc(handlers.User)))

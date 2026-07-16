@@ -8,6 +8,7 @@ import (
 
 	"github.com/RhykerWells/RK/backend/internal/app/users"
 	. "github.com/RhykerWells/RK/backend/internal/server/errors"
+	"github.com/RhykerWells/RK/backend/internal/server/middleware"
 	"github.com/RhykerWells/RK/backend/internal/server/response"
 	"goji.io/v3/pat"
 )
@@ -27,6 +28,28 @@ func User(w http.ResponseWriter, r *http.Request) {
 		default:
 			response.Error(w, http.StatusInternalServerError, err)
 		}
+		return
+	}
+
+	returnedUser := users.UserModelToResponse(user)
+
+	response.JSON(w, http.StatusOK, map[string]any{
+		"user": returnedUser,
+	})
+}
+
+func Me(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	user, ok := middleware.UserFromContext(ctx)
+	if !ok {
+		response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
+	user, err := users.GetUserByID(ctx, user.ID)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
