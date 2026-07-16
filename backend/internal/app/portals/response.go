@@ -1,6 +1,8 @@
 package portals
 
 import (
+	"sort"
+
 	"github.com/RhykerWells/RK/backend/internal/app/users"
 	"github.com/RhykerWells/RK/backend/internal/database/models"
 )
@@ -26,6 +28,21 @@ func PortalRolesFromModel(model *models.Portal) []PortalRoleResponse {
 	return roles
 }
 
+func PortalRolePermissionsFromModel(model *models.PortalRole) []string {
+	permissionSet := make(map[string]struct{})
+	for _, rolePermission := range model.GetPortalRolePermissions() {
+		permissionSet[rolePermission.PermissionKey] = struct{}{}
+	}
+
+	permissions := make([]string, 0, len(permissionSet))
+	for permission := range permissionSet {
+		permissions = append(permissions, permission)
+	}
+	sort.Strings(permissions)
+
+	return permissions
+}
+
 func PortalRoleFromModel(model *models.PortalRole) PortalRoleResponse {
 	return PortalRoleResponse{
 		ID:            model.ID,
@@ -34,6 +51,7 @@ func PortalRoleFromModel(model *models.PortalRole) PortalRoleResponse {
 		Colour:        model.Colour,
 		Position:      model.Position,
 		DiscordRoleID: model.DiscordRoleID,
+		Permissions:   PortalRolePermissionsFromModel(model),
 		CreatedAt:     model.CreatedAt,
 		UpdatedAt:     model.UpdatedAt,
 	}
@@ -54,7 +72,11 @@ func PortalMemberFromModel(model *models.PortalMembership) PortalMemberResponse 
 	roles := make([]PortalRoleResponse, 0, len(model.GetPortalMembershipRoles()))
 
 	for _, membershipRole := range model.GetPortalMembershipRoles() {
-		roles = append(roles, PortalRoleFromModel(membershipRole.GetPortalRole()))
+		role := membershipRole.GetPortalRole()
+		if role == nil {
+			continue
+		}
+		roles = append(roles, PortalRoleFromModel(role))
 	}
 
 	user := model.GetUser()
