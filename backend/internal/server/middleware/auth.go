@@ -2,12 +2,16 @@ package middleware
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"net/http"
 	"strings"
 
+	"github.com/RhykerWells/RK/backend/internal/app/portals"
 	"github.com/RhykerWells/RK/backend/internal/app/users"
 	"github.com/RhykerWells/RK/backend/internal/auth"
 	"github.com/RhykerWells/RK/backend/internal/database/models"
+	"github.com/RhykerWells/RK/backend/internal/permissions"
 	"github.com/RhykerWells/RK/backend/internal/server/response"
 )
 
@@ -78,4 +82,37 @@ func UserFromContext(ctx context.Context) (*models.User, bool) {
 
 	user, ok := v.(*models.User)
 	return user, ok
+}
+
+func WithPermissionsMW(h func(http.ResponseWriter, *http.Request), perms ...permissions.Permission) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		user, _ := UserFromContext(ctx)
+		if user.IsAdministrator {
+			h(w, r)
+			return
+		}
+
+		portal, ok := PortalFromContext(ctx)
+		if ok {
+			memberModel, err := portals.GetPortalMemberByID(ctx, portal, user.ID)
+			if err != nil {
+				switch {
+				case errors.Is(err, sql.ErrNoRows):
+					response.ErrorMessage(w, http.StatusForbidden, "forbidden")
+				default:
+					response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
+				}
+				return
+			}
+
+			if hasRequiredPermission(portals.PortalMemberFromModel(memberModel).Roles, perms) {
+				h(w, r)
+				return
+			}
+		}
+
+		response.ErrorMessage(w, http.StatusForbidden, "forbidden")
+	})
 }
