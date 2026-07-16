@@ -4,9 +4,10 @@ type Permission string
 
 const (
 	// Portal permissions
-	PermissionPortalManage        Permission = "portal.manage"
-	PermissionPortalManageMembers Permission = "portal.manage.members"
-	PermissionPortalManageRoles   Permission = "portal.manage.roles"
+	PermissionPortalManage            Permission = "portal.manage"
+	PermissionPortalManageRoles       Permission = "portal.manage.roles"
+	PermissionPortalManageMembers     Permission = "portal.manage.members"
+	PermissionPortalManageMemberRoles Permission = "portal.manage.member.roles"
 
 	// Folder permissions
 	PermissionFolderView   Permission = "folder.view"
