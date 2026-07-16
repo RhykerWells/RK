@@ -18,7 +18,7 @@ func registerPortalRoutes(api *goji.Mux) {
 	portalRequiredMux.HandleFunc(pat.Get(EndpointPortal), handlers.Portal)
 
 	// Portal Management Endpoints
-	api.Handle(pat.Post(EndpointPortals), middleware.WithPermissionsMW(handlers.PortalCreate, permissions.PermissionPortalsManage))
+	api.HandleFunc(pat.Post(EndpointPortals), handlers.PortalCreate)
 	portalRequiredMux.Handle(pat.Delete(EndpointPortal), middleware.WithPermissionsMW(handlers.PortalDelete, permissions.PermissionPortalsManage))
 
 	// Portal Role Retrieval Endpoints

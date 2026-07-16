@@ -13,7 +13,18 @@ import (
 )
 
 func PortalRoles(w http.ResponseWriter, r *http.Request) {
-	portalModel, _ := middleware.PortalFromContext(r.Context())
+	ctx := r.Context()
+	portalModel, _ := middleware.PortalFromContext(ctx)
+	user, _ := middleware.UserFromContext(ctx)
+
+	// Check if user is admin or belongs to this portal
+	if !user.IsAdministrator {
+		_, err := portals.GetPortalMemberByID(ctx, portalModel, user.ID)
+		if err != nil {
+			response.ErrorMessage(w, http.StatusForbidden, "forbidden")
+			return
+		}
+	}
 
 	roles := portals.PortalRolesFromModel(portalModel)
 
@@ -25,6 +36,16 @@ func PortalRoles(w http.ResponseWriter, r *http.Request) {
 func PortalRole(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
+	user, _ := middleware.UserFromContext(ctx)
+
+	// Check if user is admin or belongs to this portal
+	if !user.IsAdministrator {
+		_, err := portals.GetPortalMemberByID(ctx, portalModel, user.ID)
+		if err != nil {
+			response.ErrorMessage(w, http.StatusForbidden, "forbidden")
+			return
+		}
+	}
 
 	roleIDStr := pat.Param(r, "role_id")
 	roleID, err := strconv.ParseInt(roleIDStr, 10, 64)

@@ -81,9 +81,19 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func UserDelete(w http.ResponseWriter, r *http.Request) {
-	userID := pat.Param(r, "user_id")
-
 	ctx := r.Context()
+	currentUser, ok := middleware.UserFromContext(ctx)
+	if !ok {
+		response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
+	// Only administrators can delete users
+	if !currentUser.IsAdministrator {
+		response.ErrorMessage(w, http.StatusForbidden, "forbidden")
+		return
+	}
+	userID := pat.Param(r, "user_id")
 
 	user, err := getUser(ctx, r.URL.Query().Get("type"), userID)
 	if err != nil {
