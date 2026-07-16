@@ -16,6 +16,7 @@ const (
 	// Folder permissions
 	PermissionFolderView   Permission = "folder.view"
 	PermissionFolderCreate Permission = "folder.create"
+	PermissionFolderEdit   Permission = "folder.edit"
 	PermissionFolderRename Permission = "folder.rename"
 	PermissionFolderDelete Permission = "folder.delete"
 
