@@ -31,4 +31,13 @@ var (
 	// Portal Members
 	EndpointPortalMembers = EndpointPortal + "/members"
 	EndpointPortalMember  = EndpointPortalMembers + "/:user_id"
+
+	// Folders
+	EndpointPortalFolders        = EndpointPortal + "/folders"
+	EndpointPortalFolder         = EndpointPortalFolders + "/:folder_id"
+	EndpointPortalFolderContents = EndpointPortalFolder + "/contents"
+
+	// Documents
+	EndpointFolderDocuments = EndpointPortal + "/documents"
+	EndpointFolderDocument  = EndpointFolderDocuments + "/:document_id"
 )
