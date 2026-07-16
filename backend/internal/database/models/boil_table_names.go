@@ -4,6 +4,7 @@
 package models
 
 var TableNames = struct {
+	APITokens                   string
 	DocumentFiles               string
 	DocumentLinks               string
 	DocumentPermissionOverrides string
@@ -20,6 +21,7 @@ var TableNames = struct {
 	Sessions                    string
 	Users                       string
 }{
+	APITokens:                   "api_tokens",
 	DocumentFiles:               "document_files",
 	DocumentLinks:               "document_links",
 	DocumentPermissionOverrides: "document_permission_overrides",

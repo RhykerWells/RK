@@ -104,30 +104,6 @@ var UserTableColumns = struct {
 
 // Generated where
 
-type whereHelpernull_Time struct{ field string }
-
-func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
-func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
 var UserWhere = struct {
 	ID              whereHelperint64
 	AuthType        whereHelperstring
@@ -160,6 +136,7 @@ var UserWhere = struct {
 
 // UserRels is where relationship names are stored.
 var UserRels = struct {
+	APITokens                            string
 	CreatedByDocumentFiles               string
 	CreatedByDocumentLinks               string
 	CreatedByDocumentPermissionOverrides string
@@ -180,6 +157,7 @@ var UserRels = struct {
 	UpdatedByPortals                     string
 	Sessions                             string
 }{
+	APITokens:                            "APITokens",
 	CreatedByDocumentFiles:               "CreatedByDocumentFiles",
 	CreatedByDocumentLinks:               "CreatedByDocumentLinks",
 	CreatedByDocumentPermissionOverrides: "CreatedByDocumentPermissionOverrides",
@@ -203,6 +181,7 @@ var UserRels = struct {
 
 // userR is where relationships are stored.
 type userR struct {
+	APITokens                            APITokenSlice                   `boil:"APITokens" json:"APITokens" toml:"APITokens" yaml:"APITokens"`
 	CreatedByDocumentFiles               DocumentFileSlice               `boil:"CreatedByDocumentFiles" json:"CreatedByDocumentFiles" toml:"CreatedByDocumentFiles" yaml:"CreatedByDocumentFiles"`
 	CreatedByDocumentLinks               DocumentLinkSlice               `boil:"CreatedByDocumentLinks" json:"CreatedByDocumentLinks" toml:"CreatedByDocumentLinks" yaml:"CreatedByDocumentLinks"`
 	CreatedByDocumentPermissionOverrides DocumentPermissionOverrideSlice `boil:"CreatedByDocumentPermissionOverrides" json:"CreatedByDocumentPermissionOverrides" toml:"CreatedByDocumentPermissionOverrides" yaml:"CreatedByDocumentPermissionOverrides"`
@@ -227,6 +206,22 @@ type userR struct {
 // NewStruct creates a new relationship struct
 func (*userR) NewStruct() *userR {
 	return &userR{}
+}
+
+func (o *User) GetAPITokens() APITokenSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetAPITokens()
+}
+
+func (r *userR) GetAPITokens() APITokenSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.APITokens
 }
 
 func (o *User) GetCreatedByDocumentFiles() DocumentFileSlice {
@@ -635,6 +630,20 @@ func (q userQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 	return count > 0, nil
 }
 
+// APITokens retrieves all the api_token's APITokens with an executor.
+func (o *User) APITokens(mods ...qm.QueryMod) apiTokenQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"api_tokens\".\"user_id\"=?", o.ID),
+	)
+
+	return APITokens(queryMods...)
+}
+
 // CreatedByDocumentFiles retrieves all the document_file's DocumentFiles with an executor via created_by column.
 func (o *User) CreatedByDocumentFiles(mods ...qm.QueryMod) documentFileQuery {
 	var queryMods []qm.QueryMod
@@ -899,6 +908,112 @@ func (o *User) Sessions(mods ...qm.QueryMod) sessionQuery {
 	)
 
 	return Sessions(queryMods...)
+}
+
+// LoadAPITokens allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadAPITokens(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser any, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		var ok bool
+		object, ok = maybeUser.(*User)
+		if !ok {
+			object = new(User)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeUser))
+			}
+		}
+	} else {
+		s, ok := maybeUser.(*[]*User)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeUser))
+			}
+		}
+	}
+
+	args := make(map[any]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]any, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`api_tokens`),
+		qm.WhereIn(`api_tokens.user_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load api_tokens")
+	}
+
+	var resultSlice []*APIToken
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice api_tokens")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on api_tokens")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for api_tokens")
+	}
+
+	if singular {
+		object.R.APITokens = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &apiTokenR{}
+			}
+			foreign.R.User = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.UserID {
+				local.R.APITokens = append(local.R.APITokens, foreign)
+				if foreign.R == nil {
+					foreign.R = &apiTokenR{}
+				}
+				foreign.R.User = local
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadCreatedByDocumentFiles allows an eager lookup of values, cached into the
@@ -2912,6 +3027,59 @@ func (userL) LoadSessions(ctx context.Context, e boil.ContextExecutor, singular 
 		}
 	}
 
+	return nil
+}
+
+// AddAPITokens adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.APITokens.
+// Sets related.R.User appropriately.
+func (o *User) AddAPITokens(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*APIToken) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.UserID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"api_tokens\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+				strmangle.WhereClause("\"", "\"", 2, apiTokenPrimaryKeyColumns),
+			)
+			values := []any{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.UserID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			APITokens: related,
+		}
+	} else {
+		o.R.APITokens = append(o.R.APITokens, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &apiTokenR{
+				User: o,
+			}
+		} else {
+			rel.R.User = o
+		}
+	}
 	return nil
 }
 
