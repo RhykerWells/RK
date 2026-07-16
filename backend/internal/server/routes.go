@@ -23,26 +23,26 @@ func (s *Server) registerRoutes() {
 	s.Multiplexer.HandleFunc(pat.Get(EndpointAuthLogout), handlers.Logout)
 
 	// Users
-	s.Multiplexer.HandleFunc(pat.Get(EndpointUser), handlers.User)
+	s.Multiplexer.Handle(pat.Get(EndpointUser), middleware.WithAuthMW(http.HandlerFunc(handlers.User)))
 	s.Multiplexer.HandleFunc(pat.Post(EndpointUserCreate), handlers.UserCreate)
-	s.Multiplexer.HandleFunc(pat.Delete(EndpointUserDelete), handlers.UserDelete)
+	s.Multiplexer.Handle(pat.Delete(EndpointUserDelete), middleware.WithAuthMW(http.HandlerFunc(handlers.UserDelete)))
 
 	// Portals
-	s.Multiplexer.Handle(pat.Get(EndpointPortal), middleware.WithPortalMW(http.HandlerFunc(handlers.Portal)))
-	s.Multiplexer.HandleFunc(pat.Get(EndpointPortalCreate), handlers.PortalCreate)
-	s.Multiplexer.Handle(pat.Delete(EndpointPortalDelete), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalDelete)))
+	s.Multiplexer.Handle(pat.Get(EndpointPortal), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.Portal))))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalCreate), middleware.WithAuthMW(http.HandlerFunc(handlers.PortalCreate)))
+	s.Multiplexer.Handle(pat.Delete(EndpointPortalDelete), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalDelete))))
 
 	// Portal Roles
-	s.Multiplexer.Handle(pat.Get(EndpointPortalRoles), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoles)))
-	s.Multiplexer.Handle(pat.Get(EndpointPortalRole), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRole)))
-	s.Multiplexer.Handle(pat.Post(EndpointPortalRoles), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoleCreate)))
-	s.Multiplexer.Handle(pat.Patch(EndpointPortalRole), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoleUpdate)))
-	s.Multiplexer.Handle(pat.Delete(EndpointPortalRole), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoleDelete)))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalRoles), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoles))))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalRole), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRole))))
+	s.Multiplexer.Handle(pat.Post(EndpointPortalRoles), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoleCreate))))
+	s.Multiplexer.Handle(pat.Patch(EndpointPortalRole), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoleUpdate))))
+	s.Multiplexer.Handle(pat.Delete(EndpointPortalRole), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalRoleDelete))))
 
 	// Portal Members
-	s.Multiplexer.Handle(pat.Get(EndpointPortalMembers), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMembers)))
-	s.Multiplexer.Handle(pat.Get(EndpointPortalMember), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMember)))
-	s.Multiplexer.Handle(pat.Post(EndpointPortalMember), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMemberCreate)))
-	s.Multiplexer.Handle(pat.Patch(EndpointPortalMember), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMemberUpdate)))
-	s.Multiplexer.Handle(pat.Delete(EndpointPortalMember), middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMemberDelete)))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalMembers), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMembers))))
+	s.Multiplexer.Handle(pat.Get(EndpointPortalMember), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMember))))
+	s.Multiplexer.Handle(pat.Post(EndpointPortalMember), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMemberCreate))))
+	s.Multiplexer.Handle(pat.Patch(EndpointPortalMember), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMemberUpdate))))
+	s.Multiplexer.Handle(pat.Delete(EndpointPortalMember), middleware.WithAuthMW(middleware.WithPortalMW(http.HandlerFunc(handlers.PortalMemberDelete))))
 }
