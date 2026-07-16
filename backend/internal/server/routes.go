@@ -22,6 +22,7 @@ func (s *Server) registerRoutes() {
 	registerUserRoutes(authRequiredMux)
 
 	registerPortalRoutes(authRequiredMux)
+	registerFolderDocumentRoutes(authRequiredMux)
 
 	api.Handle(pat.New("/*"), authRequiredMux)
 
