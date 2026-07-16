@@ -48,14 +48,14 @@ func PortalMemberCreate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
 
-	memberIDStr := pat.Param(r, "user_id")
-	memberID, err := strconv.ParseInt(memberIDStr, 10, 64)
+	userIDStr := pat.Param(r, "user_id")
+	userID, err := strconv.ParseInt(userIDStr, 10, 64)
 	if err != nil {
 		response.Error(w, http.StatusBadRequest, ErrInvalidUserID)
 		return
 	}
 
-	member, err := portals.PortalMemberCreate(ctx, portalModel, memberID)
+	member, err := portals.PortalMemberCreate(ctx, portalModel, userID)
 	if err != nil {
 		response.Error(w, http.StatusBadRequest, err)
 		return
