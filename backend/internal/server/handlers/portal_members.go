@@ -1,16 +1,45 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/RhykerWells/RK/backend/internal/app/portals"
+	"github.com/RhykerWells/RK/backend/internal/database/models"
 	. "github.com/RhykerWells/RK/backend/internal/server/errors"
 	"github.com/RhykerWells/RK/backend/internal/server/middleware"
 	"github.com/RhykerWells/RK/backend/internal/server/response"
 	"goji.io/v3/pat"
 )
+
+func getPortalMemberFromPath(ctx context.Context, r *http.Request, portalModel *models.Portal, allowMe bool) (*models.PortalMembership, error) {
+	userParam := pat.Param(r, "user_id")
+
+	var userID int64
+
+	if userParam == "@me" {
+		if !allowMe {
+			return nil, ErrInvalidUserID
+		}
+		userModel, _ := middleware.UserFromContext(ctx)
+		userID = userModel.ID
+	} else {
+		var err error
+		userID, err = strconv.ParseInt(userParam, 10, 64)
+		if err != nil {
+			return nil, ErrInvalidUserID
+		}
+	}
+
+	member, err := portals.GetPortalMemberByID(ctx, portalModel, userID)
+	if err != nil {
+		return nil, ErrMemberNotFound
+	}
+
+	return member, nil
+}
 
 func PortalMembers(w http.ResponseWriter, r *http.Request) {
 	portalModel, _ := middleware.PortalFromContext(r.Context())
@@ -26,17 +55,16 @@ func PortalMember(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
 
-	memberIDStr := pat.Param(r, "user_id")
-	memberID, err := strconv.ParseInt(memberIDStr, 10, 64)
+	member, err := getPortalMemberFromPath(ctx, r, portalModel, true)
 	if err != nil {
-		response.Error(w, http.StatusBadRequest, ErrInvalidUserID)
-		return
-	}
-
-	member, err := portals.GetPortalMemberByID(ctx, portalModel, memberID)
-	if err != nil {
-		response.Error(w, http.StatusNotFound, ErrMemberNotFound)
-		return
+		switch err {
+		case ErrInvalidUserID:
+			response.Error(w, http.StatusBadRequest, err)
+		case ErrMemberNotFound:
+			response.Error(w, http.StatusNotFound, err)
+		default:
+			response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
+		}
 	}
 
 	response.JSON(w, http.StatusOK, map[string]any{
@@ -70,17 +98,16 @@ func PortalMemberUpdate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
 
-	memberIDStr := pat.Param(r, "user_id")
-	memberID, err := strconv.ParseInt(memberIDStr, 10, 64)
+	member, err := getPortalMemberFromPath(ctx, r, portalModel, true)
 	if err != nil {
-		response.Error(w, http.StatusBadRequest, ErrInvalidUserID)
-		return
-	}
-
-	member, err := portals.GetPortalMemberByID(ctx, portalModel, memberID)
-	if err != nil {
-		response.Error(w, http.StatusNotFound, ErrMemberNotFound)
-		return
+		switch err {
+		case ErrInvalidUserID:
+			response.Error(w, http.StatusBadRequest, err)
+		case ErrMemberNotFound:
+			response.Error(w, http.StatusNotFound, err)
+		default:
+			response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
+		}
 	}
 
 	var update portals.UpdatePortalMemberRequest
@@ -104,14 +131,38 @@ func PortalMemberDelete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
 
-	memberIDStr := pat.Param(r, "user_id")
-	memberID, err := strconv.ParseInt(memberIDStr, 10, 64)
-	if err != nil {
-		response.Error(w, http.StatusBadRequest, ErrInvalidUserID)
+	member, _ := getPortalMemberFromPath(ctx, r, portalModel, false)
+
+	if err := portals.MemberDelete(ctx, member); err != nil {
+		response.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	member, err := portals.GetPortalMemberByID(ctx, portalModel, memberID)
+	response.JSON(w, http.StatusNoContent, nil)
+}
+
+func PortalMemberJoin(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	portalModel, _ := middleware.PortalFromContext(ctx)
+	userModel, _ := middleware.UserFromContext(ctx)
+
+	member, err := portals.PortalMemberCreate(ctx, portalModel, userModel.ID)
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	response.JSON(w, http.StatusCreated, map[string]any{
+		"member": portals.PortalMemberFromModel(member),
+	})
+}
+
+func PortalMemberLeave(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	portalModel, _ := middleware.PortalFromContext(ctx)
+	userModel, _ := middleware.UserFromContext(ctx)
+
+	member, err := portals.GetPortalMemberByID(ctx, portalModel, userModel.ID)
 	if err != nil {
 		response.Error(w, http.StatusNotFound, ErrMemberNotFound)
 		return

@@ -1,6 +1,8 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/RhykerWells/RK/backend/internal/permissions"
 	"github.com/RhykerWells/RK/backend/internal/server/handlers"
 	"github.com/RhykerWells/RK/backend/internal/server/middleware"
@@ -36,6 +38,10 @@ func registerPortalRoutes(api *goji.Mux) {
 	portalRequiredMux.Handle(pat.Post(EndpointPortalMember), middleware.WithPermissionsMW(handlers.PortalMemberCreate, permissions.PermissionPortalManageMembers))
 	portalRequiredMux.Handle(pat.Patch(EndpointPortalMember), middleware.WithPermissionsMW(handlers.PortalMemberUpdate, permissions.PermissionPortalManageMembers))
 	portalRequiredMux.Handle(pat.Delete(EndpointPortalMember), middleware.WithPermissionsMW(handlers.PortalMemberDelete, permissions.PermissionPortalManageMembers))
+
+	// Portal Member Self-management Endpoint
+	portalRequiredMux.Handle(pat.Post(EndpointPortalMember), http.HandlerFunc(handlers.PortalMemberJoin))
+	portalRequiredMux.Handle(pat.Delete(EndpointPortalMember), http.HandlerFunc(handlers.PortalMemberLeave))
 
 	api.Handle(pat.New("/*"), portalRequiredMux)
 }

@@ -13,8 +13,7 @@ var (
 	EndpointAuthLogout   = EndpointAPI + "/logout"
 
 	// Current user
-	// Requires login through the dashboard
-	EndpointMe    = EndpointAPI + "/me"
+	EndpointMe    = EndpointAPI + "/@me"
 	EndpointMeAPI = EndpointMe + "/api"
 
 	// Users
