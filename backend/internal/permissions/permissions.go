@@ -3,8 +3,12 @@ package permissions
 type Permission string
 
 const (
-	// Portal permissions
-	PermissionPortalManage            Permission = "portal.manage"
+	PermissionAdministrator Permission = "administrator"
+
+	// Global Portal permissions
+	PermissionPortalsManage Permission = "portals.manage"
+
+	// Individual Portal permissions
 	PermissionPortalManageRoles       Permission = "portal.manage.roles"
 	PermissionPortalManageMembers     Permission = "portal.manage.members"
 	PermissionPortalManageMemberRoles Permission = "portal.manage.member.roles"
@@ -33,11 +37,16 @@ type Definition struct {
 }
 
 var Definitions = map[Permission]Definition{
-	// Portal permissions
-	PermissionPortalManage: {
-		HumanReadableName: "Manage Portal",
-		Description:       "Allows management of portal settings",
+	PermissionAdministrator: {
+		HumanReadableName: "Administrator",
+		Description:       "Grants all permissions and access to all portals",
 	},
+	// Global Portal permissions
+	PermissionPortalsManage: {
+		HumanReadableName: "Manage Portals",
+		Description:       "Allows management of site portals",
+	},
+	// Individual Portal permissions
 	PermissionPortalManageRoles: {
 		HumanReadableName: "Manage Portal Roles",
 		Description:       "Allows management of portal roles",
@@ -103,7 +112,7 @@ var Definitions = map[Permission]Definition{
 }
 
 var AllPermissions = []Permission{
-	PermissionPortalManage,
+	PermissionPortalsManage,
 	PermissionPortalManageRoles,
 	PermissionPortalManageMembers,
 	PermissionPortalManageMemberRoles,
@@ -121,4 +130,11 @@ var AllPermissions = []Permission{
 
 	PermissionFileUpload,
 	PermissionFileDelete,
+}
+
+func PermissionName(permission Permission) string {
+	if def, ok := Definitions[permission]; ok {
+		return def.HumanReadableName
+	}
+	return string(permission)
 }
