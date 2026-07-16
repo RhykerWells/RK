@@ -14,26 +14,3 @@ The backend is responsible for:
 - Providing a stable API for the frontend
 
 The backend does not render HTML pages. Presentation is handled entirely by the frontend application.
-
-# Project Structure
-```
-backend/
-├── cmd/
-│   └── server/          # Application entry point
-├── internal/
-│   ├── api/             # HTTP routing and handlers
-│   ├── auth/            # Authentication
-│   ├── config/          # Configuration loading
-│   ├── database/        # Database connection
-│   ├── discord/         # Discord integration
-│   ├── documents/       # Document services
-│   ├── files/           # File management
-│   ├── permissions/     # Role & permission logic
-│   ├── portals/         # Workspace management
-│   ├── users/           # User management
-│   └── versioning/      # Document revision history
-├── migrations/          # SQL migrations
-├── pkg/                 # Reusable public packages (if needed)
-├── go.mod
-└── README.md
-```
