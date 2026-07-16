@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-func generateSessionToken() (string, error) {
+func GenerateToken() (string, error) {
 	token := make([]byte, sessionTokenLength)
 	_, err := rand.Read(token)
 	if err != nil {
@@ -17,7 +17,7 @@ func generateSessionToken() (string, error) {
 	return hex.EncodeToString(token), nil
 }
 
-func hashSessionToken(token string) string {
+func HashToken(token string) string {
 	sum := sha256.Sum256([]byte(token))
 	return hex.EncodeToString(sum[:])
 }

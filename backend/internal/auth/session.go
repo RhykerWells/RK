@@ -24,14 +24,14 @@ const sessionDuration = 24 * 30 * time.Hour
 const SessionCookieName = "rk_session"
 
 func CreateSession(ctx context.Context, user *models.User) (*models.Session, string, error) {
-	token, err := generateSessionToken()
+	token, err := GenerateToken()
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to generate session token: %w", err)
 	}
 
 	session := &models.Session{
 		UserID:    user.ID,
-		TokenHash: hashSessionToken(token),
+		TokenHash: HashToken(token),
 		ExpiresAt: time.Now().Add(sessionDuration),
 		CreatedAt: time.Now(),
 	}
@@ -48,7 +48,7 @@ func ValidateSessionToken(ctx context.Context, token string) (*models.Session, e
 		return nil, ErrInvalidSessionToken
 	}
 
-	tokenHash := hashSessionToken(token)
+	tokenHash := HashToken(token)
 
 	session, err := models.Sessions(models.SessionWhere.TokenHash.EQ(tokenHash)).One(ctx, boil.GetContextDB())
 	if err != nil {
@@ -68,7 +68,7 @@ func DeleteSession(ctx context.Context, token string) error {
 		return ErrInvalidSessionToken
 	}
 
-	tokenHash := hashSessionToken(token)
+	tokenHash := HashToken(token)
 
 	_, err := models.Sessions(models.SessionWhere.TokenHash.EQ(tokenHash)).DeleteAll(ctx, boil.GetContextDB())
 	if err != nil {
