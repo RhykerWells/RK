@@ -12,6 +12,7 @@ var (
 	EndpointAuthCallback = EndpointAPI + "/callback"
 	EndpointAuthLogout   = EndpointAPI + "/logout"
 	EndpointMe           = EndpointAPI + "/me"
+	EndpointMeAPI        = EndpointMe + "/api"
 
 	// Users
 	EndpointUsers      = EndpointAPI + "/users"

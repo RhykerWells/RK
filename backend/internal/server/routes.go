@@ -23,6 +23,10 @@ func (s *Server) registerRoutes() {
 	s.Multiplexer.HandleFunc(pat.Get(EndpointAuthLogout), handlers.Logout)
 	s.Multiplexer.Handle(pat.Get(EndpointMe), middleware.WithAuthMW(http.HandlerFunc(handlers.Me)))
 
+	// API token generation
+	s.Multiplexer.Handle(pat.Post(EndpointMeAPI), middleware.WithAuthMW(http.HandlerFunc(handlers.IssueAPIToken)))
+	s.Multiplexer.Handle(pat.Delete(EndpointMeAPI), middleware.WithAuthMW(http.HandlerFunc(handlers.RevokeAPIToken)))
+
 	// Users
 	s.Multiplexer.Handle(pat.Get(EndpointUser), middleware.WithAuthMW(http.HandlerFunc(handlers.User)))
 	s.Multiplexer.HandleFunc(pat.Post(EndpointUserCreate), handlers.UserCreate)

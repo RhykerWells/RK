@@ -9,12 +9,14 @@ import (
 
 	"github.com/RhykerWells/RK/backend/internal/config"
 	"github.com/RhykerWells/RK/backend/internal/database/models"
+	"github.com/aarondl/null/v8"
 	"github.com/aarondl/sqlboiler/v4/boil"
 )
 
 var (
 	ErrInvalidSessionToken = errors.New("invalid session token")
 	ErrSessionNotFound     = errors.New("session not found")
+	ErrUserHasAPIToken     = errors.New("user already has an API token")
 )
 
 const sessionTokenLength = 32
@@ -110,4 +112,67 @@ func ClearSessionCookie(w http.ResponseWriter) {
 		MaxAge:   -1,
 	}
 	http.SetCookie(w, cookie)
+}
+
+func CreateAPIToken(ctx context.Context, userID int64, expiresAt *time.Time) (*models.APIToken, string, error) {
+	hasToken, err := UserHasAPIToken(ctx, userID)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to check if user has API token: %w", err)
+	}
+
+	if hasToken {
+		return nil, "", ErrUserHasAPIToken
+	}
+
+	token, err := GenerateToken()
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to generate API token: %w", err)
+	}
+
+	apiToken := &models.APIToken{
+		UserID:    userID,
+		TokenHash: HashToken(token),
+		ExpiresAt: null.TimeFromPtr(expiresAt),
+		CreatedAt: time.Now(),
+	}
+
+	if err := apiToken.Insert(ctx, boil.GetContextDB(), boil.Infer()); err != nil {
+		return nil, "", fmt.Errorf("failed to insert API token: %w", err)
+	}
+
+	return apiToken, token, nil
+}
+
+func ValidateAPIToken(ctx context.Context, token string) (*models.APIToken, error) {
+	if token == "" {
+		return nil, ErrInvalidSessionToken
+	}
+
+	tokenHash := HashToken(token)
+
+	apiToken, err := models.APITokens(models.APITokenWhere.TokenHash.EQ(tokenHash)).One(ctx, boil.GetContextDB())
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if token has expired
+	if apiToken.ExpiresAt.Valid && time.Now().After(apiToken.ExpiresAt.Time) {
+		return nil, ErrSessionNotFound
+	}
+
+	return apiToken, nil
+}
+
+func UserHasAPIToken(ctx context.Context, userID int64) (bool, error) {
+	count, err := models.APITokens(models.APITokenWhere.UserID.EQ(userID)).Count(ctx, boil.GetContextDB())
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+func RevokeToken(ctx context.Context, userID int64) error {
+	_, err := models.APITokens(models.APITokenWhere.UserID.EQ(userID)).DeleteAll(ctx, boil.GetContextDB())
+	return err
 }

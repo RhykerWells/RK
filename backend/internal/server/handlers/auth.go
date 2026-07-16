@@ -2,11 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/RhykerWells/RK/backend/internal/app/users"
 	"github.com/RhykerWells/RK/backend/internal/auth"
 	"github.com/RhykerWells/RK/backend/internal/config"
+	"github.com/RhykerWells/RK/backend/internal/server/middleware"
+	"github.com/RhykerWells/RK/backend/internal/server/response"
 	"github.com/aarondl/null/v8"
 	"github.com/bwmarrin/discordgo"
 	"golang.org/x/oauth2"
@@ -132,4 +135,68 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	// Redirect back to the homepage (or login page).
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func IssueAPIToken(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	session, ok := middleware.SessionFromContext(ctx)
+	if !ok {
+		response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
+	var req struct {
+		ExpiresIn int64 `json:"expires_in,omitempty"` // Optional: seconds until expiration
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		response.ErrorMessage(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	// Create API token
+	_, token, err := auth.CreateAPIToken(ctx, session.UserID, nil)
+	if err != nil {
+		switch {
+		case errors.Is(err, auth.ErrUserHasAPIToken):
+			response.ErrorMessage(w, http.StatusBadRequest, "user already has an API token")
+		default:
+			response.ErrorMessage(w, http.StatusInternalServerError, "failed to create token")
+		}
+		return
+	}
+
+	response.JSON(w, http.StatusCreated, map[string]any{
+		"token": token,
+	})
+}
+
+func RevokeAPIToken(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	session, ok := middleware.SessionFromContext(ctx)
+	if !ok {
+		response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
+	ok, err := auth.UserHasAPIToken(ctx, session.UserID)
+	if err != nil {
+		response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+
+	if !ok {
+		response.ErrorMessage(w, http.StatusNotFound, "user does not have an API token")
+		return
+	}
+
+	// Revoke the token
+	if err := auth.RevokeToken(ctx, session.UserID); err != nil {
+		response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+
+	response.JSON(w, http.StatusNoContent, nil)
 }
