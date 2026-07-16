@@ -43,7 +43,7 @@ func CreateSession(ctx context.Context, user *models.User) (*models.Session, str
 	return session, token, nil
 }
 
-func GetSessionByToken(ctx context.Context, token string) (*models.Session, error) {
+func ValidateSessionToken(ctx context.Context, token string) (*models.Session, error) {
 	if token == "" {
 		return nil, ErrInvalidSessionToken
 	}

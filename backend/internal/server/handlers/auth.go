@@ -35,7 +35,7 @@ func InitDiscordOauth() {
 func Login(w http.ResponseWriter, r *http.Request) {
 	// If the user already has a valid session, send them home.
 	if cookie, err := r.Cookie(auth.SessionCookieName); err == nil {
-		if _, err := auth.GetSessionByToken(r.Context(), cookie.Value); err == nil {
+		if _, err := auth.ValidateSessionToken(r.Context(), cookie.Value); err == nil {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
