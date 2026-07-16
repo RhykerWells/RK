@@ -13,7 +13,6 @@ import (
 // These are only route definitions.
 func (s *Server) registerRoutes() {
 	handlers.InitDiscordOauth()
-
 	// Health
 	s.Multiplexer.HandleFunc(pat.Get(EndpointHealth), handlers.Health)
 
@@ -29,7 +28,7 @@ func (s *Server) registerRoutes() {
 
 	// Users
 	s.Multiplexer.Handle(pat.Get(EndpointUser), middleware.WithAuthMW(http.HandlerFunc(handlers.User)))
-	s.Multiplexer.HandleFunc(pat.Post(EndpointUserCreate), handlers.UserCreate)
+	s.Multiplexer.Handle(pat.Post(EndpointUserCreate), middleware.WithAuthMW(http.HandlerFunc(handlers.UserCreate)))
 	s.Multiplexer.Handle(pat.Delete(EndpointUserDelete), middleware.WithAuthMW(http.HandlerFunc(handlers.UserDelete)))
 
 	// Portals
