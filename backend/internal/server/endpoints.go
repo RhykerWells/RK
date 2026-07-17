@@ -12,13 +12,11 @@ var (
 	EndpointAuthCallback = EndpointAPI + "/callback"
 	EndpointAuthLogout   = EndpointAPI + "/logout"
 
-	// Current user
-	EndpointMe    = EndpointAPI + "/@me"
-	EndpointMeAPI = EndpointMe + "/api"
-
 	// Users
 	EndpointUsers = EndpointAPI + "/users"
 	EndpointUser  = EndpointUsers + "/:user_id"
+	EndpointMe    = EndpointUsers + "/@me"
+	EndpointMeAPI = EndpointMe + "/api"
 
 	// Portals
 	EndpointPortals = EndpointAPI + "/portals"
@@ -29,13 +27,13 @@ var (
 	EndpointPortalRole  = EndpointPortalRoles + "/:role_id"
 
 	// Portal Members
-	EndpointPortalMembers = EndpointPortal + "/members"
-	EndpointPortalMember  = EndpointPortalMembers + "/:user_id"
+	EndpointPortalMembers    = EndpointPortal + "/members"
+	EndpointPortalMember     = EndpointPortalMembers + "/:user_id"
+	EndpointPortalMemberSelf = EndpointPortalMembers + "/@me"
 
 	// Folders
-	EndpointPortalFolders        = EndpointPortal + "/folders"
-	EndpointPortalFolder         = EndpointPortalFolders + "/:folder_id"
-	EndpointPortalFolderContents = EndpointPortalFolder + "/contents"
+	EndpointPortalFolders = EndpointPortal + "/folders"
+	EndpointPortalFolder  = EndpointPortalFolders + "/:folder_id"
 
 	// Documents
 	EndpointFolderDocuments = EndpointPortal + "/documents"
