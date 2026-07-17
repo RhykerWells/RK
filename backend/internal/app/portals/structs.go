@@ -21,6 +21,11 @@ type CreatePortalRequest struct {
 	Domain string `json:"domain"`
 }
 
+type UpdatePortalRequest struct {
+	Name   *string `json:"name,omitempty"`
+	Domain *string `json:"domain,omitempty"`
+}
+
 type PortalResponse struct {
 	ID        int64                `json:"id"`
 	Name      string               `json:"name"`

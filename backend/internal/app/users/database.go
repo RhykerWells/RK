@@ -2,7 +2,6 @@ package users
 
 import (
 	"context"
-	"time"
 
 	"github.com/RhykerWells/RK/backend/internal/database/models"
 	"github.com/aarondl/null/v8"
@@ -35,8 +34,6 @@ func UserCreate(ctx context.Context, user *CreateUserRequest) (*models.User, err
 		Email:           user.Email,
 		AvatarURL:       user.AvatarURL,
 		IsAdministrator: false,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
 	}
 
 	err := newUser.Insert(ctx, boil.GetContextDB(), boil.Infer())

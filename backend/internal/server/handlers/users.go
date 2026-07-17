@@ -63,7 +63,7 @@ func Me(w http.ResponseWriter, r *http.Request) {
 func UserCreate(w http.ResponseWriter, r *http.Request) {
 	var req users.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.Error(w, http.StatusInternalServerError, err)
+		response.Error(w, http.StatusBadRequest, err)
 		return
 	}
 

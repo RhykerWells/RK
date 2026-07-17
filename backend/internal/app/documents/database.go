@@ -2,7 +2,6 @@ package documents
 
 import (
 	"context"
-	"time"
 
 	"github.com/RhykerWells/RK/backend/internal/database/models"
 	. "github.com/RhykerWells/RK/backend/internal/server/errors"
@@ -15,22 +14,30 @@ func GetDocumentByID(ctx context.Context, id int64) (*models.Document, error) {
 	return d, e
 }
 
-func DocumentCreate(ctx context.Context, req *CreateDocumentRequest, userID int64) (*models.Document, error) {
-	newDoc := &models.Document{
-		Title:     req.Title,
-		CreatedBy: userID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+func DocumentCreate(ctx context.Context, req *CreateDocumentRequest, portalModel *models.Portal, userModel *models.User) (*models.Document, error) {
+	if req.Title == "" {
+		return nil, ErrDocumentTitleRequired
 	}
 
 	if req.FolderID.Valid == req.OwnerID.Valid {
 		return nil, ErrNewDocumentInvalidLocation
 	}
 
-	switch {
-	case req.FolderID.Valid:
+	newDoc := &models.Document{
+		PortalID:  portalModel.ID,
+		Title:     req.Title,
+		CreatedBy: userModel.ID,
+	}
+
+	if req.FolderID.Valid {
+		if _, err := portalModel.Folders(models.FolderWhere.ID.EQ(req.FolderID.Int64)).One(ctx, boil.GetContextDB()); err != nil {
+			return nil, ErrInvalidFolderID
+		}
 		newDoc.FolderID = req.FolderID
-	case req.OwnerID.Valid:
+	} else if req.OwnerID.Valid {
+		if req.OwnerID.Int64 != userModel.ID {
+			return nil, ErrCannotCreateDocumentForAnotherUser
+		}
 		newDoc.OwnerID = req.OwnerID
 	}
 
@@ -46,8 +53,8 @@ func DocumentCreate(ctx context.Context, req *CreateDocumentRequest, userID int6
 	return newDoc, nil
 }
 
-func DocumentUpdate(ctx context.Context, document *models.Document, req *UpdateDocumentRequest, userID int64) (*models.Document, error) {
-	updated := *document
+func DocumentUpdate(ctx context.Context, documentModel *models.Document, req *UpdateDocumentRequest, userID int64) (*models.Document, error) {
+	updated := *documentModel
 
 	if req.Title != nil {
 		updated.Title = *req.Title
@@ -58,10 +65,12 @@ func DocumentUpdate(ctx context.Context, document *models.Document, req *UpdateD
 			return nil, ErrUpdateDocumentInvalidFolder
 		}
 
+		if _, err := models.Folders(models.FolderWhere.ID.EQ(req.FolderID.Int64), models.FolderWhere.PortalID.EQ(documentModel.PortalID)).One(ctx, boil.GetContextDB()); err != nil {
+			return nil, ErrUpdateDocumentInvalidFolder
+		}
+
 		updated.FolderID = *req.FolderID
 	}
-
-	updated.UpdatedAt = time.Now()
 
 	_, err := updated.Update(ctx, boil.GetContextDB(), boil.Infer())
 	if err != nil {
@@ -75,8 +84,8 @@ func DocumentUpdate(ctx context.Context, document *models.Document, req *UpdateD
 	return &updated, nil
 }
 
-func DocumentDelete(ctx context.Context, document *models.Document) error {
-	_, err := document.Delete(ctx, boil.GetContextDB())
+func DocumentDelete(ctx context.Context, documentModel *models.Document) error {
+	_, err := documentModel.Delete(ctx, boil.GetContextDB())
 
 	return err
 }

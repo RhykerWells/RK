@@ -40,10 +40,14 @@ func WithAuthMW(next http.Handler) http.Handler {
 		if cookieToken != "" {
 			session, err = auth.ValidateSessionToken(ctx, cookieToken)
 			if err == nil {
-				user, _ := users.GetUserByID(ctx, session.UserID)
-				ctx = context.WithValue(ctx, ContextSessionKey, session)
-				ctx = context.WithValue(ctx, ContextUserKey, user)
-				next.ServeHTTP(w, r.WithContext(ctx))
+				user, err := users.GetUserByID(ctx, session.UserID)
+				if err == nil {
+					ctx = context.WithValue(ctx, ContextSessionKey, session)
+					ctx = context.WithValue(ctx, ContextUserKey, user)
+					next.ServeHTTP(w, r.WithContext(ctx))
+					return
+				}
+				response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
 				return
 			}
 		}
@@ -53,9 +57,13 @@ func WithAuthMW(next http.Handler) http.Handler {
 		if bearerToken != "" {
 			apiToken, err := auth.ValidateAPIToken(ctx, bearerToken)
 			if err == nil {
-				user, _ := users.GetUserByID(ctx, apiToken.UserID)
-				ctx = context.WithValue(ctx, ContextUserKey, user)
-				next.ServeHTTP(w, r.WithContext(ctx))
+				user, err := users.GetUserByID(ctx, apiToken.UserID)
+				if err == nil {
+					ctx = context.WithValue(ctx, ContextUserKey, user)
+					next.ServeHTTP(w, r.WithContext(ctx))
+					return
+				}
+				response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
 				return
 			}
 		}
@@ -84,11 +92,51 @@ func UserFromContext(ctx context.Context) (*models.User, bool) {
 	return user, ok
 }
 
+func WithPortalMembershipMW(h func(http.ResponseWriter, *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		user, ok := UserFromContext(ctx)
+		if !ok {
+			response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
+			return
+		}
+
+		if user.IsAdministrator {
+			h(w, r)
+			return
+		}
+
+		portal, ok := PortalFromContext(ctx)
+		if !ok {
+			response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
+			return
+		}
+
+		if _, err := portals.GetPortalMemberByID(ctx, portal, user.ID); err != nil {
+			switch {
+			case errors.Is(err, sql.ErrNoRows):
+				response.ErrorMessage(w, http.StatusForbidden, "forbidden")
+			default:
+				response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
+			}
+			return
+		}
+
+		h(w, r)
+	})
+}
+
 func WithPermissionsMW(h func(http.ResponseWriter, *http.Request), perms ...permissions.Permission) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		user, _ := UserFromContext(ctx)
+		user, ok := UserFromContext(ctx)
+		if !ok {
+			response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
+			return
+		}
+
 		if user.IsAdministrator {
 			h(w, r)
 			return

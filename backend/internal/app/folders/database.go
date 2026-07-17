@@ -2,7 +2,6 @@ package folders
 
 import (
 	"context"
-	"time"
 
 	"github.com/RhykerWells/RK/backend/internal/database/models"
 	"github.com/aarondl/null/v8"
@@ -15,10 +14,8 @@ func GetPortalFolderByID(ctx context.Context, portalModel *models.Portal, folder
 
 func FolderCreate(ctx context.Context, portalID int64, req *CreateFolderRequest, userID int64) (*models.Folder, error) {
 	newFolder := &models.Folder{
-		PortalID:  portalID,
-		Name:      req.Name,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		PortalID: portalID,
+		Name:     req.Name,
 	}
 
 	if req.ParentFolderID != nil {
@@ -47,8 +44,6 @@ func FolderUpdate(ctx context.Context, folder *models.Folder, req *UpdateFolderR
 	if req.ParentFolderID != nil {
 		updated.ParentFolderID = *req.ParentFolderID
 	}
-
-	updated.UpdatedAt = time.Now()
 
 	_, err := updated.Update(ctx, boil.GetContextDB(), boil.Infer())
 	if err != nil {

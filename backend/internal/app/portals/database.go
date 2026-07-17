@@ -2,9 +2,12 @@ package portals
 
 import (
 	"context"
-	"time"
+	"database/sql"
+	"errors"
 
+	"github.com/RhykerWells/RK/backend/internal/app/users"
 	"github.com/RhykerWells/RK/backend/internal/database/models"
+	. "github.com/RhykerWells/RK/backend/internal/server/errors"
 	"github.com/aarondl/null/v8"
 	"github.com/aarondl/sqlboiler/v4/boil"
 )
@@ -17,10 +20,8 @@ func GetPortalByID(ctx context.Context, id int64) (*models.Portal, error) {
 
 func PortalCreate(ctx context.Context, portal *CreatePortalRequest) (*models.Portal, error) {
 	newPortal := &models.Portal{
-		Name:      portal.Name,
-		Domain:    portal.Domain,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		Name:   portal.Name,
+		Domain: portal.Domain,
 	}
 
 	err := newPortal.Insert(ctx, boil.GetContextDB(), boil.Infer())
@@ -35,8 +36,31 @@ func PortalCreate(ctx context.Context, portal *CreatePortalRequest) (*models.Por
 	return newPortal, nil
 }
 
-func PortalDelete(ctx context.Context, portal *models.Portal) error {
-	_, err := portal.Delete(ctx, boil.GetContextDB())
+func PortalUpdate(ctx context.Context, portalModel *models.Portal, req *UpdatePortalRequest) (*models.Portal, error) {
+	updated := *portalModel
+
+	if req.Name != nil {
+		updated.Name = *req.Name
+	}
+
+	if req.Domain != nil {
+		updated.Domain = *req.Domain
+	}
+
+	_, err := updated.Update(ctx, boil.GetContextDB(), boil.Infer())
+	if err != nil {
+		return nil, err
+	}
+
+	if err = updated.Reload(ctx, boil.GetContextDB()); err != nil {
+		return nil, err
+	}
+
+	return &updated, nil
+}
+
+func PortalDelete(ctx context.Context, portalModel *models.Portal) error {
+	_, err := portalModel.Delete(ctx, boil.GetContextDB())
 
 	return err
 }
@@ -51,8 +75,6 @@ func PortalRoleCreate(ctx context.Context, portalModel *models.Portal, role *Cre
 		Name:          role.Name,
 		Description:   role.Description,
 		DiscordRoleID: role.DiscordRoleID,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
 	}
 
 	err := newRole.Insert(ctx, boil.GetContextDB(), boil.Infer())
@@ -90,8 +112,6 @@ func PortalRoleUpdate(ctx context.Context, roleModel *models.PortalRole, update 
 		role.DiscordRoleID = null.StringFromPtr(update.DiscordRoleID)
 	}
 
-	role.UpdatedAt = time.Now()
-
 	if _, err := role.Update(ctx, boil.GetContextDB(), boil.Infer()); err != nil {
 		return nil, err
 	}
@@ -110,11 +130,24 @@ func GetPortalMemberByID(ctx context.Context, portalModel *models.Portal, userID
 }
 
 func PortalMemberCreate(ctx context.Context, portalModel *models.Portal, userID int64) (*models.PortalMembership, error) {
+	if _, err := users.GetUserByID(ctx, userID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	if _, err := GetPortalMemberByID(ctx, portalModel, userID); err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+	} else {
+		return nil, ErrMemberAlreadyExists
+	}
+
 	newMembership := &models.PortalMembership{
-		PortalID:  portalModel.ID,
-		UserID:    userID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		PortalID: portalModel.ID,
+		UserID:   userID,
 	}
 
 	err := newMembership.Insert(ctx, boil.GetContextDB(), boil.Infer())
@@ -129,8 +162,15 @@ func PortalMemberCreate(ctx context.Context, portalModel *models.Portal, userID 
 	return newMembership, nil
 }
 
-func MemberUpdate(ctx context.Context, memberModel *models.PortalMembership, update *UpdatePortalMemberRequest) (*models.PortalMembership, error) {
+func PortalMemberUpdate(ctx context.Context, memberModel *models.PortalMembership, update *UpdatePortalMemberRequest) (*models.PortalMembership, error) {
 	member := *memberModel
+
+	// Validate the requested roles belong to the membership portal.
+	for _, roleID := range update.Roles {
+		if _, err := GetPortalRoleByID(ctx, &models.Portal{ID: member.PortalID}, roleID); err != nil {
+			return nil, err
+		}
+	}
 
 	// Remove existing roles
 	_, err := models.PortalMembershipRoles(models.PortalMembershipRoleWhere.PortalMembershipID.EQ(member.ID)).DeleteAll(ctx, boil.GetContextDB())
@@ -154,8 +194,6 @@ func MemberUpdate(ctx context.Context, memberModel *models.PortalMembership, upd
 		}
 	}
 
-	// Update membership timestamp
-	member.UpdatedAt = time.Now()
 	if _, err := member.Update(ctx, boil.GetContextDB(), boil.Infer()); err != nil {
 		return nil, err
 	}

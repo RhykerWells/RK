@@ -13,14 +13,14 @@ func registerFolderDocumentRoutes(api *goji.Mux) {
 	portalRequiredMux.Use(middleware.WithPortalMW)
 
 	// Folder Endpoints
-	portalRequiredMux.HandleFunc(pat.Get(EndpointPortalFolders), handlers.Folders)
-	portalRequiredMux.HandleFunc(pat.Get(EndpointPortalFolder), handlers.Folder)
+	portalRequiredMux.Handle(pat.Get(EndpointPortalFolders), middleware.WithPermissionsMW(handlers.Folders, permissions.PermissionFolderView))
+	portalRequiredMux.Handle(pat.Get(EndpointPortalFolder), middleware.WithPermissionsMW(handlers.Folder, permissions.PermissionFolderView))
 	portalRequiredMux.Handle(pat.Post(EndpointPortalFolders), middleware.WithPermissionsMW(handlers.FolderCreate, permissions.PermissionFolderCreate))
 	portalRequiredMux.Handle(pat.Patch(EndpointPortalFolder), middleware.WithPermissionsMW(handlers.FolderUpdate, permissions.PermissionFolderEdit))
 	portalRequiredMux.Handle(pat.Delete(EndpointPortalFolder), middleware.WithPermissionsMW(handlers.FolderDelete, permissions.PermissionFolderDelete))
 
 	// Document Endpoints
-	portalRequiredMux.HandleFunc(pat.Get(EndpointFolderDocument), handlers.Document)
+	portalRequiredMux.Handle(pat.Get(EndpointFolderDocument), middleware.WithPermissionsMW(handlers.Document, permissions.PermissionDocumentView))
 	portalRequiredMux.Handle(pat.Post(EndpointFolderDocuments), middleware.WithPermissionsMW(handlers.DocumentCreate, permissions.PermissionDocumentCreate))
 	portalRequiredMux.Handle(pat.Patch(EndpointFolderDocument), middleware.WithPermissionsMW(handlers.DocumentUpdate, permissions.PermissionDocumentEdit))
 	portalRequiredMux.Handle(pat.Delete(EndpointFolderDocument), middleware.WithPermissionsMW(handlers.DocumentDelete, permissions.PermissionDocumentDelete))

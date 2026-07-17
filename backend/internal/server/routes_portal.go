@@ -1,8 +1,6 @@
 package server
 
 import (
-	"net/http"
-
 	"github.com/RhykerWells/RK/backend/internal/permissions"
 	"github.com/RhykerWells/RK/backend/internal/server/handlers"
 	"github.com/RhykerWells/RK/backend/internal/server/middleware"
@@ -15,15 +13,15 @@ func registerPortalRoutes(api *goji.Mux) {
 	portalRequiredMux.Use(middleware.WithPortalMW)
 
 	// Portal Retrieval Endpoints
-	portalRequiredMux.HandleFunc(pat.Get(EndpointPortal), handlers.Portal)
+	portalRequiredMux.Handle(pat.Get(EndpointPortal), middleware.WithPortalMembershipMW(handlers.Portal))
 
 	// Portal Management Endpoints
 	api.HandleFunc(pat.Post(EndpointPortals), handlers.PortalCreate)
 	portalRequiredMux.Handle(pat.Delete(EndpointPortal), middleware.WithPermissionsMW(handlers.PortalDelete, permissions.PermissionPortalsManage))
 
 	// Portal Role Retrieval Endpoints
-	portalRequiredMux.HandleFunc(pat.Get(EndpointPortalRoles), handlers.PortalRoles)
-	portalRequiredMux.HandleFunc(pat.Get(EndpointPortalRole), handlers.PortalRole)
+	portalRequiredMux.Handle(pat.Get(EndpointPortalRoles), middleware.WithPortalMembershipMW(handlers.PortalRoles))
+	portalRequiredMux.Handle(pat.Get(EndpointPortalRole), middleware.WithPortalMembershipMW(handlers.PortalRole))
 
 	// Portal Role Management Endpoints
 	portalRequiredMux.Handle(pat.Post(EndpointPortalRoles), middleware.WithPermissionsMW(handlers.PortalRoleCreate, permissions.PermissionPortalManageRoles))
@@ -31,17 +29,17 @@ func registerPortalRoutes(api *goji.Mux) {
 	portalRequiredMux.Handle(pat.Delete(EndpointPortalRoles), middleware.WithPermissionsMW(handlers.PortalRoleDelete, permissions.PermissionPortalManageRoles))
 
 	// Portal Member Retrieval Endpoints
-	portalRequiredMux.HandleFunc(pat.Get(EndpointPortalMembers), handlers.PortalMembers)
-	portalRequiredMux.HandleFunc(pat.Get(EndpointPortalMember), handlers.PortalMember)
+	portalRequiredMux.Handle(pat.Get(EndpointPortalMembers), middleware.WithPortalMembershipMW(handlers.PortalMembers))
+	portalRequiredMux.Handle(pat.Get(EndpointPortalMember), middleware.WithPortalMembershipMW(handlers.PortalMember))
+
+	// Portal Member Self-management Endpoint
+	portalRequiredMux.HandleFunc(pat.Post(EndpointPortalMemberSelf), handlers.PortalMemberJoin)
+	portalRequiredMux.HandleFunc(pat.Delete(EndpointPortalMemberSelf), handlers.PortalMemberLeave)
 
 	// Portal Member Management Endpoints
 	portalRequiredMux.Handle(pat.Post(EndpointPortalMember), middleware.WithPermissionsMW(handlers.PortalMemberCreate, permissions.PermissionPortalManageMembers))
 	portalRequiredMux.Handle(pat.Patch(EndpointPortalMember), middleware.WithPermissionsMW(handlers.PortalMemberUpdate, permissions.PermissionPortalManageMembers, permissions.PermissionPortalManageMemberRoles))
 	portalRequiredMux.Handle(pat.Delete(EndpointPortalMember), middleware.WithPermissionsMW(handlers.PortalMemberDelete, permissions.PermissionPortalManageMembers))
-
-	// Portal Member Self-management Endpoint
-	portalRequiredMux.Handle(pat.Post(EndpointPortalMember), http.HandlerFunc(handlers.PortalMemberJoin))
-	portalRequiredMux.Handle(pat.Delete(EndpointPortalMember), http.HandlerFunc(handlers.PortalMemberLeave))
 
 	api.Handle(pat.New("/*"), portalRequiredMux)
 }

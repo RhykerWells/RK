@@ -44,16 +44,6 @@ func getPortalMemberFromPath(ctx context.Context, r *http.Request, portalModel *
 func PortalMembers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
-	user, _ := middleware.UserFromContext(ctx)
-
-	// Check if user is admin or belongs to this portal
-	if !user.IsAdministrator {
-		_, err := portals.GetPortalMemberByID(ctx, portalModel, user.ID)
-		if err != nil {
-			response.ErrorMessage(w, http.StatusForbidden, "forbidden")
-			return
-		}
-	}
 
 	members := portals.PortalMembersFromModel(portalModel)
 
@@ -65,16 +55,6 @@ func PortalMembers(w http.ResponseWriter, r *http.Request) {
 func PortalMember(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
-	user, _ := middleware.UserFromContext(ctx)
-
-	// Check if user is admin or belongs to this portal
-	if !user.IsAdministrator {
-		_, err := portals.GetPortalMemberByID(ctx, portalModel, user.ID)
-		if err != nil {
-			response.ErrorMessage(w, http.StatusForbidden, "forbidden")
-			return
-		}
-	}
 
 	member, err := getPortalMemberFromPath(ctx, r, portalModel, true)
 	if err != nil {
@@ -86,6 +66,7 @@ func PortalMember(w http.ResponseWriter, r *http.Request) {
 		default:
 			response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
 		}
+		return
 	}
 
 	response.JSON(w, http.StatusOK, map[string]any{
@@ -104,9 +85,21 @@ func PortalMemberCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, err := portals.GetPortalMemberByID(ctx, portalModel, userID); err == nil {
+		response.ErrorMessage(w, http.StatusBadRequest, "member already exists")
+		return
+	}
+
 	member, err := portals.PortalMemberCreate(ctx, portalModel, userID)
 	if err != nil {
-		response.Error(w, http.StatusBadRequest, err)
+		switch err {
+		case ErrUserNotFound:
+			response.Error(w, http.StatusNotFound, err)
+		case ErrMemberAlreadyExists:
+			response.Error(w, http.StatusBadRequest, err)
+		default:
+			response.Error(w, http.StatusBadRequest, err)
+		}
 		return
 	}
 
@@ -129,6 +122,7 @@ func PortalMemberUpdate(w http.ResponseWriter, r *http.Request) {
 		default:
 			response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
 		}
+		return
 	}
 
 	var update portals.UpdatePortalMemberRequest
@@ -137,7 +131,7 @@ func PortalMemberUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	member, err = portals.MemberUpdate(ctx, member, &update)
+	member, err = portals.PortalMemberUpdate(ctx, member, &update)
 	if err != nil {
 		response.Error(w, http.StatusInternalServerError, err)
 		return
@@ -152,7 +146,18 @@ func PortalMemberDelete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
 
-	member, _ := getPortalMemberFromPath(ctx, r, portalModel, false)
+	member, err := getPortalMemberFromPath(ctx, r, portalModel, false)
+	if err != nil {
+		switch err {
+		case ErrInvalidUserID:
+			response.Error(w, http.StatusBadRequest, err)
+		case ErrMemberNotFound:
+			response.Error(w, http.StatusNotFound, err)
+		default:
+			response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
+		}
+		return
+	}
 
 	if err := portals.MemberDelete(ctx, member); err != nil {
 		response.Error(w, http.StatusInternalServerError, err)

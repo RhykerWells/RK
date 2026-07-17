@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/RhykerWells/RK/backend/internal/app/documents"
+	serverErrors "github.com/RhykerWells/RK/backend/internal/server/errors"
 	"github.com/RhykerWells/RK/backend/internal/server/middleware"
 	"github.com/RhykerWells/RK/backend/internal/server/response"
 	"goji.io/v3/pat"
@@ -40,6 +41,7 @@ func Document(w http.ResponseWriter, r *http.Request) {
 
 func DocumentCreate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	portalModel, _ := middleware.PortalFromContext(ctx)
 	user, _ := middleware.UserFromContext(ctx)
 
 	var req documents.CreateDocumentRequest
@@ -48,9 +50,14 @@ func DocumentCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	docModel, err := documents.DocumentCreate(ctx, &req, user.ID)
+	docModel, err := documents.DocumentCreate(ctx, &req, portalModel, user)
 	if err != nil {
-		response.Error(w, http.StatusInternalServerError, err)
+		status := http.StatusInternalServerError
+		switch err {
+		case serverErrors.ErrNewDocumentInvalidLocation, serverErrors.ErrInvalidFolderID, serverErrors.ErrUserNotFound, serverErrors.ErrDocumentTitleRequired:
+			status = http.StatusBadRequest
+		}
+		response.Error(w, status, err)
 		return
 	}
 
@@ -61,6 +68,7 @@ func DocumentCreate(w http.ResponseWriter, r *http.Request) {
 
 func DocumentUpdate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	portalModel, _ := middleware.PortalFromContext(ctx)
 	user, _ := middleware.UserFromContext(ctx)
 
 	docIDStr := pat.Param(r, "document_id")
@@ -73,6 +81,11 @@ func DocumentUpdate(w http.ResponseWriter, r *http.Request) {
 	docModel, err := documents.GetDocumentByID(ctx, docID)
 	if err != nil {
 		response.Error(w, http.StatusNotFound, err)
+		return
+	}
+
+	if docModel.PortalID != portalModel.ID {
+		response.ErrorMessage(w, http.StatusForbidden, "forbidden")
 		return
 	}
 
@@ -84,17 +97,23 @@ func DocumentUpdate(w http.ResponseWriter, r *http.Request) {
 
 	updatedDoc, err := documents.DocumentUpdate(ctx, docModel, &req, user.ID)
 	if err != nil {
-		response.Error(w, http.StatusInternalServerError, err)
+		status := http.StatusInternalServerError
+		switch err {
+		case serverErrors.ErrUpdateDocumentInvalidFolder:
+			status = http.StatusBadRequest
+		}
+		response.Error(w, status, err)
 		return
 	}
 
-	response.JSON(w, http.StatusCreated, map[string]any{
+	response.JSON(w, http.StatusOK, map[string]any{
 		"document": documents.PortalDocumentFromModel(updatedDoc),
 	})
 }
 
 func DocumentDelete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	portalModel, _ := middleware.PortalFromContext(ctx)
 
 	docIDStr := pat.Param(r, "document_id")
 	docID, err := strconv.ParseInt(docIDStr, 10, 64)
@@ -106,6 +125,11 @@ func DocumentDelete(w http.ResponseWriter, r *http.Request) {
 	docModel, err := documents.GetDocumentByID(ctx, docID)
 	if err != nil {
 		response.Error(w, http.StatusNotFound, err)
+		return
+	}
+
+	if docModel.PortalID != portalModel.ID {
+		response.ErrorMessage(w, http.StatusForbidden, "forbidden")
 		return
 	}
 

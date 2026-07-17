@@ -19,7 +19,8 @@ var (
 )
 
 var (
-	ErrMemberNotFound = errors.New("member not found")
+	ErrMemberNotFound      = errors.New("member not found")
+	ErrMemberAlreadyExists = errors.New("member already exists")
 )
 
 var (
@@ -31,6 +32,8 @@ var (
 	ErrInvalidDocumentID = errors.New("invalid document ID")
 	ErrDocumentNotFound  = errors.New("document not found")
 
-	ErrNewDocumentInvalidLocation  = errors.New("document requires either a folder or owner")
-	ErrUpdateDocumentInvalidFolder = errors.New("document folder must be valid")
+	ErrNewDocumentInvalidLocation         = errors.New("document requires either a folder or owner")
+	ErrCannotCreateDocumentForAnotherUser = errors.New("cannot create document for another user")
+	ErrUpdateDocumentInvalidFolder        = errors.New("document folder must be valid")
+	ErrDocumentTitleRequired              = errors.New("document title is required")
 )
