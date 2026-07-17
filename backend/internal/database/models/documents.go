@@ -33,6 +33,7 @@ type Document struct {
 	LatestVersionID null.Int64 `boil:"latest_version_id" json:"latest_version_id,omitempty" toml:"latest_version_id" yaml:"latest_version_id,omitempty"`
 	CreatedAt       time.Time  `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt       time.Time  `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	PortalID        int64      `boil:"portal_id" json:"portal_id" toml:"portal_id" yaml:"portal_id"`
 
 	R *documentR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L documentL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -48,6 +49,7 @@ var DocumentColumns = struct {
 	LatestVersionID string
 	CreatedAt       string
 	UpdatedAt       string
+	PortalID        string
 }{
 	ID:              "id",
 	FolderID:        "folder_id",
@@ -58,6 +60,7 @@ var DocumentColumns = struct {
 	LatestVersionID: "latest_version_id",
 	CreatedAt:       "created_at",
 	UpdatedAt:       "updated_at",
+	PortalID:        "portal_id",
 }
 
 var DocumentTableColumns = struct {
@@ -70,6 +73,7 @@ var DocumentTableColumns = struct {
 	LatestVersionID string
 	CreatedAt       string
 	UpdatedAt       string
+	PortalID        string
 }{
 	ID:              "documents.id",
 	FolderID:        "documents.folder_id",
@@ -80,6 +84,7 @@ var DocumentTableColumns = struct {
 	LatestVersionID: "documents.latest_version_id",
 	CreatedAt:       "documents.created_at",
 	UpdatedAt:       "documents.updated_at",
+	PortalID:        "documents.portal_id",
 }
 
 // Generated where
@@ -94,6 +99,7 @@ var DocumentWhere = struct {
 	LatestVersionID whereHelpernull_Int64
 	CreatedAt       whereHelpertime_Time
 	UpdatedAt       whereHelpertime_Time
+	PortalID        whereHelperint64
 }{
 	ID:              whereHelperint64{field: "\"documents\".\"id\""},
 	FolderID:        whereHelpernull_Int64{field: "\"documents\".\"folder_id\""},
@@ -104,6 +110,7 @@ var DocumentWhere = struct {
 	LatestVersionID: whereHelpernull_Int64{field: "\"documents\".\"latest_version_id\""},
 	CreatedAt:       whereHelpertime_Time{field: "\"documents\".\"created_at\""},
 	UpdatedAt:       whereHelpertime_Time{field: "\"documents\".\"updated_at\""},
+	PortalID:        whereHelperint64{field: "\"documents\".\"portal_id\""},
 }
 
 // DocumentRels is where relationship names are stored.
@@ -111,6 +118,7 @@ var DocumentRels = struct {
 	CreatedByUser               string
 	Folder                      string
 	Owner                       string
+	Portal                      string
 	UpdatedByUser               string
 	DocumentFiles               string
 	SourceDocumentDocumentLinks string
@@ -121,6 +129,7 @@ var DocumentRels = struct {
 	CreatedByUser:               "CreatedByUser",
 	Folder:                      "Folder",
 	Owner:                       "Owner",
+	Portal:                      "Portal",
 	UpdatedByUser:               "UpdatedByUser",
 	DocumentFiles:               "DocumentFiles",
 	SourceDocumentDocumentLinks: "SourceDocumentDocumentLinks",
@@ -134,6 +143,7 @@ type documentR struct {
 	CreatedByUser               *User                           `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
 	Folder                      *Folder                         `boil:"Folder" json:"Folder" toml:"Folder" yaml:"Folder"`
 	Owner                       *User                           `boil:"Owner" json:"Owner" toml:"Owner" yaml:"Owner"`
+	Portal                      *Portal                         `boil:"Portal" json:"Portal" toml:"Portal" yaml:"Portal"`
 	UpdatedByUser               *User                           `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
 	DocumentFiles               DocumentFileSlice               `boil:"DocumentFiles" json:"DocumentFiles" toml:"DocumentFiles" yaml:"DocumentFiles"`
 	SourceDocumentDocumentLinks DocumentLinkSlice               `boil:"SourceDocumentDocumentLinks" json:"SourceDocumentDocumentLinks" toml:"SourceDocumentDocumentLinks" yaml:"SourceDocumentDocumentLinks"`
@@ -193,6 +203,22 @@ func (r *documentR) GetOwner() *User {
 	}
 
 	return r.Owner
+}
+
+func (o *Document) GetPortal() *Portal {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetPortal()
+}
+
+func (r *documentR) GetPortal() *Portal {
+	if r == nil {
+		return nil
+	}
+
+	return r.Portal
 }
 
 func (o *Document) GetUpdatedByUser() *User {
@@ -295,8 +321,8 @@ func (r *documentR) GetDocumentVersions() DocumentVersionSlice {
 type documentL struct{}
 
 var (
-	documentAllColumns            = []string{"id", "folder_id", "owner_id", "created_by", "updated_by", "title", "latest_version_id", "created_at", "updated_at"}
-	documentColumnsWithoutDefault = []string{"created_by", "title"}
+	documentAllColumns            = []string{"id", "folder_id", "owner_id", "created_by", "updated_by", "title", "latest_version_id", "created_at", "updated_at", "portal_id"}
+	documentColumnsWithoutDefault = []string{"created_by", "title", "portal_id"}
 	documentColumnsWithDefault    = []string{"id", "folder_id", "owner_id", "updated_by", "latest_version_id", "created_at", "updated_at"}
 	documentPrimaryKeyColumns     = []string{"id"}
 	documentGeneratedColumns      = []string{"id"}
@@ -424,6 +450,17 @@ func (o *Document) Owner(mods ...qm.QueryMod) userQuery {
 	queryMods = append(queryMods, mods...)
 
 	return Users(queryMods...)
+}
+
+// Portal pointed to by the foreign key.
+func (o *Document) Portal(mods ...qm.QueryMod) portalQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.PortalID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return Portals(queryMods...)
 }
 
 // UpdatedByUser pointed to by the foreign key.
@@ -843,6 +880,118 @@ func (documentL) LoadOwner(ctx context.Context, e boil.ContextExecutor, singular
 					foreign.R = &userR{}
 				}
 				foreign.R.OwnerDocuments = append(foreign.R.OwnerDocuments, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadPortal allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (documentL) LoadPortal(ctx context.Context, e boil.ContextExecutor, singular bool, maybeDocument any, mods queries.Applicator) error {
+	var slice []*Document
+	var object *Document
+
+	if singular {
+		var ok bool
+		object, ok = maybeDocument.(*Document)
+		if !ok {
+			object = new(Document)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeDocument)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeDocument))
+			}
+		}
+	} else {
+		s, ok := maybeDocument.(*[]*Document)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeDocument)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeDocument))
+			}
+		}
+	}
+
+	args := make(map[any]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &documentR{}
+		}
+		args[object.PortalID] = struct{}{}
+
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &documentR{}
+			}
+
+			args[obj.PortalID] = struct{}{}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]any, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`portals`),
+		qm.WhereIn(`portals.id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Portal")
+	}
+
+	var resultSlice []*Portal
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Portal")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for portals")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for portals")
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Portal = foreign
+		if foreign.R == nil {
+			foreign.R = &portalR{}
+		}
+		foreign.R.Documents = append(foreign.R.Documents, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.PortalID == foreign.ID {
+				local.R.Portal = foreign
+				if foreign.R == nil {
+					foreign.R = &portalR{}
+				}
+				foreign.R.Documents = append(foreign.R.Documents, local)
 				break
 			}
 		}
@@ -1701,6 +1850,53 @@ func (o *Document) RemoveOwner(ctx context.Context, exec boil.ContextExecutor, r
 		related.R.OwnerDocuments = related.R.OwnerDocuments[:ln-1]
 		break
 	}
+	return nil
+}
+
+// SetPortal of the document to the related item.
+// Sets o.R.Portal to related.
+// Adds o to related.R.Documents.
+func (o *Document) SetPortal(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Portal) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"documents\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"portal_id"}),
+		strmangle.WhereClause("\"", "\"", 2, documentPrimaryKeyColumns),
+	)
+	values := []any{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.PortalID = related.ID
+	if o.R == nil {
+		o.R = &documentR{
+			Portal: related,
+		}
+	} else {
+		o.R.Portal = related
+	}
+
+	if related.R == nil {
+		related.R = &portalR{
+			Documents: DocumentSlice{o},
+		}
+	} else {
+		related.R.Documents = append(related.R.Documents, o)
+	}
+
 	return nil
 }
 

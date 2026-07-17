@@ -60,6 +60,7 @@ func DocumentSchemas() []Schema {
 				CREATE TABLE IF NOT EXISTS documents (
 					id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
+					portal_id BIGINT NOT NULL,
 					folder_id BIGINT,
 					owner_id BIGINT,
 
@@ -72,6 +73,12 @@ func DocumentSchemas() []Schema {
 
 					created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+					CONSTRAINT documents_portal_fk
+						FOREIGN KEY (portal_id)
+						REFERENCES portals(id)
+						ON DELETE CASCADE
+						ON UPDATE CASCADE,
 
 					CONSTRAINT documents_folder_fk
 						FOREIGN KEY (folder_id)

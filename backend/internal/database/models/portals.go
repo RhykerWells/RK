@@ -96,12 +96,14 @@ var PortalWhere = struct {
 var PortalRels = struct {
 	CreatedByUser     string
 	UpdatedByUser     string
+	Documents         string
 	Folders           string
 	PortalMemberships string
 	PortalRoles       string
 }{
 	CreatedByUser:     "CreatedByUser",
 	UpdatedByUser:     "UpdatedByUser",
+	Documents:         "Documents",
 	Folders:           "Folders",
 	PortalMemberships: "PortalMemberships",
 	PortalRoles:       "PortalRoles",
@@ -111,6 +113,7 @@ var PortalRels = struct {
 type portalR struct {
 	CreatedByUser     *User                 `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
 	UpdatedByUser     *User                 `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
+	Documents         DocumentSlice         `boil:"Documents" json:"Documents" toml:"Documents" yaml:"Documents"`
 	Folders           FolderSlice           `boil:"Folders" json:"Folders" toml:"Folders" yaml:"Folders"`
 	PortalMemberships PortalMembershipSlice `boil:"PortalMemberships" json:"PortalMemberships" toml:"PortalMemberships" yaml:"PortalMemberships"`
 	PortalRoles       PortalRoleSlice       `boil:"PortalRoles" json:"PortalRoles" toml:"PortalRoles" yaml:"PortalRoles"`
@@ -151,6 +154,22 @@ func (r *portalR) GetUpdatedByUser() *User {
 	}
 
 	return r.UpdatedByUser
+}
+
+func (o *Portal) GetDocuments() DocumentSlice {
+	if o == nil {
+		return nil
+	}
+
+	return o.R.GetDocuments()
+}
+
+func (r *portalR) GetDocuments() DocumentSlice {
+	if r == nil {
+		return nil
+	}
+
+	return r.Documents
 }
 
 func (o *Portal) GetFolders() FolderSlice {
@@ -323,6 +342,20 @@ func (o *Portal) UpdatedByUser(mods ...qm.QueryMod) userQuery {
 	queryMods = append(queryMods, mods...)
 
 	return Users(queryMods...)
+}
+
+// Documents retrieves all the document's Documents with an executor.
+func (o *Portal) Documents(mods ...qm.QueryMod) documentQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"documents\".\"portal_id\"=?", o.ID),
+	)
+
+	return Documents(queryMods...)
 }
 
 // Folders retrieves all the folder's Folders with an executor.
@@ -587,6 +620,112 @@ func (portalL) LoadUpdatedByUser(ctx context.Context, e boil.ContextExecutor, si
 					foreign.R = &userR{}
 				}
 				foreign.R.UpdatedByPortals = append(foreign.R.UpdatedByPortals, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadDocuments allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (portalL) LoadDocuments(ctx context.Context, e boil.ContextExecutor, singular bool, maybePortal any, mods queries.Applicator) error {
+	var slice []*Portal
+	var object *Portal
+
+	if singular {
+		var ok bool
+		object, ok = maybePortal.(*Portal)
+		if !ok {
+			object = new(Portal)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybePortal)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybePortal))
+			}
+		}
+	} else {
+		s, ok := maybePortal.(*[]*Portal)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybePortal)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybePortal))
+			}
+		}
+	}
+
+	args := make(map[any]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &portalR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &portalR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]any, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`documents`),
+		qm.WhereIn(`documents.portal_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load documents")
+	}
+
+	var resultSlice []*Document
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice documents")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on documents")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for documents")
+	}
+
+	if singular {
+		object.R.Documents = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &documentR{}
+			}
+			foreign.R.Portal = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.PortalID {
+				local.R.Documents = append(local.R.Documents, foreign)
+				if foreign.R == nil {
+					foreign.R = &documentR{}
+				}
+				foreign.R.Portal = local
 				break
 			}
 		}
@@ -1036,6 +1175,59 @@ func (o *Portal) RemoveUpdatedByUser(ctx context.Context, exec boil.ContextExecu
 		}
 		related.R.UpdatedByPortals = related.R.UpdatedByPortals[:ln-1]
 		break
+	}
+	return nil
+}
+
+// AddDocuments adds the given related objects to the existing relationships
+// of the portal, optionally inserting them as new records.
+// Appends related to o.R.Documents.
+// Sets related.R.Portal appropriately.
+func (o *Portal) AddDocuments(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Document) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.PortalID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"documents\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"portal_id"}),
+				strmangle.WhereClause("\"", "\"", 2, documentPrimaryKeyColumns),
+			)
+			values := []any{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.PortalID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &portalR{
+			Documents: related,
+		}
+	} else {
+		o.R.Documents = append(o.R.Documents, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &documentR{
+				Portal: o,
+			}
+		} else {
+			rel.R.Portal = o
+		}
 	}
 	return nil
 }
