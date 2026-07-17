@@ -25,7 +25,7 @@ import (
 // Document is an object representing the database table.
 type Document struct {
 	ID              int64      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	FolderID        int64      `boil:"folder_id" json:"folder_id" toml:"folder_id" yaml:"folder_id"`
+	FolderID        null.Int64 `boil:"folder_id" json:"folder_id,omitempty" toml:"folder_id" yaml:"folder_id,omitempty"`
 	OwnerID         null.Int64 `boil:"owner_id" json:"owner_id,omitempty" toml:"owner_id" yaml:"owner_id,omitempty"`
 	CreatedBy       int64      `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
 	UpdatedBy       null.Int64 `boil:"updated_by" json:"updated_by,omitempty" toml:"updated_by" yaml:"updated_by,omitempty"`
@@ -86,7 +86,7 @@ var DocumentTableColumns = struct {
 
 var DocumentWhere = struct {
 	ID              whereHelperint64
-	FolderID        whereHelperint64
+	FolderID        whereHelpernull_Int64
 	OwnerID         whereHelpernull_Int64
 	CreatedBy       whereHelperint64
 	UpdatedBy       whereHelpernull_Int64
@@ -96,7 +96,7 @@ var DocumentWhere = struct {
 	UpdatedAt       whereHelpertime_Time
 }{
 	ID:              whereHelperint64{field: "\"documents\".\"id\""},
-	FolderID:        whereHelperint64{field: "\"documents\".\"folder_id\""},
+	FolderID:        whereHelpernull_Int64{field: "\"documents\".\"folder_id\""},
 	OwnerID:         whereHelpernull_Int64{field: "\"documents\".\"owner_id\""},
 	CreatedBy:       whereHelperint64{field: "\"documents\".\"created_by\""},
 	UpdatedBy:       whereHelpernull_Int64{field: "\"documents\".\"updated_by\""},
@@ -296,8 +296,8 @@ type documentL struct{}
 
 var (
 	documentAllColumns            = []string{"id", "folder_id", "owner_id", "created_by", "updated_by", "title", "latest_version_id", "created_at", "updated_at"}
-	documentColumnsWithoutDefault = []string{"folder_id", "created_by", "title"}
-	documentColumnsWithDefault    = []string{"id", "owner_id", "updated_by", "latest_version_id", "created_at", "updated_at"}
+	documentColumnsWithoutDefault = []string{"created_by", "title"}
+	documentColumnsWithDefault    = []string{"id", "folder_id", "owner_id", "updated_by", "latest_version_id", "created_at", "updated_at"}
 	documentPrimaryKeyColumns     = []string{"id"}
 	documentGeneratedColumns      = []string{"id"}
 )
@@ -652,7 +652,9 @@ func (documentL) LoadFolder(ctx context.Context, e boil.ContextExecutor, singula
 		if object.R == nil {
 			object.R = &documentR{}
 		}
-		args[object.FolderID] = struct{}{}
+		if !queries.IsNil(object.FolderID) {
+			args[object.FolderID] = struct{}{}
+		}
 
 	} else {
 		for _, obj := range slice {
@@ -660,7 +662,9 @@ func (documentL) LoadFolder(ctx context.Context, e boil.ContextExecutor, singula
 				obj.R = &documentR{}
 			}
 
-			args[obj.FolderID] = struct{}{}
+			if !queries.IsNil(obj.FolderID) {
+				args[obj.FolderID] = struct{}{}
+			}
 
 		}
 	}
@@ -717,7 +721,7 @@ func (documentL) LoadFolder(ctx context.Context, e boil.ContextExecutor, singula
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.FolderID == foreign.ID {
+			if queries.Equal(local.FolderID, foreign.ID) {
 				local.R.Folder = foreign
 				if foreign.R == nil {
 					foreign.R = &folderR{}
@@ -1567,7 +1571,7 @@ func (o *Document) SetFolder(ctx context.Context, exec boil.ContextExecutor, ins
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.FolderID = related.ID
+	queries.Assign(&o.FolderID, related.ID)
 	if o.R == nil {
 		o.R = &documentR{
 			Folder: related,
@@ -1584,6 +1588,39 @@ func (o *Document) SetFolder(ctx context.Context, exec boil.ContextExecutor, ins
 		related.R.Documents = append(related.R.Documents, o)
 	}
 
+	return nil
+}
+
+// RemoveFolder relationship.
+// Sets o.R.Folder to nil.
+// Removes o from all passed in related items' relationships struct.
+func (o *Document) RemoveFolder(ctx context.Context, exec boil.ContextExecutor, related *Folder) error {
+	var err error
+
+	queries.SetScanner(&o.FolderID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("folder_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.Folder = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.Documents {
+		if queries.Equal(o.FolderID, ri.FolderID) {
+			continue
+		}
+
+		ln := len(related.R.Documents)
+		if ln > 1 && i < ln-1 {
+			related.R.Documents[i] = related.R.Documents[ln-1]
+		}
+		related.R.Documents = related.R.Documents[:ln-1]
+		break
+	}
 	return nil
 }
 

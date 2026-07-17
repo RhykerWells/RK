@@ -982,7 +982,7 @@ func (folderL) LoadDocuments(ctx context.Context, e boil.ContextExecutor, singul
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.FolderID {
+			if queries.Equal(local.ID, foreign.FolderID) {
 				local.R.Documents = append(local.R.Documents, foreign)
 				if foreign.R == nil {
 					foreign.R = &documentR{}
@@ -1470,7 +1470,7 @@ func (o *Folder) AddDocuments(ctx context.Context, exec boil.ContextExecutor, in
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.FolderID = o.ID
+			queries.Assign(&rel.FolderID, o.ID)
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
@@ -1491,7 +1491,7 @@ func (o *Folder) AddDocuments(ctx context.Context, exec boil.ContextExecutor, in
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.FolderID = o.ID
+			queries.Assign(&rel.FolderID, o.ID)
 		}
 	}
 
@@ -1512,6 +1512,80 @@ func (o *Folder) AddDocuments(ctx context.Context, exec boil.ContextExecutor, in
 			rel.R.Folder = o
 		}
 	}
+	return nil
+}
+
+// SetDocuments removes all previously related items of the
+// folder replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Folder's Documents accordingly.
+// Replaces o.R.Documents with related.
+// Sets related.R.Folder's Documents accordingly.
+func (o *Folder) SetDocuments(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Document) error {
+	query := "update \"documents\" set \"folder_id\" = null where \"folder_id\" = $1"
+	values := []any{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.Documents {
+			queries.SetScanner(&rel.FolderID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Folder = nil
+		}
+		o.R.Documents = nil
+	}
+
+	return o.AddDocuments(ctx, exec, insert, related...)
+}
+
+// RemoveDocuments relationships from objects passed in.
+// Removes related items from R.Documents (uses pointer comparison, removal does not keep order)
+// Sets related.R.Folder.
+func (o *Folder) RemoveDocuments(ctx context.Context, exec boil.ContextExecutor, related ...*Document) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.FolderID, nil)
+		if rel.R != nil {
+			rel.R.Folder = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("folder_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.Documents {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.Documents)
+			if ln > 1 && i < ln-1 {
+				o.R.Documents[i] = o.R.Documents[ln-1]
+			}
+			o.R.Documents = o.R.Documents[:ln-1]
+			break
+		}
+	}
+
 	return nil
 }
 

@@ -60,9 +60,9 @@ func DocumentSchemas() []Schema {
 				CREATE TABLE IF NOT EXISTS documents (
 					id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
-					folder_id BIGINT NOT NULL,
-
+					folder_id BIGINT,
 					owner_id BIGINT,
+
 					created_by BIGINT NOT NULL,
 					updated_by BIGINT,
 
