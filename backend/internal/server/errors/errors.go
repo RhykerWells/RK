@@ -21,3 +21,16 @@ var (
 var (
 	ErrMemberNotFound = errors.New("member not found")
 )
+
+var (
+	ErrInvalidFolderID = errors.New("invalid folder ID")
+	ErrFolderNotFound  = errors.New("folder not found")
+)
+
+var (
+	ErrInvalidDocumentID = errors.New("invalid document ID")
+	ErrDocumentNotFound  = errors.New("document not found")
+
+	ErrNewDocumentInvalidLocation  = errors.New("document requires either a folder or owner")
+	ErrUpdateDocumentInvalidFolder = errors.New("document folder must be valid")
+)
