@@ -15,7 +15,6 @@ func registerFolderDocumentRoutes(api *goji.Mux) {
 	// Folder Endpoints
 	portalRequiredMux.HandleFunc(pat.Get(EndpointPortalFolders), handlers.Folders)
 	portalRequiredMux.HandleFunc(pat.Get(EndpointPortalFolder), handlers.Folder)
-	portalRequiredMux.HandleFunc(pat.Get(EndpointPortalFolderContents), handlers.FolderContents)
 	portalRequiredMux.Handle(pat.Post(EndpointPortalFolders), middleware.WithPermissionsMW(handlers.FolderCreate, permissions.PermissionFolderCreate))
 	portalRequiredMux.Handle(pat.Patch(EndpointPortalFolder), middleware.WithPermissionsMW(handlers.FolderUpdate, permissions.PermissionFolderEdit))
 	portalRequiredMux.Handle(pat.Delete(EndpointPortalFolder), middleware.WithPermissionsMW(handlers.FolderDelete, permissions.PermissionFolderDelete))

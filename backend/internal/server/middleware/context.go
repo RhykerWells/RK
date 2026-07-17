@@ -6,4 +6,6 @@ const (
 	ContextPortalKey ServerCtxKey = iota
 	ContextSessionKey
 	ContextUserKey
+	ContextFolderKey
+	ContextDocumentKey
 )

@@ -28,6 +28,20 @@ func PortalRolesFromModel(model *models.Portal) []PortalRoleResponse {
 	return roles
 }
 
+func PortalRoleFromModel(model *models.PortalRole) PortalRoleResponse {
+	return PortalRoleResponse{
+		ID:            model.ID,
+		Name:          model.Name,
+		Description:   model.Description,
+		Colour:        model.Colour,
+		Position:      model.Position,
+		DiscordRoleID: model.DiscordRoleID,
+		Permissions:   PortalRolePermissionsFromModel(model),
+		CreatedAt:     model.CreatedAt,
+		UpdatedAt:     model.UpdatedAt,
+	}
+}
+
 func PortalRolePermissionsFromModel(model *models.PortalRole) []string {
 	permissionSet := make(map[string]struct{})
 	for _, rolePermission := range model.GetPortalRolePermissions() {
@@ -43,25 +57,10 @@ func PortalRolePermissionsFromModel(model *models.PortalRole) []string {
 	return permissions
 }
 
-func PortalRoleFromModel(model *models.PortalRole) PortalRoleResponse {
-	return PortalRoleResponse{
-		ID:            model.ID,
-		Name:          model.Name,
-		Description:   model.Description,
-		Colour:        model.Colour,
-		Position:      model.Position,
-		DiscordRoleID: model.DiscordRoleID,
-		Permissions:   PortalRolePermissionsFromModel(model),
-		CreatedAt:     model.CreatedAt,
-		UpdatedAt:     model.UpdatedAt,
-	}
-}
-
 func PortalMembersFromModel(model *models.Portal) []PortalMemberResponse {
 	members := make([]PortalMemberResponse, 0, len(model.GetPortalMemberships()))
 
 	for _, member := range model.GetPortalMemberships() {
-
 		members = append(members, PortalMemberFromModel(member))
 	}
 
