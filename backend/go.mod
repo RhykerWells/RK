@@ -13,6 +13,7 @@ require (
 require (
 	github.com/aarondl/randomize v0.0.2 // indirect
 	github.com/ericlagergren/decimal v0.0.0-20190420051523-6335edbaa640 // indirect
+	github.com/go-chi/chi/v5 v5.3.1 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
