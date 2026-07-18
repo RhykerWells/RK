@@ -1,30 +1,26 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/RhykerWells/RK/backend/internal/server/handlers"
-	"github.com/RhykerWells/RK/backend/internal/server/middleware"
-	"goji.io/v3"
-	"goji.io/v3/pat"
+	"github.com/RhykerWells/RK/backend/internal/server/response"
 )
 
 func (s *Server) registerRoutes() {
 	handlers.InitDiscordOauth()
 
-	api := goji.SubMux()
+	s.Router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		response.JSON(w, http.StatusOK, map[string]string{
+			"status": "ok",
+		})
+	})
 
-	api.HandleFunc(pat.Get(EndpointHealth), handlers.Health)
+	s.Router.Get("/login", handlers.Login)
+	s.Router.Get("/callback", handlers.Callback)
+	s.Router.Get("/logout", handlers.Logout)
 
-	registerAuthRoutes(api)
+	s.registerUserRoutes()
 
-	authRequiredMux := goji.SubMux()
-	authRequiredMux.Use(middleware.WithAuthMW)
-
-	registerUserRoutes(authRequiredMux)
-
-	registerPortalRoutes(authRequiredMux)
-	registerFolderDocumentRoutes(authRequiredMux)
-
-	api.Handle(pat.New("/*"), authRequiredMux)
-
-	s.Multiplexer.Handle(pat.New(EndpointAPI+"/*"), api)
+	s.registerPortalRoutes()
 }

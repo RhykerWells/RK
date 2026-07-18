@@ -13,18 +13,18 @@ import (
 	"github.com/RhykerWells/RK/backend/internal/config"
 	"github.com/RhykerWells/RK/backend/internal/logger"
 	"github.com/RhykerWells/RK/backend/internal/server/handlers"
-	"goji.io/v3"
+	"github.com/go-chi/chi/v5"
 )
 
 type Server struct {
-	Multiplexer *goji.Mux
-	Logger      *slog.Logger
+	Router chi.Router
+	Logger *slog.Logger
 }
 
 func NewServer() *Server {
 	s := &Server{
-		Multiplexer: goji.NewMux(),
-		Logger:      logger.With("m", "server"),
+		Router: chi.NewRouter(),
+		Logger: logger.With("m", "server"),
 	}
 
 	handlers.SetLogger(s.Logger)
@@ -41,7 +41,7 @@ func (s *Server) Start() error {
 
 	httpServer := &http.Server{
 		Addr:    address,
-		Handler: s.Multiplexer,
+		Handler: s.Router,
 	}
 
 	errs := make(chan error, 1)
