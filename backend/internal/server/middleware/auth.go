@@ -16,7 +16,7 @@ import (
 )
 
 // WithAuthMW validates requests using either a session cookie, or an API token.
-// If a valid session/token is found, the session is stored on the request context.
+// If a valid session/token is found, the user and session (where applicable) is stored on the request context.
 func WithAuthMW(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -40,10 +40,10 @@ func WithAuthMW(next http.Handler) http.Handler {
 		if cookieToken != "" {
 			session, err = auth.ValidateSessionToken(ctx, cookieToken)
 			if err == nil {
-				user, err := users.GetUserByID(ctx, session.UserID)
+				userModel, err := users.GetUserByID(ctx, session.UserID)
 				if err == nil {
 					ctx = context.WithValue(ctx, ContextSessionKey, session)
-					ctx = context.WithValue(ctx, ContextUserKey, user)
+					ctx = context.WithValue(ctx, ContextUserKey, userModel)
 					next.ServeHTTP(w, r.WithContext(ctx))
 					return
 				}
@@ -57,9 +57,9 @@ func WithAuthMW(next http.Handler) http.Handler {
 		if bearerToken != "" {
 			apiToken, err := auth.ValidateAPIToken(ctx, bearerToken)
 			if err == nil {
-				user, err := users.GetUserByID(ctx, apiToken.UserID)
+				userModel, err := users.GetUserByID(ctx, apiToken.UserID)
 				if err == nil {
-					ctx = context.WithValue(ctx, ContextUserKey, user)
+					ctx = context.WithValue(ctx, ContextUserKey, userModel)
 					next.ServeHTTP(w, r.WithContext(ctx))
 					return
 				}
@@ -78,8 +78,8 @@ func SessionFromContext(ctx context.Context) (*models.Session, bool) {
 		return nil, false
 	}
 
-	session, ok := v.(*models.Session)
-	return session, ok
+	sessionModel, ok := v.(*models.Session)
+	return sessionModel, ok
 }
 
 func UserFromContext(ctx context.Context) (*models.User, bool) {
@@ -88,32 +88,56 @@ func UserFromContext(ctx context.Context) (*models.User, bool) {
 		return nil, false
 	}
 
-	user, ok := v.(*models.User)
-	return user, ok
+	userModel, ok := v.(*models.User)
+	return userModel, ok
 }
 
-func WithPortalMembershipMW(h func(http.ResponseWriter, *http.Request)) http.Handler {
+// RequireAdminMW checks if the current user is a site administrator and prevents access to the next handler if they are not.
+func RequireAdminMW(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		user, ok := UserFromContext(ctx)
+		userModel, ok := UserFromContext(ctx)
 		if !ok {
 			response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
 			return
 		}
 
-		if user.IsAdministrator {
-			h(w, r)
+		if !userModel.IsAdministrator {
+			response.ErrorMessage(w, http.StatusForbidden, "forbidden")
 			return
 		}
 
-		portal, ok := PortalFromContext(ctx)
+		next.ServeHTTP(w, r)
+	})
+}
+
+// WithPortalMembershipMW checks if the current user is a member of the portal and prevents access to the next handler if they are not.
+// If the user is an administrator, they are allowed access regardless of membership.
+// If a valid membership (excluding administration) is found, it is stored on the request context.
+func WithPortalMembershipMW(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		userModel, ok := UserFromContext(ctx)
+		if !ok {
+			response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
+			return
+		}
+
+		if userModel.IsAdministrator {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		portalModel, ok := PortalFromContext(ctx)
 		if !ok {
 			response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
 			return
 		}
 
-		if _, err := portals.GetPortalMemberByID(ctx, portal, user.ID); err != nil {
+		memberModel, err := portals.GetPortalMemberByID(ctx, portalModel, userModel.ID)
+		if err != nil {
 			switch {
 			case errors.Is(err, sql.ErrNoRows):
 				response.ErrorMessage(w, http.StatusForbidden, "forbidden")
@@ -123,44 +147,49 @@ func WithPortalMembershipMW(h func(http.ResponseWriter, *http.Request)) http.Han
 			return
 		}
 
-		h(w, r)
+		ctx = context.WithValue(ctx, ContextMemberKey, memberModel)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-func WithPermissionsMW(h func(http.ResponseWriter, *http.Request), perms ...permissions.Permission) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
+func PortalMemberFromContext(ctx context.Context) (*models.PortalMembership, bool) {
+	v := ctx.Value(ContextMemberKey)
+	if v == nil {
+		return nil, false
+	}
 
-		user, ok := UserFromContext(ctx)
-		if !ok {
-			response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
-			return
-		}
+	memberModel, ok := v.(*models.PortalMembership)
+	return memberModel, ok
+}
 
-		if user.IsAdministrator {
-			h(w, r)
-			return
-		}
+func WithPermissionsMW(perms ...permissions.Permission) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
 
-		portal, ok := PortalFromContext(ctx)
-		if ok {
-			memberModel, err := portals.GetPortalMemberByID(ctx, portal, user.ID)
-			if err != nil {
-				switch {
-				case errors.Is(err, sql.ErrNoRows):
-					response.ErrorMessage(w, http.StatusForbidden, "forbidden")
-				default:
-					response.ErrorMessage(w, http.StatusInternalServerError, "internal server error")
-				}
+			userModel, ok := UserFromContext(ctx)
+			if !ok {
+				response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
 				return
 			}
 
-			if hasRequiredPermission(portals.PortalMemberFromModel(memberModel).Roles, perms) {
-				h(w, r)
+			if userModel.IsAdministrator {
+				next.ServeHTTP(w, r)
 				return
 			}
-		}
 
-		response.ErrorMessage(w, http.StatusForbidden, "forbidden")
-	})
+			memberModel, ok := PortalMemberFromContext(ctx)
+			if !ok {
+				response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
+				return
+			}
+
+			if !hasRequiredPermission(portals.PortalMemberFromModel(memberModel).Roles, perms) {
+				response.ErrorMessage(w, http.StatusForbidden, "forbidden")
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
 }

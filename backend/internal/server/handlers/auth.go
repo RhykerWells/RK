@@ -105,7 +105,7 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 			AvatarURL:   null.StringFrom(dgoUser.AvatarURL("1024")),
 		}
 
-		user, err = users.UserCreate(ctx, req)
+		user, err = users.UserCreate(ctx, req, users.AuthTypeDiscord)
 		if err != nil {
 			http.Redirect(w, r, "/?error=failed_creating_user", http.StatusSeeOther)
 			return

@@ -3,9 +3,10 @@ package middleware
 type ServerCtxKey int
 
 const (
-	ContextPortalKey ServerCtxKey = iota
-	ContextSessionKey
+	ContextSessionKey ServerCtxKey = iota
 	ContextUserKey
+	ContextPortalKey
+	ContextMemberKey
 	ContextFolderKey
 	ContextDocumentKey
 )
