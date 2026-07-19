@@ -10,7 +10,13 @@ func (s *Server) registerUserRoutes() {
 	s.Router.Route("/users", func(r chi.Router) {
 		r.Use(middleware.WithAuthMW)
 
-		r.Get("/{user_id}", handlers.User)
+		r.Get("/", handlers.Users)
+
+		r.Route("/{user_id}", func(r chi.Router) {
+			r.Get("/", handlers.User)
+
+			r.With(middleware.RequireAdminMW).Delete("/", handlers.UserDelete)
+		})
 		r.Route("/@me", func(r chi.Router) {
 			r.Get("/", handlers.Me)
 

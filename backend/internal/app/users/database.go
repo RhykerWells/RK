@@ -15,6 +15,12 @@ const (
 	AuthTypeLocal   Authtype = "local"
 )
 
+func GetUsers(ctx context.Context) ([]*models.User, error) {
+	users, err := models.Users().All(ctx, boil.GetContextDB())
+
+	return users, err
+}
+
 func GetUserByID(ctx context.Context, id int64) (*models.User, error) {
 	u, e := models.FindUser(ctx, boil.GetContextDB(), id)
 
@@ -25,9 +31,9 @@ func GetUserByDiscordID(ctx context.Context, discordID string) (*models.User, er
 	return models.Users(models.UserWhere.DiscordID.EQ(null.StringFrom(discordID))).One(ctx, boil.GetContextDB())
 }
 
-func UserCreate(ctx context.Context, user *CreateUserRequest) (*models.User, error) {
+func UserCreate(ctx context.Context, user *CreateUserRequest, authType Authtype) (*models.User, error) {
 	newUser := &models.User{
-		AuthType:        string(AuthTypeDiscord),
+		AuthType:        string(authType),
 		DiscordID:       user.DiscordID,
 		Username:        user.Username,
 		DisplayName:     user.DisplayName,

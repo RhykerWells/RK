@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -10,14 +9,28 @@ import (
 	. "github.com/RhykerWells/RK/backend/internal/server/errors"
 	"github.com/RhykerWells/RK/backend/internal/server/middleware"
 	"github.com/RhykerWells/RK/backend/internal/server/response"
+	"github.com/go-chi/chi/v5"
 	"goji.io/v3/pat"
 )
 
-func User(w http.ResponseWriter, r *http.Request) {
-	userID := pat.Param(r, "user_id")
-
+func Users(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	usersModel, err := users.GetUsers(ctx)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.JSON(w, http.StatusOK, map[string]any{
+		"users": users.UsersModelToResponse(usersModel),
+	})
+}
+
+func User(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	userID := chi.URLParam(r, "user_id")
 	user, err := getUser(ctx, r.URL.Query().Get("type"), userID)
 	if err != nil {
 		switch {
@@ -31,70 +44,25 @@ func User(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	returnedUser := users.UserModelToResponse(user)
-
 	response.JSON(w, http.StatusOK, map[string]any{
-		"user": returnedUser,
+		"user": users.UserModelToResponse(user),
 	})
 }
 
 func Me(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	user, ok := middleware.UserFromContext(ctx)
-	if !ok {
-		response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
-		return
-	}
-
-	user, err := users.GetUserByID(ctx, user.ID)
-	if err != nil {
-		response.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	returnedUser := users.UserModelToResponse(user)
+	user, _ := middleware.UserFromContext(ctx)
 
 	response.JSON(w, http.StatusOK, map[string]any{
-		"user": returnedUser,
-	})
-}
-
-func UserCreate(w http.ResponseWriter, r *http.Request) {
-	var req users.CreateUserRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	user, err := users.UserCreate(r.Context(), &req)
-	if err != nil {
-		response.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	returnedUser := users.UserModelToResponse(user)
-
-	response.JSON(w, http.StatusCreated, map[string]any{
-		"user": returnedUser,
+		"user": users.UserModelToResponse(user),
 	})
 }
 
 func UserDelete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	currentUser, ok := middleware.UserFromContext(ctx)
-	if !ok {
-		response.ErrorMessage(w, http.StatusUnauthorized, "unauthorized")
-		return
-	}
 
-	// Only administrators can delete users
-	if !currentUser.IsAdministrator {
-		response.ErrorMessage(w, http.StatusForbidden, "forbidden")
-		return
-	}
 	userID := pat.Param(r, "user_id")
-
 	user, err := getUser(ctx, r.URL.Query().Get("type"), userID)
 	if err != nil {
 		switch {
