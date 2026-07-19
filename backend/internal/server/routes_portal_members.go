@@ -29,6 +29,7 @@ func registerPortalMemberRoutes(r chi.Router) {
 
 			r.Group(func(r chi.Router) {
 				r.Use(middleware.WithPermissionsMW(permissions.PermissionPortalManageMembers))
+
 				r.Put("/", handlers.PortalMemberAdd)
 				r.Delete("/", handlers.PortalMemberRemove)
 			})

@@ -74,7 +74,7 @@ func PortalMember(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func PortalMemberCreate(w http.ResponseWriter, r *http.Request) {
+func PortalMemberAdd(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
 
@@ -142,7 +142,7 @@ func PortalMemberUpdate(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func PortalMemberDelete(w http.ResponseWriter, r *http.Request) {
+func PortalMemberRemove(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	portalModel, _ := middleware.PortalFromContext(ctx)
 
