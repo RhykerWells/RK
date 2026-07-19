@@ -10,6 +10,7 @@ import (
 func registerPortalRoleRoutes(r chi.Router) {
 	r.Route("/roles", func(r chi.Router) {
 		r.Use(middleware.WithPortalMembershipMW)
+
 		r.Get("/", handlers.PortalRoles)
 
 		r.With(middleware.WithPermissionsMW(permissions.PermissionPortalManageRoles)).Post("/", handlers.PortalRoleCreate)
