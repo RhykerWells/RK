@@ -10,6 +10,8 @@ func (s *Server) registerPortalRoutes() {
 	s.Router.Route("/portals", func(r chi.Router) {
 		r.Use(middleware.WithAuthMW)
 
+		r.Get("/", handlers.Portals)
+
 		r.With(middleware.RequireAdminMW).Post("/", handlers.PortalCreate)
 
 		r.Route("/{portal_id}", func(r chi.Router) {
@@ -17,7 +19,13 @@ func (s *Server) registerPortalRoutes() {
 
 			r.Get("/", handlers.Portal)
 
-			r.With(middleware.RequireAdminMW).Delete("/", handlers.PortalDelete)
+			r.Group(func(r chi.Router) {
+				r.Use(middleware.RequireAdminMW)
+
+				r.Put("/", handlers.PortalUpdate)
+
+				r.Delete("/", handlers.PortalDelete)
+			})
 
 			registerPortalRoleRoutes(r)
 			registerPortalFolderRoutes(r)

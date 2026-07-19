@@ -12,6 +12,12 @@ import (
 	"github.com/aarondl/sqlboiler/v4/boil"
 )
 
+func GetPortals(ctx context.Context) ([]*models.Portal, error) {
+	portals, err := models.Portals().All(ctx, boil.GetContextDB())
+
+	return portals, err
+}
+
 func GetPortalByID(ctx context.Context, id int64) (*models.Portal, error) {
 	p, e := models.FindPortal(ctx, boil.GetContextDB(), id)
 

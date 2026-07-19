@@ -7,6 +7,16 @@ import (
 	"github.com/RhykerWells/RK/backend/internal/database/models"
 )
 
+func PortalsModelToResponse(models []*models.Portal) []PortalResponse {
+	responses := make([]PortalResponse, 0, len(models))
+
+	for _, model := range models {
+		responses = append(responses, PortalModelToResponse(model))
+	}
+
+	return responses
+}
+
 func PortalModelToResponse(model *models.Portal) PortalResponse {
 	return PortalResponse{
 		ID:        model.ID,
